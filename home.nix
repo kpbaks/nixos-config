@@ -52,6 +52,9 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    wofi
+    rofi-wayland
+    pavucontrol # audio sink gui
     overskride # bluetooth gui
     wf-recorder # wayland screen recorder
     wl-screenrec # wayland screen recorder
@@ -807,7 +810,7 @@ in rec {
       # exec-once = wl-paste --type text --watch cliphist store #Stores only text data
       # exec-once = wl-paste --type image --watch cliphist store #Stores only image data
       exec-once = swww init
-      exec-once = krunner --daemon
+      # exec-once = krunner --daemon
       exec-once = swaync
 
       exec-once = hypridle
@@ -818,8 +821,12 @@ in rec {
       exec-once = wluma &
       exec-once = ianny &
 
-      windowrule=animation slide left,kitty
-      windowrule=animation popin,dolphin
+      windowrule = animation slide left,kitty
+      windowrule = animation popin,dolphin
+      windowrule = noblur,^(firefox)$ # disables blur for firefox
+
+      windowrulev2 = bordercolor rgb(FF0000) rgb(880808),fullscreen:1 # set bordercolor to red if window is fullscreen
+      windowrulev2 = bordercolor rgb(FFFF00),title:^(.*Hyprland.*)$ # set bordercolor to yellow when title contains Hyprland
 
       monitor=DP-1,2560x1600@60,0x0,1
       # monitor=DP-1,2560x1600@60,0x0,1,vrr,1
@@ -831,8 +838,26 @@ in rec {
     '';
     settings = {
       "$super" = "SUPER";
+
+      bindl = let
+        name = "19b7b30";
+      in [
+        # https://wiki.hyprland.org/Configuring/Binds/#switches
+        "switch:, ${name}, exec, hyprlock"
+      ];
+      # mouse bindings
+      bindm = [
+        "ALT,mouse:272,movewindow"
+      ];
+      # key bindings
       bind =
         [
+          ", f11, fullscreen, 2"
+
+          # "focusmonitor"
+          # "movecurrentworkspacetomonitor"
+          # "swapactiveworkspaces"
+          "SUPER, c, movetoworkspace, special"
           "SUPER, q, killactive"
           "SUPER, a, exec, anki"
           "SUPER, f, exec, firefox"
@@ -849,7 +874,11 @@ in rec {
           "SUPER, e, exec, dolphin"
           "SUPER, p, exec, okular # pdf"
           "SUPER, z, exec, zotero"
-          "ALT, space, exec, krunner"
+          # "ALT, space, exec, krunner"
+          "ALT, space, exec, wofi --show drun"
+
+          "SUPER, mouse_down, workspace, e-1"
+          "SUPER, mouse_up, workspace, e+1"
 
           "SUPERSHIFT, f, togglefloating"
           ", xf86audioplay, exec, playerctl play-pause "
