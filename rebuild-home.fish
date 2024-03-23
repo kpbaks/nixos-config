@@ -61,6 +61,11 @@ if set --query _flag_dry_run
     exit 0
 end
 
-eval $expr
+if eval $expr
+    set -l generation (home-manager generations | head -1 | string match --groups-only --regex 'id (\d+)')
+    git add ./home.nix
+    and git commit --message "feat(home): derived generation $generation"
+    and git log -1 HEAD
+end
 
 # home-manager switch $hm_switch_opts --file ./home.nix
