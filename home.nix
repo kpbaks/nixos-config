@@ -826,8 +826,8 @@ in rec {
       windowrule = animation popin,dolphin
       windowrule = noblur,^(firefox)$ # disables blur for firefox
 
-      windowrulev2 = bordercolor rgb(00FF00), spotify
-      windowrulev2 = bordercolor rgb(0000FF), telegram
+      windowrulev2 = bordercolor rgb(00FF00), class:spotify
+      windowrulev2 = bordercolor rgb(0000FF), class:telegram
       windowrulev2 = bordercolor rgb(FF00FF) rgb(880808),fullscreen:1 # set bordercolor to red if window is fullscreen
       windowrulev2 = bordercolor rgb(FFFF00),title:^(.*Hyprland.*)$ # set bordercolor to yellow when title contains Hyprland
       windowrulev2 = bordercolor rgb(FF0000),title:^(.*YouTube.*)$ # set bordercolor to red when title contains YouTube
