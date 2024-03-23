@@ -52,6 +52,7 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    overskride # bluetooth gui
     wf-recorder # wayland screen recorder
     wl-screenrec # wayland screen recorder
     ianny
