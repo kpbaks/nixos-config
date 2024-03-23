@@ -831,6 +831,7 @@ in rec {
       windowrulev2 = bordercolor rgb(FF00FF) rgb(880808),fullscreen:1 # set bordercolor to red if window is fullscreen
       windowrulev2 = bordercolor rgb(FFFF00),title:^(.*Hyprland.*)$ # set bordercolor to yellow when title contains Hyprland
       windowrulev2 = bordercolor rgb(FF0000),title:^(.*YouTube.*)$ # set bordercolor to red when title contains YouTube
+      windowrulev2 = bordercolor rgb(E53E00),title:^(.*Reddit.*)$
 
       monitor=DP-1,2560x1600@60,0x0,1
       # monitor=DP-1,2560x1600@60,0x0,1,vrr,1
