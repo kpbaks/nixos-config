@@ -54,26 +54,26 @@ in rec {
   home.packages = with pkgs; [
     ianny
     wluma
-    wlsunset
-    poppler_utils
-    webcord
-    hyprshot
-    grim
-    slurp
-    udiskie
+    wlsunset # set screen gamma (aka. night light) based on time of day
+    poppler_utils # pdf utilities
+    webcord # fork of discord, with newer electron version, to support screen sharing
+    hyprshot # screenshot tool designed to integrate with hyprland
+    grim # wayland screenshot tool
+    slurp # wayland tool to make a screen selection
+    udiskie # daemon used to automatically mount external drives like USBs
     # flameshot
-    brightnessctl
-    thunderbird
+    brightnessctl # control screen brightness
+    thunderbird # email client
     discord
-    telegram-desktop
-    spotify
-    zotero
-    copyq
-    libnotify
+    telegram-desktop # messaging client
+    spotify # music player
+    zotero # citation/bibliography manager
+    copyq # clipboard manager
+    libnotify # for `notify-send`
     hyprlock # wayland screen lock
     hypridle # hyprlands idle daemon
     hyprpicker # wlroots-compatible wayland color picker
-    pamixer
+    pamixer # control audio levels
     playerctl # media player controller
     timg # terminal image viewer
     swww # wayland wallpaper setter
@@ -386,7 +386,6 @@ in rec {
   };
 
   programs.git-cliff.enable = true;
-
   programs.gitui.enable = true;
 
   # programs.gpg.enable = true;
@@ -394,6 +393,9 @@ in rec {
   # TODO: convert
   programs.helix = {
     enable = true;
+    # package = pkgs.helix;
+    # https://discourse.nixos.org/t/home-manager-helix-editor-install-helix-using-flake/40503/6
+    package = (builtins.getFlake "github:helix-editor/helix").packages.${pkgs.system}.default;
     defaultEditor = true;
     extraPackages = with pkgs; [
       marksman
@@ -1019,15 +1021,20 @@ in rec {
       mainbar = {
         layer = "top";
         position = "top";
-        spacing = 8; # px
+        spacing = 4; # px
+        height = 35;
+        margin-top = 5;
+        margin-bottom = 10;
         modules-left = [
           "hyprland/workspaces"
           "tray"
         ];
         modules-center = [
           "hyprland/window"
+          "pulseaudio"
         ];
         modules-right = [
+          "keyboard-state"
           "battery"
           "clock"
           "network"
@@ -1039,16 +1046,50 @@ in rec {
         "hyprland/workspaces" = {
           # format = "{icon}";
         };
+        pulseaudio = {
+          format = "{volume}% {icon}";
+          format-bluetooth = "{volume}% {icon}";
+          format-bluetooth-muted = "{icon} {format_source}";
+          format-muted = "{format_source}";
+          format-source = "";
+          format-source-muted = "";
+          format-icons = {
+            headphone = "";
+            hands-free = "";
+            headset = "";
+            phone = "";
+            portable = "";
+            car = "";
+            default = ["" "" ""];
+          };
+          on-click = "pavucontrol";
+        };
+        keyboard-state = {
+          numlock = true;
+          capslock = true;
+          format = " {name} {icon}";
+          format-icons = {
+            locked = "";
+            unlocked = "";
+          };
+        };
         battery = {
           format = "{capacity}% {icon}";
           format-icons = ["" "" "" "" ""];
+        };
+        cpu = {
+          format = "{usage}% ";
+          tooltip = false;
+        };
+        memory = {
+          format = "{}% ";
         };
         clock = {
           format-alt = "{:%a, %d. %b  %H:%M}";
         };
         tray = {
           icon-size = 20;
-          spacing = 8;
+          spacing = 10;
         };
       };
     };
@@ -1072,44 +1113,25 @@ in rec {
       #workspaces {
         background-color: inherit;
         color: #ffffff;
-
       }
 
       #workspaces button:hover {
         background: inherit;
       }
 
-      #memory {
-        color: #ffb86c;
-        padding: ${padding};
-      }
-
-      #cpu {
-        color: #ffffff;
-        background-color: #8be9fd;
-        border-radius: 4px;
-        padding: ${padding};
-      }
-
-      #clock {
-        padding: ${padding};
-      }
-
-      #temperature {
-        padding: ${padding};
-      }
-
-      #battery {
-        padding: ${padding};
-      }
-
-      #disk {
-
-        padding: ${padding};
-      }
-
-      #network {
-        padding: ${padding};
+      #clock,
+      #battery,
+      #cpu,
+      #memory,
+      #disk,
+      #temperature,
+      #backlight,
+      #network,
+      #pulseaudio,
+      #tray,
+      #mode {
+        padding: 0 10px;
+        color: black;
       }
     '';
   };

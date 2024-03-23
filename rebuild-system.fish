@@ -14,11 +14,16 @@ pushd $scriptdir
 
 source ./utils.fish
 
-set -l uid (id --user)
+set -l euid (id --user)
 
+id
 
-if test $uid -ne 0
+if test $euid -ne 0
     exit 2
 end
+
+# nixos-rebuild
+# nixos-rebuild switch --flake .#
+nixos-rebuild switch --flake .
 
 popd $scriptdir

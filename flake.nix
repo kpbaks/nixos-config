@@ -7,15 +7,15 @@
     # home-manager.url = "github:nix-community/home-manager/release-23.11";
     home-manager.url = "github:nix-community/home-manager/master";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-    anyrun.url = "github:Kirottu/anyrun";
-    anyrun.inputs.nixpkgs.follows = "nixpkgs";
+    # anyrun.url = "github:Kirottu/anyrun";
+    # anyrun.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = {
     self,
     nixpkgs,
     home-manager,
-    anyrun,
+    # anyrun,
     ...
   } @ inputs: let
     HOSTNAME = "nixos";
