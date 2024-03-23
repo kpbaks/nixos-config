@@ -20,7 +20,7 @@
   tostring = builtins.toString;
   merge = list: builtins.foldl' (acc: it: acc // it) {} list;
 in rec {
-  # TODO: add helix nightly
+  # TODO: consider using https://github.com/chessai/nix-std
   nixpkgs.overlays = [
     (import (builtins.fetchTarball {
       url = "https://github.com/nix-community/neovim-nightly-overlay/archive/master.tar.gz";
@@ -52,6 +52,8 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    wf-recorder # wayland screen recorder
+    wl-screenrec # wayland screen recorder
     ianny
     wluma
     wlsunset # set screen gamma (aka. night light) based on time of day
@@ -813,6 +815,7 @@ in rec {
       exec-once = udiskie &
       exec-once = wlsunset -t 4000 -T 6500 -S 06:30 -s 18:30
       exec-once = wluma &
+      exec-once = ianny &
 
       windowrule=animation slide left,kitty
       windowrule=animation popin,dolphin
@@ -934,7 +937,7 @@ in rec {
         gaps_out = 5;
         border_size = 2;
         no_border_on_floating = false;
-        layout = "dwindle"; # oneof ["dwindle" "master"]
+        layout = "master"; # oneof ["dwindle" "master"]
         resize_on_border = true;
         hover_icon_on_border = true;
       };
@@ -1012,6 +1015,20 @@ in rec {
     name = "eDP-1"
     path = "/sys/class/backlight/intel_backlight"
     capturer = "wlroots"
+  '';
+
+  home.file.".config/io.github.zefr0x.ianny/config.toml".text = ''
+    # time is given in seconds
+    [timer]
+    idle_timeout = 240
+    short_break_timeout = 1200
+    long_break_timeout = 3840
+    short_break_duration = 120
+    long_break_duration = 240
+
+    [notification]
+    show_progress_bar = true
+    minimum_update_delay = 1
   '';
 
   programs.waybar = {
