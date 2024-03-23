@@ -43,7 +43,11 @@ if not contains -- home.nix $modified_files
 end
 
 # 2. show changes
-git diff ./home.nix
+git --no-pager diff ./home.nix
+
+if not gum confirm "make derivation?" --default=true
+    exit 0
+end
 
 # if not set --query _flag_yes
 #     read 
@@ -63,8 +67,11 @@ end
 
 if eval $expr
     set -l generation (home-manager generations | head -1 | string match --groups-only --regex 'id (\d+)')
-    git add ./home.nix
-    and git commit --message "feat(home): derived generation $generation"
+    set -l message "feat(home): derived generation $generation"
+    gum confirm "stage ./home.fix and commit with message: '$message'?" --default=true
+    and git add ./home.nix
+    # TODO: just use `git commit` and enter commit msg in editor, but have it default to $message
+    and git commit --message $message
     and git log -1 HEAD
 end
 
