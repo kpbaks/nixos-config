@@ -76,6 +76,7 @@ in rec {
     zotero # citation/bibliography manager
     copyq # clipboard manager
     libnotify # for `notify-send`
+    swaylock
     hyprlock # wayland screen lock
     hypridle # hyprlands idle daemon
     hyprpicker # wlroots-compatible wayland color picker
@@ -843,7 +844,7 @@ in rec {
         name = "19b7b30";
       in [
         # https://wiki.hyprland.org/Configuring/Binds/#switches
-        "switch:, ${name}, exec, hyprlock"
+        ",switch:${name}, exec, hyprlock"
       ];
       # mouse bindings
       bindm = [
