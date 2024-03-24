@@ -1068,6 +1068,8 @@ in rec {
     minimum_update_delay = 1
   '';
 
+  home.file.".config/waybar/nix-logo.img".source = ./nix-logo.png;
+
   programs.waybar = {
     enable = true;
     systemd.enable = true;
@@ -1080,6 +1082,7 @@ in rec {
         margin-top = 5;
         margin-bottom = 10;
         modules-left = [
+          "image#nix-logo"
           "hyprland/workspaces"
           "tray"
         ];
@@ -1097,6 +1100,11 @@ in rec {
           "memory"
           "temperature"
         ];
+        "image#nix-logo" = {
+          path = home.homeDirectory + "/.config/waybar/nix-logo.png";
+          size = 32;
+          interval = 60 * 60 * 24;
+        };
         "hyprland/workspaces" = {
           # format = "{icon}";
           format = "{name}: {icon}";
