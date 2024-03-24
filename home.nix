@@ -1099,6 +1099,24 @@ in rec {
         ];
         "hyprland/workspaces" = {
           # format = "{icon}";
+          format = "{name}: {icon}";
+          format-icons = {
+            "1" = "";
+            "2" = "";
+            "3" = "";
+            "4" = "";
+            "5" = "";
+            "active" = "";
+            "default" = "";
+          };
+        };
+        "hyprland/window" = {
+          format = "👉 {}";
+          rewrite = {
+            "(.*) — Mozilla Firefox" = "🌎 $1";
+            "(.*) - fish" = "><> [$1]";
+          };
+          separate-outputs = true;
         };
         pulseaudio = {
           format = "{volume}% {icon}";
@@ -1153,6 +1171,7 @@ in rec {
       * {
         /* font-family: Source Code Pro; */
         font-family: JetBrainsMono Nerd Font;
+        /* font-family: monospace; */
         font-size: 16px;
         border: none;
       }
@@ -1165,12 +1184,28 @@ in rec {
       }
 
       #workspaces {
-        background-color: inherit;
-        color: #ffffff;
+        padding: 0 0.5em;
+        background-color: @surface0;
+        color: @text;
+        margin: 0.25em;
       }
 
-      #workspaces button:hover {
-        background: inherit;
+      #workspaces button.empty {
+        color: @overlay0;
+      }
+
+      #workspaces button.visible {
+        color: @blue;
+      }
+
+      #workspaces button.active {
+        color: @green;
+      }
+
+      #workspaces button.urgent {
+        background-color: @red;
+        border-radius: 1em;
+        color: @text;
       }
 
       #clock,
