@@ -1068,7 +1068,7 @@ in rec {
     minimum_update_delay = 1
   '';
 
-  home.file.".config/waybar/nix-logo.img".source = ./nix-logo.png;
+  home.file.".config/waybar/nix-logo.png".source = ./nix-logo.png;
 
   programs.waybar = {
     enable = true;
@@ -1078,9 +1078,9 @@ in rec {
         layer = "top";
         position = "top";
         spacing = 4; # px
-        height = 35;
+        height = 42;
         margin-top = 5;
-        margin-bottom = 10;
+        margin-bottom = 5;
         modules-left = [
           "image#nix-logo"
           "hyprland/workspaces"
