@@ -1228,25 +1228,6 @@ in rec {
         padding: 0.5em 0;
       }
 
-            #pulseaudio-slider slider {
-          min-height: 0px;
-          min-width: 0px;
-          opacity: 0;
-          background-image: none;
-          border: none;
-          box-shadow: none;
-      }
-      #pulseaudio-slider trough {
-          min-height: 80px;
-          min-width: 10px;
-          border-radius: 5px;
-          background-color: black;
-      }
-      #pulseaudio-slider highlight {
-          min-width: 10px;
-          border-radius: 5px;
-          background-color: green;
-      }
 
       #clock,
       #battery,
