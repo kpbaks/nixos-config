@@ -1087,8 +1087,9 @@ in rec {
           "tray"
         ];
         modules-center = [
-          "hyprland/window"
+          # "hyprland/window"
           "pulseaudio"
+          "pulseaudio/slider"
         ];
         modules-right = [
           "keyboard-state"
@@ -1100,11 +1101,17 @@ in rec {
           "memory"
           "temperature"
         ];
+        "pulseaudio/slider" = {
+          min = 0;
+          max = 100;
+          orientation = "horizontal";
+        };
         "image#nix-logo" = {
           path = home.homeDirectory + "/.config/waybar/nix-logo.png";
           size = 32;
           interval = 60 * 60 * 24;
-          on-click = "open https://nixos.org/";
+          on-click = "xdg-open 'https://nixos.org/'";
+          tooltip = true;
         };
         "hyprland/workspaces" = {
           # format = "{icon}";
@@ -1219,6 +1226,26 @@ in rec {
 
       #image {
         padding: 0.5em 0;
+      }
+
+            #pulseaudio-slider slider {
+          min-height: 0px;
+          min-width: 0px;
+          opacity: 0;
+          background-image: none;
+          border: none;
+          box-shadow: none;
+      }
+      #pulseaudio-slider trough {
+          min-height: 80px;
+          min-width: 10px;
+          border-radius: 5px;
+          background-color: black;
+      }
+      #pulseaudio-slider highlight {
+          min-width: 10px;
+          border-radius: 5px;
+          background-color: green;
       }
 
       #clock,
