@@ -1089,7 +1089,7 @@ in rec {
         modules-center = [
           # "hyprland/window"
           "pulseaudio"
-          "pulseaudio/slider"
+          # "pulseaudio/slider"
         ];
         modules-right = [
           "keyboard-state"
@@ -1100,7 +1100,44 @@ in rec {
           "cpu"
           "memory"
           "temperature"
+          "group/group-power"
         ];
+        "group/group-power" = {
+          orientation = "inherit";
+          drawer = {
+            transition-duration = 500;
+            children-class = "not-power";
+            transition-left-to-right = false;
+          };
+          modules = [
+            "custom/power"
+            "custom/quit"
+            "custom/lock"
+            "custom/reboot"
+          ];
+        };
+
+        "custom/quit" = {
+          format = "󰗼";
+          tooltip = false;
+          on-click = "hyprctl dispatch exit";
+        };
+        "custom/lock" = {
+          format = "󰍁";
+          tooltip = false;
+          on-click = "swaylock";
+        };
+        "custom/reboot" = {
+          format = "󰜉";
+          tooltip = false;
+          on-click = "systemctl reboot";
+        };
+
+        "custom/power" = {
+          format = "";
+          tooltip = false;
+          on-click = "shutdown now";
+        };
         "pulseaudio/slider" = {
           min = 0;
           max = 100;
