@@ -1104,6 +1104,7 @@ in rec {
           path = home.homeDirectory + "/.config/waybar/nix-logo.png";
           size = 32;
           interval = 60 * 60 * 24;
+          on-click = "open https://nixos.org/";
         };
         "hyprland/workspaces" = {
           # format = "{icon}";
@@ -1216,6 +1217,10 @@ in rec {
         color: @text;
       }
 
+      #image {
+        padding: 0.5em 0;
+      }
+
       #clock,
       #battery,
       #cpu,
@@ -1228,7 +1233,7 @@ in rec {
       #tray,
       #mode {
         padding: 0 10px;
-        color: black;
+        color: @text;
       }
     '';
   };
