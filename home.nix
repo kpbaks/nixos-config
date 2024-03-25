@@ -342,7 +342,7 @@ in rec {
       output.orientation = "bottom";
       smoothing.noise_reduction = 88;
       color = {
-        background = "'#000000'";
+        # background = "'#000000'";
         # foreground = "'#FFFFFF'";
         foreground = "'magenta'";
 
