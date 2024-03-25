@@ -344,16 +344,16 @@ in rec {
       color = {
         background = "'#000000'";
         # foreground = "'#FFFFFF'";
-        foreground = "magenta";
+        foreground = "'magenta'";
 
         gradient = 1; # on/off
         gradient_count = 8;
-        gradient_color_1 = "#59cc33";
-        gradient_color_2 = "#80cc33";
-        gradient_color_3 = "#a6cc33";
-        gradient_color_4 = "#cccc33";
-        gradient_color_5 = "#cca633";
-        gradient_color_6 = "#cc8033";
+        gradient_color_1 = "'#59cc33'";
+        gradient_color_2 = "'#80cc33'";
+        gradient_color_3 = "'#a6cc33'";
+        gradient_color_4 = "'#cccc33'";
+        gradient_color_5 = "'#cca633'";
+        gradient_color_6 = "'#cc8033'";
       };
     };
   };
