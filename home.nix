@@ -52,6 +52,7 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    dunst
     wofi
     rofi-wayland
     pavucontrol # audio sink gui
@@ -84,7 +85,7 @@ in rec {
     playerctl # media player controller
     timg # terminal image viewer
     swww # wayland wallpaper setter
-    swaynotificationcenter # wayland notification daemon
+    # swaynotificationcenter # wayland notification daemon
     # mako # wayland notification daemon
     cliphist # clipboard history
     wezterm # terminal
@@ -812,7 +813,8 @@ in rec {
       # exec-once = wl-paste --type image --watch cliphist store #Stores only image data
       exec-once = swww init
       # exec-once = krunner --daemon
-      exec-once = swaync
+      # exec-once = swaync
+      exec-once = dunst &
 
       exec-once = hypridle
       exec-once = copyq
