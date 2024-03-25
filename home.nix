@@ -1137,7 +1137,7 @@ in rec {
   home.file.".config/waybar/nix-logo.png".source = ./nix-logo.png;
 
   programs.waybar = {
-    enable = true;
+    enable = false;
     systemd.enable = true;
     settings = {
       mainbar = {
