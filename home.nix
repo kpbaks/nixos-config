@@ -893,7 +893,7 @@ in rec {
           ", xf86audioprev, exec, playerctl previous"
           ", xf86audiostop, exec, playerctl stop"
           ", xf86audioraisevolume, exec, pamixer -i 5"
-          ", f86audiolowervolume, exec, pamixer -d 5"
+          ", xf86audiolowervolume, exec, pamixer -d 5"
 
           "SUPER, left, movefocus, l"
           "SUPER, right, movefocus, r"
