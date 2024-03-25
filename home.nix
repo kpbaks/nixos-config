@@ -52,6 +52,7 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    networkmanagerapplet
     wofi
     rofi-wayland
     pavucontrol # audio sink gui
@@ -784,19 +785,23 @@ in rec {
     enable = true;
     settings = {
       global = {
-        width = 300;
-        height = 300;
+        width = "(200,300)";
+        height = 200;
         offset = "30x50";
         origin = "top-right";
         transparency = 10;
+        progress_bar = true;
         frame_color = "#eceff1";
-        font = "JetBrains Nerd Font Mono";
+        font = "JetBrains Nerd Font Mono 10";
       };
 
       urgency_normal = {
         background = "#37474f";
         foreground = "#eceff1";
         timeout = 10;
+      };
+      urgency_critical = {
+        timeout = 0;
       };
     };
     iconTheme.name = "Adwaita";
@@ -847,11 +852,15 @@ in rec {
       '')
     ];
   };
-  # xdg.portal = {
-  #   enable = true;
-  #   xdgOpenUsePortal = true;
-  #   extraPortals = [pkgs.xdg-desktop-portal-kde];
-  # };
+
+  xdg.portal = {
+    enable = true;
+    # xdgOpenUsePortal = true;
+    extraPortals = [
+      pkgs.xdg-desktop-portal-gtk
+      # pkgs.xdg-desktop-portal-kde
+    ];
+  };
 
   wayland.windowManager.hyprland = let
     fps = 60;
@@ -863,9 +872,11 @@ in rec {
     extraConfig = ''
       # exec-once = wl-paste --type text --watch cliphist store #Stores only text data
       # exec-once = wl-paste --type image --watch cliphist store #Stores only image data
-      exec-once = swww init
       # exec-once = krunner --daemon
       # exec-once = swaync
+      exec-once = swww init &
+      # pkgs.networkmanagerapplet
+      exec-once = nm-applet --indicator &
       exec-once = dunst &
 
       exec-once = hypridle
@@ -936,7 +947,8 @@ in rec {
           "SUPER, p, exec, okular # pdf"
           "SUPER, z, exec, zotero"
           # "ALT, space, exec, krunner"
-          "ALT, space, exec, wofi --show drun"
+          # "ALT, space, exec, wofi --show drun"
+          "ALT, space, exec, rofi -show drun -show-icons"
 
           "SUPER, mouse_down, workspace, e-1"
           "SUPER, mouse_up, workspace, e+1"
