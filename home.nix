@@ -52,7 +52,6 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
-    dunst
     wofi
     rofi-wayland
     pavucontrol # audio sink gui
@@ -752,6 +751,31 @@ in rec {
     darkModeScripts = {};
     lightModeScripts = {};
   };
+
+  services.dunst = {
+    enable = true;
+    settings = {
+      global = {
+        width = 300;
+        height = 300;
+        offset = "30x50";
+        origin = "top-right";
+        transparency = 10;
+        frame_color = "#eceff1";
+        font = "JetBrains Nerd Font Mono";
+      };
+
+      urgency_normal = {
+        background = "#37474f";
+        foreground = "#eceff1";
+        timeout = 10;
+      };
+    };
+    iconTheme.name = "Adwaita";
+    iconTheme.package = pkgs.gnome.adwaita-icon-theme;
+    iconTheme.size = "32x32";
+  };
+
   services.kdeconnect = {
     enable = true;
     indicator = true;
