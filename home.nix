@@ -853,14 +853,9 @@ in rec {
     ];
   };
 
-  xdg.portal = {
-    enable = true;
-    # xdgOpenUsePortal = true;
-    extraPortals = [
-      pkgs.xdg-desktop-portal-gtk
-      # pkgs.xdg-desktop-portal-kde
-    ];
-  };
+  xdg.portal.enable = true;
+  xdg.portal.config.common.default = "*";
+  xdg.portal.extraPortals = [pkgs.xdg-desktop-portal-gtk];
 
   wayland.windowManager.hyprland = let
     fps = 60;
