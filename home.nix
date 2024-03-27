@@ -52,6 +52,8 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    d2
+    graphviz
     aria
     networkmanagerapplet
     wofi
@@ -932,6 +934,7 @@ in rec {
           ", f11, fullscreen, 1"
           "SHIFT, f11, fullscreen, 2"
           "CTRL, f11, fullscreen, 0"
+          "SUPER, r, layoutmsg, orientationext"
 
           # "focusmonitor"
           # "movecurrentworkspacetomonitor"
