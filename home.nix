@@ -935,7 +935,8 @@ in rec {
           "SHIFT, f11, fullscreen, 2"
           "CTRL, f11, fullscreen, 0"
           "SUPER, r, layoutmsg, orientationnext"
-          "SUPERSHIFT, m, layoutmsg, swapwithmaster"
+          # "SUPERSHIFT, m, layoutmsg, swapwithmaster"
+          "SUPER, space, layoutmsg, swapwithmaster"
 
           # "focusmonitor"
           # "movecurrentworkspacetomonitor"
