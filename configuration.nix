@@ -18,6 +18,13 @@
   nix = {
     settings = {
       experimental-features = ["nix-command" "flakes"];
+      substituters = [
+        "https://cache.nixos.org"
+        "https://nix-community.cachix.org"
+      ];
+      trusted-public-keys = [
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      ];
       trusted-substituters = ["https://cache.nixos.org"];
     };
   };
@@ -29,7 +36,7 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "23.11"; # Did you read the comment?
-  
+
   # Allow unfree packages e.g. closed-source nvidia drivers
   nixpkgs.config.allowUnfree = true;
 
@@ -47,6 +54,8 @@
     # add shit here
   ];
   programs.direnv.enable = true;
+
+  hardware.i2c.enable = true;
 
   hardware.tuxedo-rs = {
     enable = true;
@@ -152,10 +161,8 @@
 
   # Enable networking
   networking.networkmanager.enable = true;
-
   # Set your time zone.
   time.timeZone = "Europe/Copenhagen";
-
   # Select internationalisation properties.
   i18n.defaultLocale = "en_DK.UTF-8";
 
@@ -173,10 +180,10 @@
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
-
   # Enable the KDE Plasma Desktop Environment.
   services.xserver.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
+  # services.xserver.desktopManager.gnome.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb.layout = "dk";
@@ -321,7 +328,6 @@
       # mailspring
       # kmail
       # merkuro
-      # jetbrains.rust-rover
 
       # nickel # configuration language
       # nls # nickel language server
@@ -329,34 +335,14 @@
       cachix
       # simplescreenrecorder
       # obs-studio
-      # rclone
-      # croc
-      # sshx
       # gnuplot
-      # findutils # find, locate
       # vulkan-tools
-      # taskwarrior
-      # taskwarrior-tui
     ];
   };
 
   fonts.packages = with pkgs; [
     (nerdfonts.override {fonts = ["JetBrainsMono" "FiraCode" "Iosevka" "VictorMono"];})
   ];
-
-  # home-manager.users.kpbaks = {pkgs, ...}: {
-  #   home.packages = with pkgs; [httpie];
-  #   # programs.fish.enable = true;
-  #   programs.bash.enable = true;
-  #   # The state version is required and should stay at the version you
-  #   # originally installed.
-  #   # home.stateVersion = "24.05";
-  #   home.stateVersion = "23.11";
-  # };
-
-  # home-manager.useUserPackages = true;
-  # home-manager.useGlobalPkgs = true;
-
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -372,6 +358,7 @@
     lshw
     pciutils # lscpi
     nvtop
+    ddcutil
   ];
 
   programs.hyprland = {
@@ -398,6 +385,8 @@
   services.mullvad-vpn.enable = true;
   # services.spotifyd.enable = true;
   # services.surrealdb.enable = true;
+  # Enable the OpenSSH daemon.
+  # services.openssh.enable = true;
 
   # services.thermald.enable = true;
   # TODO: check out services.auto-cpufreq
@@ -420,9 +409,6 @@
   #     STOP_CHARGE_THRESH_BAT0 = 80; # 80 and above it stops charging
   #   };
   # };
-
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];

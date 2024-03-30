@@ -18,6 +18,12 @@ if not argparse $options -- $argv
     return 2
 end
 
+set -l scriptdir (status filename | path dirname | path resolve)
+
+if test $scriptdir != $PWD
+    printf '%swarn:%s script was not called from %s\n' $yellow $reset $scriptdir
+end
+
 if set --query _flag_help
     set -l option_color (set_color $fish_color_option)
     set -l section_header_color (set_color yellow)
@@ -33,7 +39,6 @@ end >&2
 
 # 1. check if ./home.nix has any changes since its latest commit
 # - if it does not, then print a message and quit.
-
 set -l modified_files (git ls-files --modified)
 if not contains -- home.nix $modified_files
     set -l current_branch main
@@ -71,8 +76,9 @@ if eval $expr
     gum confirm "stage ./home.fix and commit with message: '$message'?" --default=true
     and git add ./home.nix
     # TODO: just use `git commit` and enter commit msg in editor, but have it default to $message
-    and git commit --message $message
+    and git commit --edit --message $message
     and git log -1 HEAD
-end
 
-# home-manager switch $hm_switch_opts --file ./home.nix
+    gum confirm "push to remote: $remote?" --default=true
+    and git push
+end

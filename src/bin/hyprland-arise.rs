@@ -1,7 +1,12 @@
+use std::time::Duration;
+
 use clap::Parser;
+use hyprland::ctl::notify::Icon::Info;
+use hyprland::ctl::Color;
 use hyprland::data::{Client, Clients, Monitors, Workspace};
 use hyprland::dispatch::*;
 use hyprland::prelude::*;
+use log::{debug, info};
 
 #[derive(clap::Parser)]
 #[clap(version, author, about)]
@@ -22,9 +27,15 @@ enum AppError {
 impl std::error::Error for AppError {}
 
 fn main() -> anyhow::Result<()> {
+    env_logger::try_init()?;
     let cli = Cli::try_parse()?;
 
     let active_workspace = Workspace::get_active()?;
+    debug!("active workspace: {:?}", active_workspace);
+
+    // let fullscreen = active_workspace.fullscreen;
+
+    if active_workspace.fullscreen {}
 
     // Clients::get()?.for_each(|client| println!("{:?}", client));
 
@@ -34,6 +45,7 @@ fn main() -> anyhow::Result<()> {
     // TODO: handle case with multiple clients matching
     if let Some(client) = Clients::get()?.find(|client| client.class.to_lowercase() == cli.class) {
         let window_identifier = WindowIdentifier::ProcessId(client.pid.try_into().unwrap());
+        debug!("window identifier: {:?}", window_identifier);
 
         hyprland::dispatch!(
             MoveToWorkspace,
@@ -55,6 +67,13 @@ fn main() -> anyhow::Result<()> {
     //     FocusWindow,
     //     WindowIdentifier::ProcessId(client.pid.try_into().unwrap())
     // )?;
+
+    hyprland::ctl::notify::call(
+        Info,
+        Duration::from_secs(2),
+        Color::new(100, 0, 0, 128),
+        "hello".into(),
+    )?;
 
     Ok(())
 }

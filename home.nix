@@ -561,6 +561,43 @@ in rec {
       );
   };
 
+  home.file.".config/kitty/tokyonight-storm.conf".file = ./extra/kitty/tokyonight-storm.conf;
+  programs.kitty = {
+    enable = true;
+    environment = {
+      LS_COLORS = "1";
+    };
+    font.name = "JetBrainsMono Nerd Font Mono";
+    font.size = "14";
+    keybindings = {
+      "ctrl+c" = "copy_or_interrupt";
+      f11 = "toggle_fullscreen";
+    };
+    extraConfig = ''
+      include tokyonight-storm.conf
+    '';
+    settings = {
+      disable_ligatures = "never";
+      modify_font = "underline_thickness 100%";
+      # modify_font = "strikethrough_position 2px";
+      undercurl_style = "thick-sparse";
+
+      scrollback_lines = 10000;
+      enable_audio_bell = false;
+      update_check_interval = 0;
+      background_opacity = 0.9;
+      strip_trailing_spaces = "smart";
+      allow_hyperlinks = "yes";
+      url_color = "#0087bd";
+      url_style = "curly";
+      open_url_with = "default";
+      detect_urls = "yes";
+      show_hyperlink_targets = "yes";
+      underline_hyperlinks = "hover";
+    };
+    shellIntegration.enableFishIntegration = false;
+  };
+
   programs.mpv = {
     enable = true;
   };
