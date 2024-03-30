@@ -230,7 +230,7 @@ in rec {
           family = "Iosevka Nerd Font Mono";
           style = "Regular";
         };
-        size = 14;
+        size = 16;
       };
       mouse = {
         hide_when_typing = true;
@@ -908,7 +908,9 @@ in rec {
       windowrulev2 = bordercolor rgb(FF0000),title:^(.*YouTube.*)$ # set bordercolor to red when title contains YouTube
       windowrulev2 = bordercolor rgb(E53E00),title:^(.*Reddit.*)$
 
-      monitor=DP-1,2560x1600@60,0x0,1
+      monitor = DP-5, 2560x1440@60, 0x0, 1, bitdepth, 10 # acer monitor at home
+      monitor = eDP-1, 2560x1600@60, 0x2560, 1
+
       # monitor=DP-1,2560x1600@60,0x0,1,vrr,1
       # monitor=DP-1,2560x1600@60,0x0,1,bitdepth,10
       # recommended rule for quickly pluggin in random monitors
