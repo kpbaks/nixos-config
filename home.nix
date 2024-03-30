@@ -972,7 +972,7 @@ in rec {
           "SUPER, mouse_down, workspace, e-1"
           "SUPER, mouse_up, workspace, e+1"
 
-          "SUPERSHIFT, f, togglefloating"
+          # "SUPERSHIFT, f, togglefloating"
           ", xf86audioplay, exec, playerctl play-pause "
           ", xf86audionext, exec, playerctl next"
           ", xf86audioprev, exec, playerctl previous"
