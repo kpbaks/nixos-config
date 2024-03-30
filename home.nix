@@ -872,6 +872,8 @@ in rec {
   xdg.portal.config.common.default = "*";
   xdg.portal.extraPortals = [pkgs.xdg-desktop-portal-gtk];
 
+  home.file.".config/hypr/bin/hyprland-arise".source = ./target/release/hyprland-arise;
+
   wayland.windowManager.hyprland = let
     fps = 60;
   in {
@@ -948,6 +950,8 @@ in rec {
           "SUPER, q, killactive"
           "SUPER, a, exec, anki"
           "SUPER, f, exec, firefox"
+          "SUPERSHIFT, f, exec, ~/.config/hypr/bin/hyprland-arise --class firefox"
+
           # "$super, K, exec, wezterm-gui start"
           # "SUPER, k, exec, kitty"
           # "SUPER, k, exec, wezterm-gui start"
