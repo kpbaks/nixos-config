@@ -52,7 +52,8 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
-    grit
+    waybar
+    # grit
     d2
     graphviz
     aria
