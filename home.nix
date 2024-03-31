@@ -988,7 +988,9 @@ in rec {
           # "swapactiveworkspaces"
           "SUPER, c, movetoworkspace, special"
           "SUPER, q, killactive"
-          "SUPER, a, exec, anki"
+
+          "SUPERSHIFT, a, exec, anki"
+          "SUPER, a, exec, ~/.config/hypr/bin/hyprland-arise --class anki"
           "SUPERSHIFT, f, exec, firefox"
           "SUPER, f, exec, ~/.config/hypr/bin/hyprland-arise --class firefox"
 
@@ -998,15 +1000,29 @@ in rec {
           # "SUPER, k, exec, alacritty"
           "SUPER, k, exec, ~/.config/hypr/bin/hyprland-arise --class kitty"
           "SUPERSHIFT, k, exec, kitty"
-          "SUPER, s, exec, spotify"
+
+          "SUPERSHIFT, s, exec, spotify"
+          "SUPER, s, exec, ~/.config/hypr/bin/hyprland-arise --class spotify"
           # "SUPER, d, exec, discord"
-          "SUPER, d, exec, webcord"
-          "SUPER, m, exec, thunderbird # mail"
-          "SUPER, t, exec, telegram-desktop"
-          "SUPER, o, exec, obs # obs-studio"
+          "SUPERSHIFT, d, exec, webcord"
+          "SUPER, d, exec, ~/.config/hypr/bin/hyprland-arise --class webcord"
+
+          "SUPERSHIFT, m, exec, thunderbird # mail"
+          "SUPER, m, exec, ~/.config/hypr/bin/hyprland-arise --class thunderbird"
+
+          "SUPERSHIFT, t, exec, telegram-desktop"
+          "SUPER, t, exec, ~/.config/hypr/bin/hyprland-arise --class org.telegram.desktop --exec telegram-desktop"
+
+          "SUPERSHIFT, o, exec, obs # obs-studio"
+          "SUPER, o, exec, ~/.config/hypr/bin/hyprland-arise --class com.obsproject.Studio --exec obs"
+          "SUPERSHIFT, e, exec, ~/.config/hypr/bind/hyprland-arise --class dolphin"
           "SUPER, e, exec, dolphin"
-          "SUPER, p, exec, okular # pdf"
-          "SUPER, z, exec, zotero"
+
+          "SUPER, p, exec, ~/.config/hypr/bind/hyprland-arise --class okular"
+          "SUPERSHIFT, p, exec, okular # pdf"
+
+          "SUPER, z, exec, ~/.config/hypr/bind/hyprland-arise --class Zotero"
+          "SUPERSHIFT, z, exec, zotero"
           # "ALT, space, exec, krunner"
           # "ALT, space, exec, wofi --show drun"
           "ALT, space, exec, rofi -show drun -show-icons"
