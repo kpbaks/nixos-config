@@ -561,20 +561,21 @@ in rec {
       );
   };
 
-  home.file.".config/kitty/tokyonight-storm.conf".file = ./extra/kitty/tokyonight-storm.conf;
+  home.file.".config/kitty/tokyonight-storm.conf".source = ./extra/kitty/tokyonight-storm.conf;
   programs.kitty = {
     enable = true;
     environment = {
       LS_COLORS = "1";
     };
     font.name = "JetBrainsMono Nerd Font Mono";
-    font.size = "14";
+    font.size = 14;
     keybindings = {
       "ctrl+c" = "copy_or_interrupt";
       f11 = "toggle_fullscreen";
     };
     extraConfig = ''
       include tokyonight-storm.conf
+      background_opacity = 0.9
     '';
     settings = {
       disable_ligatures = "never";
@@ -585,7 +586,7 @@ in rec {
       scrollback_lines = 10000;
       enable_audio_bell = false;
       update_check_interval = 0;
-      background_opacity = 0.9;
+      # background_opacity = 0.9;
       strip_trailing_spaces = "smart";
       allow_hyperlinks = "yes";
       url_color = "#0087bd";
@@ -948,7 +949,7 @@ in rec {
       windowrulev2 = bordercolor rgb(E53E00),title:^(.*Reddit.*)$
 
       monitor = DP-5, 2560x1440@60, 0x0, 1, bitdepth, 10 # acer monitor at home
-      monitor = eDP-1, 2560x1600@60, 0x2560, 1
+      monitor = eDP-1, 2560x1600@60, 0x-1440, 1
 
       # monitor=DP-1,2560x1600@60,0x0,1,vrr,1
       # monitor=DP-1,2560x1600@60,0x0,1,bitdepth,10
