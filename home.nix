@@ -575,7 +575,7 @@ in rec {
     };
     extraConfig = ''
       include tokyonight-storm.conf
-      background_opacity = 0.9
+      background_opacity 0.9
     '';
     settings = {
       disable_ligatures = "never";
