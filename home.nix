@@ -929,6 +929,7 @@ in rec {
       # pkgs.networkmanagerapplet
       exec-once = nm-applet --indicator &
       exec-once = dunst &
+      exec-once = waybar &
 
       exec-once = hypridle
       exec-once = copyq
