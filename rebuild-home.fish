@@ -73,7 +73,7 @@ end
 if eval $expr
     set -l generation (home-manager generations | head -1 | string match --groups-only --regex 'id (\d+)')
     set -l message "feat(home): derived generation $generation"
-    gum confirm "stage ./home.fix and commit with message: '$message'?" --default=true
+    gum confirm "stage ./home.nix and commit with message: '$message'?" --default=true
     and git add ./home.nix
     # TODO: just use `git commit` and enter commit msg in editor, but have it default to $message
     and git commit --edit --message $message

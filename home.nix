@@ -1218,7 +1218,7 @@ in rec {
     minimum_update_delay = 1
   '';
 
-  home.file.".config/waybar/nix-logo.png".source = ./nix-logo.png;
+  # home.file.".config/waybar/nix-logo.png".source = ./nix-logo.png;
 
   programs.waybar = {
     enable = false;
@@ -1232,7 +1232,7 @@ in rec {
         margin-top = 5;
         margin-bottom = 5;
         modules-left = [
-          "image#nix-logo"
+          # "image#nix-logo"
           "hyprland/workspaces"
           "tray"
         ];
@@ -1293,13 +1293,13 @@ in rec {
           max = 100;
           orientation = "horizontal";
         };
-        "image#nix-logo" = {
-          path = home.homeDirectory + "/.config/waybar/nix-logo.png";
-          size = 32;
-          interval = 60 * 60 * 24;
-          on-click = "xdg-open 'https://nixos.org/'";
-          tooltip = true;
-        };
+        # "image#nix-logo" = {
+        #   path = home.homeDirectory + "/.config/waybar/nix-logo.png";
+        #   size = 32;
+        #   interval = 60 * 60 * 24;
+        #   on-click = "xdg-open 'https://nixos.org/'";
+        #   tooltip = true;
+        # };
         "hyprland/workspaces" = {
           # format = "{icon}";
           format = "{name}: {icon}";

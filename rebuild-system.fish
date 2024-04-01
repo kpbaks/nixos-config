@@ -44,25 +44,27 @@ if not gum confirm "make derivation?" --default=true
     exit 0
 end
 
-set -l euid (id --user)
+# set -l euid (id --user)
 
-if test $euid -ne 0
-    exit 2
-end
+# if test $euid -ne 0
+#     exit 2
+# end
 
 if set --query _flag_dry_run
     exit 0
 end
 
-if sudo nixos-rebuild switch
+if please nixos-rebuild switch --flake .
 
-    # set -l generation (home-manager generations | head -1 | string match --groups-only --regex 'id (\d+)')
-    # set -l message "feat(home): derived generation $generation"
-    # gum confirm "stage ./home.fix and commit with message: '$message'?" --default=true
-    # and git add ./home.nix
-    # # TODO: just use `git commit` and enter commit msg in editor, but have it default to $message
-    # and git commit --message $message
-    # and git log -1 HEAD
+    set -l generation (nix-env --list-generations | tail -1 | string match --regex --groups-only '^\s+(\d+)')
+    set -l message "feat(system): derived generation $generation"
+    gum confirm "stage ./configuration.nix and commit with message: '$message'?" --default=true
+    and git add ./configuration.nix
+    and git commit --edit --message $message
+    and git log -1 HEAD
+
+    gum confirm "push to remote: $remote?" --default=true
+    and git push
 end
 
 # nixos-rebuild
