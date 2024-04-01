@@ -1108,6 +1108,8 @@ in rec {
         # kb_layout = "us,dk";
         # kb_options = "grp:alt_shift_toggle, caps:swapescape";
         kb_options = "grp:alt_shift_toggle";
+        # https://wiki.hyprland.org/Configuring/Variables/#follow-mouse-cursor
+        follow_mouse = 2;
         touchpad = {
           natural_scroll = true;
           scroll_factor = 1.0;
