@@ -29,8 +29,12 @@
     };
   };
 
+  nix.checkConfig = true;
+  nix.checkAllErrors = true;
+
   nix.settings.cores = 10; # number of cores per build, think `make -j N`
   nix.settings.max-jobs = 6; # number of builds that can be ran in parallel
+  nix.settings.auto-optimise-store = true; # automatically detects files in the store that have identical contents, and replaces them with hard links to a single copy
 
   nix.optimise.automatic = true;
   nix.optimise.dates = ["22:30"];
