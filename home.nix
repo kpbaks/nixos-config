@@ -568,10 +568,15 @@ in rec {
     environment = {
       LS_COLORS = "1";
     };
-    font.name = "JetBrainsMono Nerd Font Mono";
+    # font.name = "JetBrainsMono Nerd Font Mono";
+    font.name = "Iosevka Nerd Font Mono";
     font.size = 14;
     keybindings = {
       "ctrl+c" = "copy_or_interrupt";
+      "ctrl+equal" = "change_font_size all +2.0";
+      "ctrl+minus" = "change_font_size all -2.0";
+      "ctrl+0" = "change_font_size all 0";
+      "ctrl+g" = "show_last_command_output";
       f11 = "toggle_fullscreen";
     };
     extraConfig = ''
@@ -597,7 +602,7 @@ in rec {
       show_hyperlink_targets = "yes";
       underline_hyperlinks = "hover";
     };
-    shellIntegration.enableFishIntegration = false;
+    shellIntegration.enableFishIntegration = true;
   };
 
   programs.mpv = {
