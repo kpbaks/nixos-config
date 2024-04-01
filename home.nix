@@ -64,7 +64,7 @@ in rec {
     overskride # bluetooth gui
     wf-recorder # wayland screen recorder
     wl-screenrec # wayland screen recorder
-    ianny
+    # ianny
     wluma
     wlsunset # set screen gamma (aka. night light) based on time of day
     poppler_utils # pdf utilities
@@ -942,7 +942,7 @@ in rec {
       exec-once = udiskie &
       exec-once = wlsunset -t 4000 -T 6500 -S 06:30 -s 18:30
       exec-once = wluma &
-      exec-once = ianny &
+      # exec-once = ianny &
 
       windowrule = animation slide left,kitty
       windowrule = animation popin,dolphin
