@@ -29,6 +29,12 @@
     };
   };
 
+  nix.settings.cores = 10; # number of cores per build, think `make -j N`
+  nix.settings.max-jobs = 6; # number of builds that can be ran in parallel
+
+  nix.optimise.automatic = true;
+  nix.optimise.dates = ["22:30"];
+
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave
@@ -159,11 +165,8 @@
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,l:localhost,internal.domain";
 
-  # Enable networking
   networking.networkmanager.enable = true;
-  # Set your time zone.
   time.timeZone = "Europe/Copenhagen";
-  # Select internationalisation properties.
   i18n.defaultLocale = "en_DK.UTF-8";
 
   i18n.extraLocaleSettings = {
@@ -181,19 +184,24 @@
   # Enable the X11 windowing system.
   services.xserver.enable = true;
   # Enable the KDE Plasma Desktop Environment.
-  services.xserver.displayManager.sddm.enable = true;
-  services.desktopManager.plasma6.enable = true;
+  # services.xserver.displayManager.sddm.enable = true;
+  # services.desktopManager.plasma6.enable = true;
+  # services.xserver.desktopManager.plasma5.enable = true;
   # services.xserver.desktopManager.gnome.enable = true;
+  # Enable the GNOME Desktop Environment.
+  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.desktopManager.gnome.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb.layout = "dk";
   services.xserver.xkb.variant = "";
 
   # services.xserver.videoDrivers = ["displaylink" "modesetting" "nvidia"];
-  services.xserver.videoDrivers = ["displaylink" "modesetting"];
-  services.xserver.displayManager.sessionCommands = ''
-    ${pkgs.lib.getBin pkgs.xorg.xrandr}/bin/xrandr --setprovideroutputsource 2 0
-  '';
+  # services.xserver.videoDrivers = ["displaylink" "modesetting"];
+  services.xserver.videoDrivers = ["modesetting"];
+  # services.xserver.displayManager.sessionCommands = ''
+  #   ${pkgs.lib.getBin pkgs.xorg.xrandr}/bin/xrandr --setprovideroutputsource 2 0
+  # '';
 
   # Enable OpenGL
   hardware.opengl = {
@@ -238,105 +246,12 @@
     description = "Kristoffer Sørensen";
     extraGroups = ["networkmanager" "wheel"];
     packages = with pkgs; [
-      # firefox
       # firefox-devedition
-      # kate
-      # thunderbird
-      # python3
-      # julia
       vim
-      fish
-      # helix
-      # neovim
-      # neovide
-      # inlyne
-
-      # jujutsu
-      # gitui
-      # delta
-      # difftastic
-      # ouch
-
-      # bat
-      # ripgrep
-      # duf
-      # du-dust
-      # eza
-      # tokei
-      # hexyl
-      # numbat
-      # gh
-      # kitty
-      # wezterm
-      # rustup
-      # taplo
-      # bacon
-      # gcc
-      # gdb
-      # mold
-      # cargo-feature
-      # alsaLib
       udev
-      # tealdeer
-      # fd
       starship
-      # nerdfonts
       vscode
-      # lapce
-      # sublime-merge
-      wl-clipboard
-      # jq
-      # jaq
-      # jqp
-      # fx
-      # yq
-      # yq-go
-      # htmlq
-      # bun
-      # nil
-      # nushell
-      # zoxide
-      # cmake
-      # sqlite
-      # gum
-      # hyperfine
-      # glow
-      # broot
-      # yazi
-      # fzf
-      # pre-commit
-      # alejandra
-      # zellij
-      # direnv
-      # bitwarden
-      # bitwarden-cli
-      # grc
-      # alacritty
-      #nushellFull
-      # mpv
-      # vlc
-      # pixi
-      # anki
-      # file
-      # zip
-      # unzip
-      # fastfetch # a faster neofetch
-      # onefetch # git repo fetch
-      # brotab
-      # manix
-      # comma
-      # mailspring
-      # kmail
-      # merkuro
-
-      # nickel # configuration language
-      # nls # nickel language server
-      himalaya # cli email client
       cachix
-      # simplescreenrecorder
-      # obs-studio
-      # gnuplot
-      # vulkan-tools
     ];
   };
 
@@ -344,20 +259,21 @@
     (nerdfonts.override {fonts = ["JetBrainsMono" "FiraCode" "Iosevka" "VictorMono"];})
   ];
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
+  # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
-    #vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
     atool
     helix
     alejandra
+    doas
+
+    wl-clipboard
     sniffnet
     git
-    (import (fetchTarball https://install.devenv.sh/latest)).default
+    # (import (fetchTarball https://install.devenv.sh/latest)).default
     lshw
     pciutils # lscpi
-    nvtop
+    nvtopPackages.full
     ddcutil
   ];
 
@@ -379,7 +295,7 @@
   # };
 
   # List services that you want to enable:
-  services.tailscale.enable = true;
+  services.tailscale.enable = false;
   services.flatpak.enable = true;
   services.espanso.enable = true;
   services.mullvad-vpn.enable = true;
@@ -419,6 +335,11 @@
   systemd.extraConfig = ''
     DefaultTimeoutStopSec=15s
   '';
+
+  systemd.services.nix-daemon.serviceConfig = {
+    MemoryHigh = "8G";
+    MemoryMax = "10G";
+  };
 
   xdg.portal.enable = true;
 }
