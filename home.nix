@@ -52,6 +52,7 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    tabnine
     waybar
     # grit
     d2
@@ -729,6 +730,7 @@ in rec {
       rust-lang.rust-analyzer
       github.copilot
       github.copilot-chat
+      tabnine.tabnine-vscode
     ];
     userSettings = {
       "editor.tabSize" = 4;
@@ -787,6 +789,7 @@ in rec {
       };
 
       "[nix]"."editor.tabSize" = 2;
+      "tabnine.experimentalAutoImports" = true;
     };
     keybindings = let
       ctrl = key: "ctrl+" + key;
