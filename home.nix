@@ -581,6 +581,8 @@ in rec {
       "ctrl+shift+up" = "scroll_to_prompt -1";
       "ctrl+shift+down" = "scroll_to_prompt 1";
       "ctrl+shift+h" = "show_scrollback";
+      "ctrl+shift+e" = "open_url_with_hints";
+      "ctrl+shift+f1" = "show_kitty_doc overview";
       f11 = "toggle_fullscreen";
     };
     extraConfig = ''
@@ -605,6 +607,7 @@ in rec {
       detect_urls = "yes";
       show_hyperlink_targets = "yes";
       underline_hyperlinks = "hover";
+      touch_scroll_multiplier = 20;
     };
     shellIntegration.mode = "no-cursor";
     shellIntegration.enableFishIntegration = true;
