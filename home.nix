@@ -567,7 +567,7 @@ in rec {
   programs.kitty = {
     enable = true;
     environment = {
-      LS_COLORS = "1";
+      # LS_COLORS = "1";
     };
     # font.name = "JetBrainsMono Nerd Font Mono";
     font.name = "Iosevka Nerd Font Mono";
@@ -578,6 +578,9 @@ in rec {
       "ctrl+minus" = "change_font_size all -2.0";
       "ctrl+0" = "change_font_size all 0";
       "ctrl+g" = "show_last_command_output";
+      "ctrl+shift+up" = "scroll_to_prompt -1";
+      "ctrl+shift+down" = "scroll_to_prompt 1";
+      "ctrl+shift+h" = "show_scrollback";
       f11 = "toggle_fullscreen";
     };
     extraConfig = ''
