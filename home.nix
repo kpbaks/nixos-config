@@ -606,7 +606,9 @@ in rec {
       show_hyperlink_targets = "yes";
       underline_hyperlinks = "hover";
     };
+    shellIntegration.mode = "no-cursor";
     shellIntegration.enableFishIntegration = true;
+    shellIntegration.enableBashIntegration = true;
   };
 
   programs.mpv = {
