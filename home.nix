@@ -969,7 +969,7 @@ in rec {
 
       windowrulev2 = tile, class:raylib
       windowrulev2 = bordercolor rgb(1BC156), class:Spotify
-      windowrulev2 = bordercolor rgb(0000FF), class:telegram
+      windowrulev2 = bordercolor rgb(4A7AAE), class:telegram
       windowrulev2 = bordercolor rgb(FF00FF) rgb(880808),fullscreen:1 # set bordercolor to red if window is fullscreen
       windowrulev2 = bordercolor rgb(FFFF00),title:^(.*Hyprland.*)$ # set bordercolor to yellow when title contains Hyprland
       windowrulev2 = bordercolor rgb(FF0000),title:^(.*YouTube.*)$ # set bordercolor to red when title contains YouTube
