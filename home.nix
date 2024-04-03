@@ -167,6 +167,7 @@ in rec {
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
+  # https://github.com/hyprwm/hyprpicker/issues/51#issuecomment-2016368757
   home.pointerCursor = {
     gtk.enable = true;
     package = pkgs.gnome.adwaita-icon-theme;
@@ -967,7 +968,7 @@ in rec {
       windowrule = noblur,^(firefox)$ # disables blur for firefox
 
       windowrulev2 = tile, class:raylib
-      windowrulev2 = bordercolor rgb(00FF00), class:spotify
+      windowrulev2 = bordercolor rgb(1BC156), class:Spotify
       windowrulev2 = bordercolor rgb(0000FF), class:telegram
       windowrulev2 = bordercolor rgb(FF00FF) rgb(880808),fullscreen:1 # set bordercolor to red if window is fullscreen
       windowrulev2 = bordercolor rgb(FFFF00),title:^(.*Hyprland.*)$ # set bordercolor to yellow when title contains Hyprland
