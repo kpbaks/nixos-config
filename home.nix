@@ -167,6 +167,13 @@ in rec {
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
+  home.pointerCursor = {
+    gtk.enable = true;
+    package = pkgs.gnome.adwaita-icon-theme;
+    name = "Adwaita";
+    size = 16;
+  };
+
   # sourced every time the `julia` is started
   # home.file.".julia/config/startup.jl".source = ./startup.jl;
   home.file.".julia/config/startup.jl".text = let
