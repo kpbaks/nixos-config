@@ -985,7 +985,9 @@ in rec {
       windowrule = animation popin,dolphin
       windowrule = noblur,^(firefox)$ # disables blur for firefox
 
-      windowrulev2 = tile, class:raylib
+      windowrulev2 = tile, class:raylib # to make gbpplanner easier to work with
+
+      windowrulev2 = bordercolor rgb(E54430), class:firefox
       windowrulev2 = bordercolor rgb(4F5BDA), class:WebCord
       windowrulev2 = bordercolor rgb(1BC156), class:Spotify
       windowrulev2 = bordercolor rgb(4A7AAE), class:telegram
