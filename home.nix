@@ -646,7 +646,11 @@ in rec {
     ];
   };
 
-  programs.nix-index.enable = true;
+  programs.nix-index = {
+    enable = true;
+    enableFishIntegration = true;
+    # enableBashIntegration = true;
+  };
 
   # programs.nushell.enable = true;
   programs.pandoc.enable = true;
