@@ -931,11 +931,27 @@ in rec {
     ];
   };
 
-  xdg.portal.enable = true;
-  xdg.portal.config.common.default = "*";
-  xdg.portal.extraPortals = [pkgs.xdg-desktop-portal-gtk];
+  xdg.portal = {
+    enable = true;
+    xdgOpenUsePortal = true;
+    config.common.default = "hyprland";
+    extraPortals = [
+      pkgs.xdg-desktop-portal-gtk
+      pkgs.xdg-desktop-portal-kde
+      pkgs.xdg-desktop-portal-hyprland
+      pkgs.xdg-desktop-portal-wlr
+      # pkgs.xdg-desktop-portal-cosmic
+    ];
+  };
 
   home.file.".config/hypr/bin/hyprland-arise".source = ./target/release/hyprland-arise;
+
+  home.file.".config/xdg-desktop-portal/hyprland-portals.conf".text = ''
+    [preferred]
+    default=hyprland;gtk
+    org.freedesktop.impl.portal.FileChooser=kde
+    org.freedesktop.impl.portal.Screencast=kde
+  '';
 
   wayland.windowManager.hyprland = let
     fps = 60;
