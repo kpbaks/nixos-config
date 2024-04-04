@@ -78,7 +78,7 @@
     "tuxedo_keyboard.brightness=255"
     # "tuxedo_keyboard.color_left=0xff0a0a"
   ];
-  hardware.bluetooth.enable = true;
+  hardware.bluetooth.enable = false;
   hardware.bluetooth.powerOnBoot = true;
   hardware.bluetooth.package = pkgs.bluez;
 
