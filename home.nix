@@ -968,6 +968,7 @@ in rec {
       windowrule = noblur,^(firefox)$ # disables blur for firefox
 
       windowrulev2 = tile, class:raylib
+      windowrulev2 = bordercolor rgb(4F5BDA), class:WebCord
       windowrulev2 = bordercolor rgb(1BC156), class:Spotify
       windowrulev2 = bordercolor rgb(4A7AAE), class:telegram
       windowrulev2 = bordercolor rgb(FF00FF) rgb(880808),fullscreen:1 # set bordercolor to red if window is fullscreen
