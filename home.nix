@@ -52,6 +52,7 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    libwebp # why do 'r/wallpaper' upload all its images in `webp`
     tabnine
     waybar
     # grit
