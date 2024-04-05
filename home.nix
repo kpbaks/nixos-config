@@ -115,6 +115,7 @@ in rec {
     numbat # scientific units calculator repl
     fd # `find` replacement
     jaq # `jq` replacement
+    jnv # interactive JSON filter using `jq`
     jqp # `jq` expr editor
     fx # interactive JSON pager
     yq-go # `jq` but for yaml
