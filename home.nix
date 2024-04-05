@@ -748,7 +748,7 @@ in rec {
         sort_by = "natural";
         sort_dirs_first = true;
       };
-      which = {sort_by = true;};
+      # which = {sort_by = true;};
     };
   };
 
