@@ -5,11 +5,14 @@
   config,
   pkgs,
   ...
-}:
+}
+:
 # let
 #   tuxedo = import (builtins.fetchTarball "https://github.com/blitz/tuxedo-nixos/archive/master.tar.gz");
 # in
-{
+let
+  username = "kpbaks";
+in {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -28,6 +31,12 @@
       trusted-substituters = ["https://cache.nixos.org"];
     };
   };
+
+  nix.settings.trusted-users = [
+    "root"
+    # "kpbaks"
+    username
+  ];
 
   nix.checkConfig = true;
   nix.checkAllErrors = true;
@@ -345,5 +354,13 @@
     MemoryMax = "10G";
   };
 
-  xdg.portal.enable = true;
+  # xdg.portal = {
+  #   enable = true;
+  #   xdgOpenUsePortal = true;
+  #   wlr.enable = false;
+  #   extraPortals = [
+  #     pkgs.xdg-desktop-portal-gtk
+  #     pkgs.xdg-desktop-portal-kde
+  #   ];
+  # };
 }
