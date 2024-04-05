@@ -27,6 +27,12 @@ in rec {
     }))
   ];
 
+  # nix.settings = {
+  #   # https://yazi-rs.github.io/docs/installation#cache
+  #   extra-substituters = ["https://yazi.cachix.org"];
+  #   extra-trusted-public-keys = ["yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="];
+  # };
+
   accounts.calendar.basePath = home.homeDirectory + "/.calendars";
   accounts.calendar.accounts = {
     personal = {
@@ -52,6 +58,9 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    dragon
+    ffmpeg
+    ffmpegthumbnailer
     parallel
     libwebp # why do 'r/wallpaper' upload all its images in `webp`
     tabnine
