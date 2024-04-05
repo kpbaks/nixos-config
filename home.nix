@@ -660,6 +660,26 @@ in rec {
   programs.pet.enable = true;
   programs.ripgrep.enable = true;
 
+  programs.rio = {
+    enable = true;
+    settings = {
+      editor = "hx";
+      blinking-cursor = false;
+      hide-cursor-when-typing = false;
+      confirm-before-quit = true;
+      use-fork = true; # faster on linux
+      window.decorations = "Disabled";
+      fonts.family = "Iosevka Nerd Font Mono";
+      fonts.size = 16;
+
+      keyboard.use-kitty-keyboard-protocol = false;
+      scroll.multiplier = 5.0;
+
+      adaptive-theme.light = "belafonte-day";
+      adaptive-theme.dark = "belafonte-night";
+    };
+  };
+
   # programs.ruff.enable = true;
 
   programs.ssh = {
