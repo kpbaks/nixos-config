@@ -107,7 +107,6 @@ in rec {
     # mako # wayland notification daemon
     cliphist # clipboard history
     wezterm # terminal
-    kitty # terminal
     alacritty # terminal
     alejandra # nix formatter
     eww # custom desktop widgets
@@ -606,6 +605,10 @@ in rec {
       "ctrl+shift+h" = "show_scrollback";
       "ctrl+shift+e" = "open_url_with_hints";
       "ctrl+shift+f1" = "show_kitty_doc overview";
+      "page_up" = "scroll_page_up";
+      "page_down" = "scroll_page_down";
+      "ctrl+home" = "scroll_home";
+      "ctrl+end" = "scroll_end";
       f11 = "toggle_fullscreen";
     };
     extraConfig = ''
@@ -1064,7 +1067,7 @@ in rec {
           "SHIFT, f11, fullscreen, 2"
           "CTRL, f11, fullscreen, 0"
           "SUPER, r, layoutmsg, orientationnext"
-          # "SUPERSHIFT, m, layoutmsg, swapwithmaster"
+          "SUPERSHIFT, m, layoutmsg, swapwithmaster"
           "SUPER, space, layoutmsg, swapwithmaster"
 
           # "focusmonitor"
