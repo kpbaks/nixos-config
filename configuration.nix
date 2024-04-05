@@ -128,8 +128,8 @@ in {
 
       # Optionally, you may need to select the appropriate driver version for your specific GPU.
       # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
-      # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
-      hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
+      hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
+      # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
 
       # nvidia-drm.modeset=1 is required for some wayland compositors, e.g. sway
       hardware.nvidia.modesetting.enable = true;
@@ -263,7 +263,7 @@ in {
       vim
       udev
       starship
-      vscode
+      # vscode
       cachix
     ];
   };
@@ -283,7 +283,6 @@ in {
     wl-clipboard
     sniffnet
     git
-    # (import (fetchTarball https://install.devenv.sh/latest)).default
     lshw
     pciutils # lscpi
     nvtopPackages.full
