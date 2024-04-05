@@ -674,6 +674,7 @@ in rec {
 
       keyboard.use-kitty-keyboard-protocol = false;
       scroll.multiplier = 5.0;
+      scroll.divider = 1.0;
 
       adaptive-theme.light = "belafonte-day";
       adaptive-theme.dark = "belafonte-night";
