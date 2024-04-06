@@ -58,6 +58,7 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    starship
     # rerun
     devenv
     dragon
@@ -453,6 +454,20 @@ in rec {
   programs.git-cliff.enable = true;
   programs.gitui.enable = true;
 
+  # programs.gnome-terminal = {
+  #   enable = true;
+  #   showMenubar = true;
+  #   themeVariant = "system";
+  #   profile.default = {
+  #     default = true;
+  #     allowBold = true;
+  #     audibleBell = false;
+  #     transparencyPercent = 90;
+  #     showScrollbar = true;
+  #     font = "Iosevka Nerd Font Mono";
+  #   };
+  # };
+
   # programs.gpg.enable = true;
 
   # TODO: convert
@@ -701,6 +716,12 @@ in rec {
     enable = true;
     compression = true;
   };
+
+  # TODO: convert to home-manager
+  # programs.starship = {
+  #   enable = true;
+  #   enableFishIntegration = false;
+  # };
 
   programs.tealdeer = {
     enable = true;
