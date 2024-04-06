@@ -58,6 +58,7 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    # rerun
     devenv
     dragon
     ffmpeg
@@ -1299,6 +1300,25 @@ in rec {
     show_progress_bar = true
     minimum_update_delay = 1
   '';
+
+  wayland.windowManager.river = {
+    enable = true;
+    xwayland.enable = true;
+    extraSessionVariables = {
+      MOZ_ENABLE_WAYLAND = "1";
+    };
+    settings = {
+      map = {
+        normal = {
+          "Alt Q" = "close";
+        };
+      };
+    };
+
+    extraConfig = ''
+      rivertile -view-padding 6 -outer-padding 6 &
+    '';
+  };
 
   # home.file.".config/waybar/nix-logo.png".source = ./nix-logo.png;
 
