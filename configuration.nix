@@ -257,15 +257,8 @@ in {
   users.users.kpbaks = {
     isNormalUser = true;
     description = "Kristoffer Sørensen";
-    extraGroups = ["networkmanager" "wheel"];
-    packages = with pkgs; [
-      # firefox-devedition
-      vim
-      udev
-      starship
-      # vscode
-      cachix
-    ];
+    extraGroups = ["networkmanager" "wheel" "docker" "podman"];
+    packages = with pkgs; []; # managed by home-manager
   };
 
   fonts.packages = with pkgs; [
@@ -279,6 +272,8 @@ in {
     helix
     alejandra
     doas
+    cachix
+    udev
 
     wl-clipboard
     sniffnet
@@ -364,4 +359,16 @@ in {
   #     pkgs.xdg-desktop-portal-kde
   #   ];
   # };
+
+  virtualisation.containers.enable = true;
+  virtualisation.containers.cdi.dynamic.nvidia.enable = true;
+  virtualisation.docker = {
+    enable = true;
+    enableOnBoot = true;
+    extraPackages = with pkgs; [criu];
+  };
+
+  virtualisation.podman = {
+    enable = false;
+  };
 }
