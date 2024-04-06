@@ -294,6 +294,8 @@ in {
     xwayland.enable = true;
   };
 
+  programs.river.enable = true;
+
   qt.enable = true;
   qt.style = "breeze";
   qt.platformTheme = "kde";
