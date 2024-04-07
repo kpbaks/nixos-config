@@ -58,7 +58,9 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
-    starship
+    clipse # tui clipbard manager
+    gnomeExtensions.pano # fancy clipboard manager
+    starship # shell prompt generator
     # rerun
     devenv
     dragon
@@ -1031,6 +1033,7 @@ in rec {
       # exec-once = krunner --daemon
       # exec-once = swaync
       exec-once = swww init &
+      exec-once = clipse -listen
       # pkgs.networkmanagerapplet
       exec-once = nm-applet --indicator &
       exec-once = dunst &
@@ -1048,6 +1051,7 @@ in rec {
       windowrule = animation popin,dolphin
       windowrule = noblur,^(firefox)$ # disables blur for firefox
 
+      windowrulev2 = float, class:(floating) # class for floating windows
       windowrulev2 = tile, class:raylib # to make gbpplanner easier to work with
 
       windowrulev2 = bordercolor rgb(E54430), class:firefox
@@ -1132,6 +1136,8 @@ in rec {
 
           "SUPER, z, exec, ~/.config/hypr/bind/hyprland-arise --class Zotero"
           "SUPERSHIFT, z, exec, zotero"
+
+          # bind = SUPER, V, exec,  <terminal name> --class floating -e <shell-env>  -c 'clipse $PPID' # bind the open clipboard operation to a nice key.
           # "ALT, space, exec, krunner"
           # "ALT, space, exec, wofi --show drun"
           "ALT, space, exec, rofi -show drun -show-icons"
