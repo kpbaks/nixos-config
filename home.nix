@@ -58,6 +58,7 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    nushell
     clipse # tui clipbard manager
     gnomeExtensions.pano # fancy clipboard manager
     starship # shell prompt generator
