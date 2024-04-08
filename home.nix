@@ -58,6 +58,7 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    jitsi
     jitsi-meet
     nushell
     clipse # tui clipbard manager
