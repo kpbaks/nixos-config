@@ -49,6 +49,8 @@ in rec {
     };
   };
 
+  # catppuccin.flavour = "mocha";
+
   home.username = username;
   home.homeDirectory = "/home/" + username;
 
@@ -58,8 +60,11 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
-    jitsi
-    jitsi-meet
+    spotify-player
+    micro
+    procs
+    # jitsi
+    # jitsi-meet
     nushell
     clipse # tui clipbard manager
     gnomeExtensions.pano # fancy clipboard manager
@@ -725,6 +730,7 @@ in rec {
   # TODO: convert to home-manager
   # programs.starship = {
   #   enable = true;
+  # catppuccin.enable = true;
   #   enableFishIntegration = false;
   # };
 
