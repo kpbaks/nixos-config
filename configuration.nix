@@ -87,9 +87,13 @@ in {
     "tuxedo_keyboard.brightness=255"
     # "tuxedo_keyboard.color_left=0xff0a0a"
   ];
-  hardware.bluetooth.enable = true;
-  hardware.bluetooth.powerOnBoot = true;
-  hardware.bluetooth.package = pkgs.bluez;
+
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+    package = pkgs.bluez;
+    settings = {};
+  };
 
   # hardware.nvidia = {
   #   # Modesetting is required.
@@ -232,7 +236,11 @@ in {
 
   # Enable sound with pipewire.
   sound.enable = true;
+
   hardware.pulseaudio.enable = false;
+  hardware.pulseaudio.extraModules = [pkgs.pulseaudio-modules-bt];
+  hardware.pulseaudio.package = pkgs.puleaudioFull;
+
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -312,6 +320,11 @@ in {
   # services.surrealdb.enable = true;
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
+
+  # services.jitsi-meet = {
+  #   enable = true;
+  #   excalidraw.enable = true;
+  # };
 
   # services.thermald.enable = true;
   # TODO: check out services.auto-cpufreq
