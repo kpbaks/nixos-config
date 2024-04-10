@@ -952,8 +952,16 @@ in rec {
       usegeoclue = false;
       dbusserver = true;
     };
-    darkModeScripts = {};
-    lightModeScripts = {};
+    darkModeScripts = {
+      notify-mode-changed = ''
+        notify-send "dark mode enabled"
+      '';
+    };
+    lightModeScripts = {
+      notify-mode-changed = ''
+        notify-send "light mode enabled"
+      '';
+    };
   };
 
   services.dunst = {
