@@ -1046,7 +1046,11 @@ in rec {
   xdg.portal = {
     enable = true;
     xdgOpenUsePortal = true;
-    config.common.default = "hyprland";
+    config.preferred = {
+      default = "hyprland";
+      "org.freedesktop.impl.portal.Settings" = "darkman";
+    };
+    # config.common.default = "hyprland";
     extraPortals = [
       pkgs.xdg-desktop-portal-gtk
       pkgs.xdg-desktop-portal-kde
@@ -1077,6 +1081,8 @@ in rec {
       # exec-once = wl-paste --type image --watch cliphist store #Stores only image data
       # exec-once = krunner --daemon
       # exec-once = swaync
+      dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP &
+      systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP &
       exec-once = swww init &
       exec-once = clipse -listen
       # pkgs.networkmanagerapplet
@@ -1085,7 +1091,7 @@ in rec {
       exec-once = waybar &
 
       exec-once = hypridle
-      exec-once = copyq
+      # exec-once = copyq
       exec-once = eww daemon &
       exec-once = udiskie &
       exec-once = wlsunset -t 4000 -T 6500 -S 06:30 -s 18:30
