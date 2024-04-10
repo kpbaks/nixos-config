@@ -946,20 +946,26 @@ in rec {
   services.darkman = {
     enable = true;
     settings = {
-      lat = 56.15; # Aarhus
-      lon = 10.2; # Aarhus
-      portal = true;
-      usegeoclue = false;
-      dbusserver = true;
+      # lat = 56.15; # Aarhus
+      # lon = 10.2; # Aarhus
+      # portal = true;
+      usegeoclue = true;
+      # dbusserver = true;
     };
     darkModeScripts = {
+      gtk-theme = ''
+        ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
+      '';
       notify-mode-changed = ''
-        notify-send "dark mode enabled"
+        ${pkgs.libnotify}/bin/notify-send "dark mode enabled"
       '';
     };
     lightModeScripts = {
+      gtk-theme = ''
+        ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
+      '';
       notify-mode-changed = ''
-        notify-send "light mode enabled"
+        ${pkgs.libnotify}/bin/notify-send "light mode enabled"
       '';
     };
   };
