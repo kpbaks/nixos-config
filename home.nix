@@ -60,6 +60,8 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    macchina # neofetch like program
+    neovim-remote # TODO: create `darkman` script to toggle light/dark mode with `set background=dark`
     lurk # like `strace` but with colors
     kdiff3
     meld
@@ -953,6 +955,7 @@ in rec {
       usegeoclue = true;
       dbusserver = true;
     };
+    # TODO: change fish color theme
     darkModeScripts = {
       gtk-theme = ''
         ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
@@ -961,9 +964,10 @@ in rec {
         ${pkgs.libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear-night "switching to dark mode"
       '';
       hyprland-wallpaper = ''
-        swww img ~/Pictures/wallpapers/dark
+        ${pkgs.swww}/bin/swww img ~/Pictures/wallpapers/dark
       '';
     };
+    # TODO: change fish color theme
     lightModeScripts = {
       gtk-theme = ''
         ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
@@ -972,7 +976,7 @@ in rec {
         ${pkgs.libnotify}/bin/notify-send notify-send --app-name="darkman" --urgency=low --icon=weather-clear "switching to light mode"
       '';
       hyprland-wallpaper = ''
-        swww img ~/Pictures/wallpapers/light
+        ${pkgs.swww}/bin/swww img ~/Pictures/wallpapers/light
       '';
     };
   };
