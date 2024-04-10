@@ -60,6 +60,7 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    lurk # like `strace` but with colors
     kdiff3
     meld
     spotify-player
