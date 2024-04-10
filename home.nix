@@ -949,24 +949,30 @@ in rec {
     settings = {
       # lat = 56.15; # Aarhus
       # lon = 10.2; # Aarhus
-      # portal = true;
+      portal = true;
       usegeoclue = true;
-      # dbusserver = true;
+      dbusserver = true;
     };
     darkModeScripts = {
       gtk-theme = ''
         ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
       '';
-      notify-mode-changed = ''
-        ${pkgs.libnotify}/bin/notify-send "dark mode enabled"
+      desktop-notification = ''
+        ${pkgs.libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear-night "switching to dark mode"
+      '';
+      hyprland-wallpaper = ''
+        swww img ~/Pictures/wallpapers/dark
       '';
     };
     lightModeScripts = {
       gtk-theme = ''
         ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
       '';
-      notify-mode-changed = ''
-        ${pkgs.libnotify}/bin/notify-send "light mode enabled"
+      desktop-notification = ''
+        ${pkgs.libnotify}/bin/notify-send notify-send --app-name="darkman" --urgency=low --icon=weather-clear "switching to light mode"
+      '';
+      hyprland-wallpaper = ''
+        swww img ~/Pictures/wallpapers/light
       '';
     };
   };
