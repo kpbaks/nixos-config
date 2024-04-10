@@ -60,6 +60,8 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    kdiff3
+    meld
     spotify-player
     micro
     procs
@@ -425,8 +427,22 @@ in rec {
   programs.gh = {
     enable = true;
     gitCredentialHelper.enable = true;
+    extensions = with pkgs; [
+      gh-eco
+      gh-markdown-preview
+      # gh-notify
+      gh-cal
+      # gh-f
+      gh-poi
+      gh-actions-cache
+      # gh-copilot
+      gh-screensaver
+    ];
+
+    settings.git_protocol = "https"; # or "ssh"
     settings.aliases = {
       co = "pr checkout";
+      conflicts = "diff --name-only --diff-filter=U --relative";
     };
   };
 
@@ -811,6 +827,11 @@ in rec {
     enableExtensionUpdateCheck = true;
     enableUpdateCheck = true;
     extensions = with pkgs.vscode-extensions; [
+      zxh404.vscode-proto3
+      tiehuis.zig
+      gleam.gleam
+      tomoki1207.pdf
+      nvarner.typst-lsp
       usernamehw.errorlens
       tamasfe.even-better-toml
       ms-vscode.cpptools
