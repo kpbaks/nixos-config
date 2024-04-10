@@ -402,4 +402,6 @@ in {
   #   enable = true;
   #   allowedTCPPorts = [1883];
   # };
+
+  services.geoclue2.enable = true;
 }
