@@ -1081,8 +1081,8 @@ in rec {
       # exec-once = wl-paste --type image --watch cliphist store #Stores only image data
       # exec-once = krunner --daemon
       # exec-once = swaync
-      dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP &
-      systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP &
+      exec-once dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP &
+      exec-once systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP &
       exec-once = swww init &
       exec-once = clipse -listen
       # pkgs.networkmanagerapplet
