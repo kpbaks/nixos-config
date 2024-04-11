@@ -60,6 +60,8 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    the-way # termial snippet-manager
+    appflowy # open source alternative to notion
     macchina # neofetch like program
     neovim-remote # TODO: create `darkman` script to toggle light/dark mode with `set background=dark`
     lurk # like `strace` but with colors
@@ -646,7 +648,7 @@ in rec {
     };
     # font.name = "JetBrainsMono Nerd Font Mono";
     font.name = "Iosevka Nerd Font Mono";
-    font.size = 14;
+    font.size = 18;
     keybindings = {
       "ctrl+c" = "copy_or_interrupt";
       "ctrl+equal" = "change_font_size all +2.0";
