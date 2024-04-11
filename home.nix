@@ -482,6 +482,14 @@ in rec {
 
   programs.git-cliff.enable = true;
   programs.gitui.enable = true;
+  programs.lazygit = {
+    enable = true;
+    # settings = {
+    #   gui.theme = {
+    #     lightTheme = true;
+    #   };
+    # };
+  };
 
   # programs.gnome-terminal = {
   #   enable = true;
