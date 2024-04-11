@@ -1632,4 +1632,14 @@ in rec {
       }
     '';
   };
+
+  # TODO: create and submit a home-manager module for this
+  # TODO: install some .thThemes and .sublime-syntax
+  home.file.".config/the-way/config.toml".text = ''
+    theme = 'base16-ocean.dark'
+    db_dir = 'the_way_db'
+    themes_dir = 'the_way_themes'
+    # copy_cmd = 'xclip -in -selection clipboard'
+    copy_cmd = 'wl-copy --trim-newline'
+  '';
 }
