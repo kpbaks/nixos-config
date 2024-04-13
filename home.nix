@@ -12,6 +12,9 @@
   email = gmail;
   telephone-number = "21750049";
   system = "x86_64-linux";
+  config_dir = "/home/" + username + "/.config";
+  cache_dir = "/home/" + username + "/.cache";
+  data_dir = "/home/" + username + "/.local/share";
   lib = pkgs.lib;
   join = lib.strings.concatStringsSep;
   mapjoin = lib.strings.concatMapStringsSep;
@@ -60,6 +63,9 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    nwg-displays
+    daktilo # turn your keyboard into a typewriter!
+    # lemmyknow # identify anything
     the-way # termial snippet-manager
     appflowy # open source alternative to notion
     macchina # neofetch like program
@@ -1637,8 +1643,10 @@ in rec {
   # TODO: install some .thThemes and .sublime-syntax
   home.file.".config/the-way/config.toml".text = ''
     theme = 'base16-ocean.dark'
-    db_dir = 'the_way_db'
-    themes_dir = 'the_way_themes'
+    # db_dir = 'the_way_db'
+    db_dir = '${cache_dir}/the-way/the_way_db'
+    themes_dir '${data_dir}/the-way/themes'
+    # themes_dir = 'the_way_themes'
     # copy_cmd = 'xclip -in -selection clipboard'
     copy_cmd = 'wl-copy --trim-newline'
   '';
