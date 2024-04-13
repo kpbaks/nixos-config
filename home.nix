@@ -63,6 +63,7 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    caddy # Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS
     # charm-freeze
     pastel
     vivid
@@ -99,7 +100,6 @@ in rec {
     d2
     graphviz
     aria
-    networkmanagerapplet
     wofi
     rofi-wayland
     pavucontrol # audio sink gui
@@ -1122,7 +1122,7 @@ in rec {
       exec-once = swww init &
       exec-once = clipse -listen
       # pkgs.networkmanagerapplet
-      exec-once = nm-applet --indicator &
+      # exec-once = nm-applet --indicator &
       exec-once = dunst &
       exec-once = waybar &
 
@@ -1232,7 +1232,6 @@ in rec {
 
           "SUPER, mouse_down, workspace, e-1"
           "SUPER, mouse_up, workspace, e+1"
-
           # "SUPERSHIFT, f, togglefloating"
           ", xf86audioplay, exec, playerctl play-pause "
           ", xf86audionext, exec, playerctl next"
@@ -1307,7 +1306,7 @@ in rec {
         # kb_options = "grp:alt_shift_toggle, caps:swapescape";
         kb_options = "grp:alt_shift_toggle";
         # https://wiki.hyprland.org/Configuring/Variables/#follow-mouse-cursor
-        follow_mouse = 2;
+        follow_mouse = 1;
         touchpad = {
           natural_scroll = true;
           scroll_factor = 1.0;
@@ -1686,15 +1685,17 @@ in rec {
     profiles.screen-2023-nr09.outputs = [
       {
         criteria = "HDMI-A-1";
-        position = "0,2560";
+        position = "300,0";
         mode = "1920x1080@60.00Hz";
         status = "enable";
       }
       {
         criteria = "eDP-1";
-        position = "0,0";
+        position = "0,1080";
         status = "enable";
       }
     ];
   };
+
+  services.network-manager-applet.enable = true;
 }
