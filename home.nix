@@ -63,6 +63,7 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    # charm-freeze
     pastel
     vivid
     wdisplays
@@ -677,7 +678,7 @@ in rec {
     };
     extraConfig = ''
       include tokyonight-storm.conf
-      background_opacity 0.9
+      background_opacity 0.8
       # how much to dim text with the DIM/FAINT escape code attribute
       dim_opacity 0.5
 
@@ -1660,4 +1661,40 @@ in rec {
     # copy_cmd = 'xclip -in -selection clipboard'
     copy_cmd = 'wl-copy --trim-newline'
   '';
+
+  # https://haseebmajid.dev/posts/2023-07-25-nixos-kanshi-and-hyprland/
+  # "eDP-1" is laptop screen
+  services.kanshi = {
+    enable = true;
+    systemdTarget = "hyprland-session.target";
+    # TODO: finish
+    # profiles.docked-at-home.outputs = [
+    #   {
+    #     criteria = "eDP-1";
+    #     scale = 1.0;
+    #     status = "disable";
+    #   }
+    # ];
+    profiles.undocked.outputs = [
+      {
+        criteria = "eDP-1";
+        scale = 1.0;
+        status = "enable";
+      }
+    ];
+    # screen in Pernille's office at AU
+    profiles.screen-2023-nr09.outputs = [
+      {
+        criteria = "HDMI-A-1";
+        position = "0,2560";
+        mode = "1920x1080@60.00Hz";
+        status = "enable";
+      }
+      {
+        criteria = "eDP-1";
+        position = "0,0";
+        status = "enable";
+      }
+    ];
+  };
 }
