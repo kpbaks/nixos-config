@@ -678,8 +678,14 @@ in rec {
     extraConfig = ''
       include tokyonight-storm.conf
       background_opacity 0.9
+      # how much to dim text with the DIM/FAINT escape code attribute
+      dim_opacity 0.5
+
     '';
     settings = {
+      allow_remote_control = "yes";
+      dynamic_background_opacity = "yes";
+      # listen_on =
       disable_ligatures = "never";
       modify_font = "underline_thickness 100%";
       # modify_font = "strikethrough_position 2px";
