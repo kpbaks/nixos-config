@@ -63,6 +63,9 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    pastel
+    vivid
+    wdisplays
     nwg-displays
     daktilo # turn your keyboard into a typewriter!
     # lemmyknow # identify anything
@@ -1141,7 +1144,8 @@ in rec {
       windowrulev2 = bordercolor rgb(E53E00),title:^(.*Reddit.*)$
 
       monitor = DP-5, 2560x1440@60, 0x0, 1, bitdepth, 10 # acer monitor at home
-      monitor = eDP-1, 2560x1600@60, 0x1440, 1
+      # monitor = HDMI-A-1 1920x1080@60, 0x0, 1 # monitor borrowed from RIA
+      monitor = eDP-1, 2560x1600@60, 0x1440, 1 # tuxedo laptop
 
       # monitor=DP-1,2560x1600@60,0x0,1,vrr,1
       # monitor=DP-1,2560x1600@60,0x0,1,bitdepth,10
