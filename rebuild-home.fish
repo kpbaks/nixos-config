@@ -59,6 +59,7 @@ end
 # end
 
 set -l hm_switch_opts --print-build-logs --cores '(math (nproc) - 1)'
+# set -l expr gum spin --title "building derivation..." -- home-manager switch $hm_switch_opts --file ./home.nix
 set -l expr home-manager switch $hm_switch_opts --file ./home.nix
 # home-manager switch --flake .
 
@@ -70,6 +71,8 @@ if set --query _flag_dry_run
     exit 0
 end
 
+
+# if gum spin --title "building derivation..." -- home-manager switch $hm_switch_opts --file ./home.nix
 if eval $expr
     set -l generation (home-manager generations | head -1 | string match --groups-only --regex 'id (\d+)')
     set -l message "feat(home): derived generation $generation"
@@ -78,7 +81,8 @@ if eval $expr
     # TODO: just use `git commit` and enter commit msg in editor, but have it default to $message
     and git commit --edit --message $message
     and git log -1 HEAD
-
-    gum confirm "push to remote: $remote?" --default=true
+    and gum confirm "push to remote: $remote?" --default=true
     and git push
 end
+
+return 0

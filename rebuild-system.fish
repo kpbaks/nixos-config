@@ -56,6 +56,7 @@ end
 
 if please nixos-rebuild switch --flake .
 
+    # FIXME: does not give the correct generation
     set -l generation (nix-env --list-generations | tail -1 | string match --regex --groups-only '^\s+(\d+)')
     set -l message "feat(system): derived generation $generation"
     gum confirm "stage ./configuration.nix and commit with message: '$message'?" --default=true

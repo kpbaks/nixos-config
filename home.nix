@@ -1682,16 +1682,32 @@ in rec {
       }
     ];
     # screen in Pernille's office at AU
-    profiles.screen-2023-nr09.outputs = [
+    # profiles.screen-2023-nr09.outputs = [
+    #   {
+    #     criteria = "HDMI-A-1";
+    #     position = "300,0";
+    #     mode = "1920x1080@60.00Hz";
+    #     status = "enable";
+    #   }
+    #   {
+    #     criteria = "eDP-1";
+    #     position = "0,1080";
+    #     status = "enable";
+    #   }
+    # ];
+
+    profiles.dell-in-malthes-office.outputs = [
       {
-        criteria = "HDMI-A-1";
-        position = "300,0";
-        mode = "1920x1080@60.00Hz";
+        # criteria = "DELL P2210";
+        criteria = "Dell Inc. DELL P2210 W416K13J1PYM"; # "description:" on `hyprctl monitors`
+        position = "460,0";
+        # mode = "1680@59.88300";
         status = "enable";
       }
+
       {
         criteria = "eDP-1";
-        position = "0,1080";
+        position = "0,1050";
         status = "enable";
       }
     ];
