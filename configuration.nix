@@ -12,7 +12,7 @@
 # in
 let
   username = "kpbaks";
-in {
+in rec {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -388,21 +388,33 @@ in {
     enable = false;
   };
 
-  services.mosquitto = {
-    enable = true;
-    listeners = [
-      {
-        acl = ["pattern readwrite #"];
-        omitPasswordAuth = true;
-        settings.allow_anonymous = true;
-      }
-    ];
-  };
+  # services.mosquitto = {
+  #   enable = true;
+  #   listeners = [
+  #     {
+  #       acl = ["pattern readwrite #"];
+  #       omitPasswordAuth = true;
+  #       settings.allow_anonymous = true;
+  #     }
+  #   ];
+  # };
 
-  networking.firewall = {
-    enable = true;
-    allowedTCPPorts = [1883];
-  };
+  # networking.firewall = {
+  #   enable = true;
+  #   allowedTCPPorts = [
+  #     # (
+  #     #   if services.mosquitto.enable
+  #     #   then 1883
+  #     #   else null
+  #     # )
+  #     # (pkgs.mkIf services.mosquitto.enable 1883 [])
+  #   ];
+  #   # ++ (
+  #   #   if services.mosquitto.enable
+  #   #   then [1883]
+  #   #   else []
+  #   # );
+  # };
 
   services.geoclue2.enable = true;
 }
