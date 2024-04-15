@@ -313,6 +313,9 @@ in {
 
   # List services that you want to enable:
   services.tailscale.enable = true;
+  services.tailscale.openFirewall = true;
+  # services.netbird.enable = true;
+
   services.flatpak.enable = true;
   services.espanso.enable = true;
   services.mullvad-vpn.enable = true;
