@@ -857,7 +857,7 @@ in rec {
     enableUpdateCheck = true;
     extensions = with pkgs.vscode-extensions; [
       zxh404.vscode-proto3
-      tiehuis.zig
+      # tiehuis.zig
       gleam.gleam
       tomoki1207.pdf
       nvarner.typst-lsp
@@ -1663,7 +1663,9 @@ in rec {
 
   # https://haseebmajid.dev/posts/2023-07-25-nixos-kanshi-and-hyprland/
   # "eDP-1" is laptop screen
-  services.kanshi = {
+  services.kanshi = let
+    # generate-profiles = profiles: builtins.map;
+  in {
     enable = true;
     systemdTarget = "hyprland-session.target";
     # TODO: finish
@@ -1674,6 +1676,29 @@ in rec {
     #     status = "disable";
     #   }
     # ];
+
+    # foo = generate-profiles [
+    #   {
+    #     name = "undocked";
+    #     outputs = [
+    #       {
+    #         criteria = "eDP-1";
+    #         scale = 1.0;
+    #         status = "enable";
+    #       }
+    #     ];
+    #   }
+    # ];
+    # profiles = {
+    #   (profile-gen "undocked" [
+
+    #   {
+    #     criteria = "eDP-1";
+    #     scale = 1.0;
+    #     status = "enable";
+    #   }
+    #   ])
+    # };
     profiles.undocked.outputs = [
       {
         criteria = "eDP-1";
