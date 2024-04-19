@@ -475,6 +475,7 @@ in rec {
       # rebase.autostash = true;
       commit.verbose = true;
       merge.tool = "nvimdiff";
+      rebase.autosquash = true;
     };
 
     aliases = {
