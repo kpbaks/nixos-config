@@ -63,6 +63,7 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    ripdrag # drag and drop files from the terminal
     caddy # Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS
     # charm-freeze
     pastel
@@ -933,6 +934,7 @@ in rec {
 
       "[nix]"."editor.tabSize" = 2;
       "tabnine.experimentalAutoImports" = true;
+      "tabnine.debounceMilliseconds" = 1000;
     };
     keybindings = let
       ctrl = key: "ctrl+" + key;
