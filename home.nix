@@ -446,6 +446,9 @@ in rec {
         font = "${font.monospace}:size=14";
         dpi-aware = "yes";
       };
+      colors = {
+        alpha = 0.9;
+      };
 
       mouse = {
         hide-when-typing = "yes";
