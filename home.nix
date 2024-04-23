@@ -22,13 +22,14 @@
   pipe = lib.pipe;
   tostring = builtins.toString;
   merge = list: builtins.foldl' (acc: it: acc // it) {} list;
+  font.monospace = "Iosevka Nerd Font Mono";
 in rec {
   # TODO: consider using https://github.com/chessai/nix-std
-  nixpkgs.overlays = [
-    (import (builtins.fetchTarball {
-      url = "https://github.com/nix-community/neovim-nightly-overlay/archive/master.tar.gz";
-    }))
-  ];
+  # nixpkgs.overlays = [
+  #   (import (builtins.fetchTarball {
+  #     url = "https://github.com/nix-community/neovim-nightly-overlay/archive/master.tar.gz";
+  #   }))
+  # ];
 
   # nix.settings = {
   #   # https://yazi-rs.github.io/docs/installation#cache
@@ -95,7 +96,7 @@ in rec {
     ffmpegthumbnailer
     parallel
     libwebp # why do 'r/wallpaper' upload all its images in `webp`
-    tabnine
+    # tabnine
     waybar
     # grit
     d2
@@ -119,9 +120,9 @@ in rec {
     # flameshot
     brightnessctl # control screen brightness
     thunderbird # email client
-    discord
+    # discord
     telegram-desktop # messaging client
-    spotify # music player
+    # spotify # music player
     zotero # citation/bibliography manager
     copyq # clipboard manager
     libnotify # for `notify-send`
@@ -435,6 +436,23 @@ in rec {
   #   enable = true;
   # };
 
+  programs.foot = {
+    enable = true;
+    server.enable = true;
+    settings = {
+      main = {
+        term = "xterm-256color";
+
+        font = "${font.monospace}:size=14";
+        dpi-aware = "yes";
+      };
+
+      mouse = {
+        hide-when-typing = "yes";
+      };
+    };
+  };
+
   programs.fzf = {
     enable = true;
     enableFishIntegration = false;
@@ -526,7 +544,7 @@ in rec {
     enable = true;
     # package = pkgs.helix;
     # https://discourse.nixos.org/t/home-manager-helix-editor-install-helix-using-flake/40503/6
-    package = (builtins.getFlake "github:helix-editor/helix").packages.${pkgs.system}.default;
+    # package = (builtins.getFlake "github:helix-editor/helix").packages.${pkgs.system}.default;
     defaultEditor = true;
     extraPackages = with pkgs; [
       marksman
@@ -720,7 +738,7 @@ in rec {
   programs.neovim = {
     enable = true;
     defaultEditor = false;
-    package = pkgs.neovim-nightly;
+    # package = pkgs.neovim-nightly;
     extraPackages = with pkgs; [
       gnumake
       tree-sitter
@@ -852,9 +870,9 @@ in rec {
   # TODO: convert settings to this
   programs.vscode = {
     enable = true;
-    package = pkgs.vscode;
+    # package = pkgs.vscode;
     # package = pkgs.vscode.fhs;
-    # package = pkgs.vscodium;
+    package = pkgs.vscodium;
     enableExtensionUpdateCheck = true;
     enableUpdateCheck = true;
     extensions = with pkgs.vscode-extensions; [
@@ -865,16 +883,16 @@ in rec {
       nvarner.typst-lsp
       usernamehw.errorlens
       tamasfe.even-better-toml
-      ms-vscode.cpptools
+      # ms-vscode.cpptools
       llvm-vs-code-extensions.vscode-clangd
       ms-python.python
-      ms-vsliveshare.vsliveshare
+      # ms-vsliveshare.vsliveshare
       ms-toolsai.jupyter
       yzhang.markdown-all-in-one
       rust-lang.rust-analyzer
-      github.copilot
-      github.copilot-chat
-      tabnine.tabnine-vscode
+      # github.copilot
+      # github.copilot-chat
+      # tabnine.tabnine-vscode
     ];
     userSettings = {
       "editor.tabSize" = 4;
