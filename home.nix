@@ -25,11 +25,11 @@
   font.monospace = "Iosevka Nerd Font Mono";
 in rec {
   # TODO: consider using https://github.com/chessai/nix-std
-  # nixpkgs.overlays = [
-  #   (import (builtins.fetchTarball {
-  #     url = "https://github.com/nix-community/neovim-nightly-overlay/archive/master.tar.gz";
-  #   }))
-  # ];
+  nixpkgs.overlays = [
+    (import (builtins.fetchTarball {
+      url = "https://github.com/nix-community/neovim-nightly-overlay/archive/master.tar.gz";
+    }))
+  ];
 
   # nix.settings = {
   #   # https://yazi-rs.github.io/docs/installation#cache
@@ -547,7 +547,7 @@ in rec {
     enable = true;
     # package = pkgs.helix;
     # https://discourse.nixos.org/t/home-manager-helix-editor-install-helix-using-flake/40503/6
-    # package = (builtins.getFlake "github:helix-editor/helix").packages.${pkgs.system}.default;
+    package = (builtins.getFlake "github:helix-editor/helix").packages.${pkgs.system}.default;
     defaultEditor = true;
     extraPackages = with pkgs; [
       marksman
@@ -741,7 +741,7 @@ in rec {
   programs.neovim = {
     enable = true;
     defaultEditor = false;
-    # package = pkgs.neovim-nightly;
+    package = pkgs.neovim-nightly;
     extraPackages = with pkgs; [
       gnumake
       tree-sitter
