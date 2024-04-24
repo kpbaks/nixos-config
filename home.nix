@@ -1760,6 +1760,21 @@ in rec {
         status = "enable";
       }
     ];
+
+    profiles.kevork-phillips.outputs = [
+      {
+        criteria = "Philips Consumer Electronics Company Philips 200CW AU20739015912"; # "description:" on `hyprctl monitors`
+        position = "460,0";
+        # mode = "1680@59.88300";
+        status = "enable";
+      }
+
+      {
+        criteria = "eDP-1";
+        position = "0,1050";
+        status = "enable";
+      }
+    ];
   };
 
   services.network-manager-applet.enable = true;
