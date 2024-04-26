@@ -64,6 +64,7 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    upx
     ripdrag # drag and drop files from the terminal
     caddy # Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS
     # charm-freeze
@@ -765,7 +766,35 @@ in rec {
   # programs.nushell.enable = true;
   programs.pandoc.enable = true;
   programs.pet.enable = true;
-  programs.ripgrep.enable = true;
+  programs.ripgrep = {
+    enable = true;
+    # arguments = [
+    #   "--max-columns-preview"
+    #   "--colors=line:style:bold"
+    # ];
+  };
+
+  home.file.".config/ripgrep/ripgreprc".text = ''
+    # Don't let ripgrep vomit really long lines to my terminal, and show a preview.
+    --max-columns=150
+    --max-columns-preview
+
+    # Add my 'web' type.
+    --type-add
+    web:*.{html,css,js}*
+
+    # Search hidden files/directories by default
+    --hidden
+
+    # Set the colors.
+    --colors=line:none
+    --colors=line:style:bold
+
+    # Because who cares about case!?
+    --smart-case
+  '';
+
+  home.sessionVariables.RIPGREP_CONFIG_PATH = home.homeDirectory + "/.config/ripgrep/ripgreprc";
 
   programs.rio = {
     enable = true;
