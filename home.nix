@@ -768,33 +768,37 @@ in rec {
   programs.pet.enable = true;
   programs.ripgrep = {
     enable = true;
-    # arguments = [
-    #   "--max-columns-preview"
-    #   "--colors=line:style:bold"
-    # ];
+    arguments = [
+      # Don't let ripgrep vomit really long lines to my terminal, and show a preview.
+      "--max-columns=150"
+      "--max-columns-preview"
+      # Add my 'web' type.
+      "--type-add"
+      "web:*.{html,css,js}*"
+      # Search hidden files/directories by default
+      "--hidden"
+      # Set the colors.
+      "--colors=line:none"
+      "--colors=line:style:bold"
+
+      "--smart-case"
+    ];
   };
 
-  home.file.".config/ripgrep/ripgreprc".text = ''
-    # Don't let ripgrep vomit really long lines to my terminal, and show a preview.
-    --max-columns=150
-    --max-columns-preview
+  # home.file.".config/ripgrep/ripgreprc".text = ''
 
-    # Add my 'web' type.
-    --type-add
-    web:*.{html,css,js}*
+  #   # Search hidden files/directories by default
+  #   --hidden
 
-    # Search hidden files/directories by default
-    --hidden
+  #   # Set the colors.
+  #   --colors=line:none
+  #   --colors=line:style:bold
 
-    # Set the colors.
-    --colors=line:none
-    --colors=line:style:bold
+  #   # Because who cares about case!?
+  #   --smart-case
+  # '';
 
-    # Because who cares about case!?
-    --smart-case
-  '';
-
-  home.sessionVariables.RIPGREP_CONFIG_PATH = home.homeDirectory + "/.config/ripgrep/ripgreprc";
+  # home.sessionVariables.RIPGREP_CONFIG_PATH = home.homeDirectory + "/.config/ripgrep/ripgreprc";
 
   programs.rio = {
     enable = true;
