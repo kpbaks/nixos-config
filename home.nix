@@ -1794,6 +1794,22 @@ in rec {
       }
     ];
 
+    profiles.lg-in-malthes-office.outputs = [
+      {
+        # criteria = "DELL P2210";
+        criteria = "LG Electronics LG FULL HD"; # "description:" on `hyprctl monitors`
+        position = "460,0";
+        # mode = "1680@59.88300";
+        status = "enable";
+      }
+
+      {
+        criteria = "eDP-1";
+        position = "0,1050";
+        status = "enable";
+      }
+    ];
+
     profiles.kevork-phillips.outputs = [
       {
         criteria = "Philips Consumer Electronics Company Philips 200CW AU20739015912"; # "description:" on `hyprctl monitors`
