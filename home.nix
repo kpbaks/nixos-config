@@ -1827,4 +1827,13 @@ in rec {
   };
 
   services.network-manager-applet.enable = true;
+
+  programs.zathura = {
+    enable = true;
+    mappings = {
+      "" = "navigate next";
+      D = "toggle_page_mode";
+      "[fullscreen] " = "zoom in";
+    };
+  };
 }
