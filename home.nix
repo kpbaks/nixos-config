@@ -64,6 +64,7 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    zed-editor
     upx
     ripdrag # drag and drop files from the terminal
     caddy # Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS
@@ -1136,6 +1137,10 @@ in rec {
     ];
   };
 
+  xdg.mimeApps.defaultApplications = {
+    "application/pdf" = ["zathura.desktop" "evince.desktop"];
+  };
+
   xdg.portal = {
     enable = true;
     xdgOpenUsePortal = true;
@@ -1832,8 +1837,14 @@ in rec {
     enable = true;
     mappings = {
       "" = "navigate next";
-      D = "toggle_page_mode";
+      # D = "toggle_page_mode";
       "[fullscreen] " = "zoom in";
     };
+    extraConfig = ''
+      set selection-clipboard clipboard
+      map D set "first-page-column 1:1"
+      map <C-d> set "first-page-column 1:2"
+      map ge bottom
+    '';
   };
 }
