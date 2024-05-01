@@ -64,6 +64,7 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
+    dog # rust alternative to dig
     zed-editor
     upx
     ripdrag # drag and drop files from the terminal
@@ -89,7 +90,7 @@ in rec {
     # jitsi-meet
     nushell
     clipse # tui clipbard manager
-    gnomeExtensions.pano # fancy clipboard manager
+    # gnomeExtensions.pano # fancy clipboard manager
     starship # shell prompt generator
     # rerun
     devenv
@@ -124,7 +125,7 @@ in rec {
     thunderbird # email client
     # discord
     telegram-desktop # messaging client
-    # spotify # music player
+    spotify # music player
     zotero # citation/bibliography manager
     copyq # clipboard manager
     libnotify # for `notify-send`
@@ -472,7 +473,7 @@ in rec {
       # gh-notify
       gh-cal
       # gh-f
-      gh-poi
+      # gh-poi
       gh-actions-cache
       # gh-copilot
       gh-screensaver
@@ -1102,40 +1103,40 @@ in rec {
     enable = false;
   };
 
-  services.espanso = let
-    espanso-prefix-char = ":";
-    espanso-match = trigger: replace: {
-      trigger = espanso-prefix-char + trigger;
-      replace = replace;
-    };
-  in {
-    enable = true;
-    configs.default = {
-      backend = "Auto";
-      auto_restart = true;
-      show_icon = true;
-      show_notifications = true;
-      preserve_clipboard = true;
-      undo_backspace = true;
-      toggle_key = "ALT";
-      search_shortcut = "ALT+SHIFT+ENTER";
-    };
-    matches.base.matches = [
-      (espanso-match "tuta" tutamail)
-      (espanso-match "gmail" gmail)
-      (espanso-match "email" email)
-      (espanso-match "aumail" aumail)
-      (espanso-match "tf" telephone-number)
-      (espanso-match "phone" telephone-number)
-      (espanso-match "name" name)
-      (espanso-match "fname" full-name)
-      (espanso-match "addr" "Helsingforsgade 19 st, 4")
-      (espanso-match "rg" ''
-        Regards
-        ${full-name}
-      '')
-    ];
-  };
+  # services.espanso = let
+  #   espanso-prefix-char = ":";
+  #   espanso-match = trigger: replace: {
+  #     trigger = espanso-prefix-char + trigger;
+  #     replace = replace;
+  #   };
+  # in {
+  #   enable = false;
+  #   configs.default = {
+  #     backend = "Auto";
+  #     auto_restart = true;
+  #     show_icon = true;
+  #     show_notifications = true;
+  #     preserve_clipboard = true;
+  #     undo_backspace = true;
+  #     toggle_key = "ALT";
+  #     search_shortcut = "ALT+SHIFT+ENTER";
+  #   };
+  #   matches.base.matches = [
+  #     (espanso-match "tuta" tutamail)
+  #     (espanso-match "gmail" gmail)
+  #     (espanso-match "email" email)
+  #     (espanso-match "aumail" aumail)
+  #     (espanso-match "tf" telephone-number)
+  #     (espanso-match "phone" telephone-number)
+  #     (espanso-match "name" name)
+  #     (espanso-match "fname" full-name)
+  #     (espanso-match "addr" "Helsingforsgade 19 st, 4")
+  #     (espanso-match "rg" ''
+  #       Regards
+  #       ${full-name}
+  #     '')
+  #   ];
+  # };
 
   # xdg-mime query default image/svg+xml
   xdg.mimeApps.defaultApplications = let
@@ -1163,7 +1164,7 @@ in rec {
     ];
   };
 
-  home.file.".config/hypr/bin/hyprland-arise".source = ./target/release/hyprland-arise;
+  # home.file.".config/hypr/bin/hyprland-arise".source = ./target/release/hyprland-arise;
 
   home.file.".config/xdg-desktop-portal/hyprland-portals.conf".text = ''
     [preferred]
