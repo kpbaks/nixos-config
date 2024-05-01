@@ -1137,8 +1137,13 @@ in rec {
     ];
   };
 
-  xdg.mimeApps.defaultApplications = {
+  # xdg-mime query default image/svg+xml
+  xdg.mimeApps.defaultApplications = let
+    loupe = "org.gnome.Loupe.desktop";
+    browser = "firefox.desktop";
+  in {
     "application/pdf" = ["zathura.desktop" "evince.desktop"];
+    "image/svg+xml" = [browser];
   };
 
   xdg.portal = {

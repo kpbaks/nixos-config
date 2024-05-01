@@ -1,0 +1,98 @@
+digraph pipewire {
+link_87 [shape=box style=filled fillcolor=lightblue];
+link_87 [label="link_id: 87\loutput_node_id: 84\linput_node_id: 75\loutput_port_id: 86\linput_port_id: 80\lstate: init\l"];
+port_86 -> link_87 -> port_80;
+link_88 [shape=box style=filled fillcolor=lightblue];
+link_88 [label="link_id: 88\loutput_node_id: 84\linput_node_id: 75\loutput_port_id: 85\linput_port_id: 78\lstate: init\l"];
+port_85 -> link_88 -> port_78;
+subgraph cluster_node_84 {
+bgcolor=palegreen;
+label="node_id: 84\lname: spotify\lmedia_class: Stream/Output/Audio\l"
+port_86 [shape=box style=filled fillcolor=lightcoral];
+port_86 [label="port_id: 86\lname: output_FR\ldirection: output\l"];
+port_85 [shape=box style=filled fillcolor=lightcoral];
+port_85 [label="port_id: 85\lname: output_FL\ldirection: output\l"];
+}
+subgraph cluster_node_75 {
+bgcolor=palegreen;
+label="node_id: 75\lname: bluez_output.80_C3_BA_3F_D7_A3.1\lmedia_class: Audio/Sink\l"
+port_81 [shape=box style=filled fillcolor=lightcoral];
+port_81 [label="port_id: 81\lname: monitor_FR\ldirection: output\l"];
+port_80 [shape=box style=filled fillcolor=lightslateblue];
+port_80 [label="port_id: 80\lname: playback_FR\ldirection: input\l"];
+port_79 [shape=box style=filled fillcolor=lightcoral];
+port_79 [label="port_id: 79\lname: monitor_FL\ldirection: output\l"];
+port_78 [shape=box style=filled fillcolor=lightslateblue];
+port_78 [label="port_id: 78\lname: playback_FL\ldirection: input\l"];
+}
+subgraph cluster_node_74 {
+bgcolor=palegreen;
+label="node_id: 74\lname: bluez_capture_internal.80:C3:BA:3F:D7:A3\lmedia_class: Stream/Input/Audio/Internal\l"
+port_77 [shape=box style=filled fillcolor=lightcoral];
+port_77 [label="port_id: 77\lname: monitor_MONO\ldirection: output\l"];
+port_76 [shape=box style=filled fillcolor=lightslateblue];
+port_76 [label="port_id: 76\lname: input_MONO\ldirection: input\l"];
+}
+subgraph cluster_node_73 {
+bgcolor=palegreen;
+label="node_id: 73\lname: bluez_input.80:C3:BA:3F:D7:A3\lmedia_class: Audio/Source\l"
+port_82 [shape=box style=filled fillcolor=lightcoral];
+port_82 [label="port_id: 82\lname: capture_MONO\ldirection: output\l"];
+}
+subgraph cluster_node_67 {
+bgcolor=palegreen;
+label="node_id: 67\lname: v4l2_input.pci-0000_00_14.0-usb-0_6_1.2\lmedia_class: Video/Source\l"
+port_68 [shape=box style=filled fillcolor=lightcoral];
+port_68 [label="port_id: 68\lname: capture_1\ldirection: output\l"];
+}
+subgraph cluster_node_65 {
+bgcolor=palegreen;
+label="node_id: 65\lname: v4l2_input.pci-0000_00_14.0-usb-0_6_1.0\lmedia_class: Video/Source\l"
+port_66 [shape=box style=filled fillcolor=lightcoral];
+port_66 [label="port_id: 66\lname: capture_1\ldirection: output\l"];
+}
+subgraph cluster_node_57 {
+bgcolor=palegreen;
+label="node_id: 57\lname: bluez_midi.server\lmedia_class: Midi/Bridge\l"
+port_59 [shape=box style=filled fillcolor=lightcoral];
+port_59 [label="port_id: 59\lname: out\ldirection: output\l"];
+port_58 [shape=box style=filled fillcolor=lightslateblue];
+port_58 [label="port_id: 58\lname: in\ldirection: input\l"];
+}
+subgraph cluster_node_56 {
+bgcolor=palegreen;
+label="node_id: 56\lname: alsa_input.pci-0000_00_1f.3.analog-stereo\lmedia_class: Audio/Source\l"
+port_70 [shape=box style=filled fillcolor=lightcoral];
+port_70 [label="port_id: 70\lname: capture_FR\ldirection: output\l"];
+port_69 [shape=box style=filled fillcolor=lightcoral];
+port_69 [label="port_id: 69\lname: capture_FL\ldirection: output\l"];
+}
+subgraph cluster_node_55 {
+bgcolor=palegreen;
+label="node_id: 55\lname: alsa_output.pci-0000_00_1f.3.analog-stereo\lmedia_class: Audio/Sink\l"
+port_51 [shape=box style=filled fillcolor=lightcoral];
+port_51 [label="port_id: 51\lname: monitor_FR\ldirection: output\l"];
+port_52 [shape=box style=filled fillcolor=lightslateblue];
+port_52 [label="port_id: 52\lname: playback_FR\ldirection: input\l"];
+port_53 [shape=box style=filled fillcolor=lightcoral];
+port_53 [label="port_id: 53\lname: monitor_FL\ldirection: output\l"];
+port_54 [shape=box style=filled fillcolor=lightslateblue];
+port_54 [label="port_id: 54\lname: playback_FL\ldirection: input\l"];
+}
+subgraph cluster_node_43 {
+bgcolor=palegreen;
+label="node_id: 43\lname: Midi-Bridge\lmedia_class: Midi/Bridge\l"
+port_45 [shape=box style=filled fillcolor=lightcoral];
+port_45 [label="port_id: 45\lname: Midi Through:(capture_0) Midi Through Port-0\ldirection: output\l"];
+port_44 [shape=box style=filled fillcolor=lightslateblue];
+port_44 [label="port_id: 44\lname: Midi Through:(playback_0) Midi Through Port-0\ldirection: input\l"];
+}
+subgraph cluster_node_31 {
+bgcolor=palegreen;
+label="node_id: 31\lname: Freewheel-Driver\lmedia_class: (null)\l"
+}
+subgraph cluster_node_30 {
+bgcolor=palegreen;
+label="node_id: 30\lname: Dummy-Driver\lmedia_class: (null)\l"
+}
+}

@@ -288,7 +288,7 @@ in rec {
     git
     lshw
     pciutils # lscpi
-    nvtopPackages.full
+    # nvtopPackages.full
     ddcutil
   ];
 
@@ -376,17 +376,17 @@ in rec {
   #   ];
   # };
 
-  virtualisation.containers.enable = true;
-  virtualisation.containers.cdi.dynamic.nvidia.enable = true;
-  virtualisation.docker = {
-    enable = true;
-    enableOnBoot = true;
-    extraPackages = with pkgs; [criu];
-  };
+  # virtualisation.containers.enable = true;
+  # virtualisation.containers.cdi.dynamic.nvidia.enable = true;
+  # virtualisation.docker = {
+  #   enable = true;
+  #   enableOnBoot = true;
+  #   extraPackages = with pkgs; [criu];
+  # };
 
-  virtualisation.podman = {
-    enable = false;
-  };
+  # virtualisation.podman = {
+  #   enable = false;
+  # };
 
   # services.mosquitto = {
   #   enable = true;
@@ -416,5 +416,11 @@ in rec {
   #   # );
   # };
 
+  # needed for `darkman`
   services.geoclue2.enable = true;
+
+  # show dots when typing password for sudo
+  security.sudo.extraConfig = ''
+    Defaults env_reset,pwfeedback
+  '';
 }
