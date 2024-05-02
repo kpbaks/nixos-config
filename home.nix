@@ -64,7 +64,7 @@ in rec {
   # TODO: document all pkgs
 
   home.packages = with pkgs; [
-    dog # rust alternative to dig
+    dogdns # rust alternative to dig
     zed-editor
     upx
     ripdrag # drag and drop files from the terminal
@@ -522,11 +522,15 @@ in rec {
   programs.gitui.enable = true;
   programs.lazygit = {
     enable = true;
-    # settings = {
-    #   gui.theme = {
-    #     lightTheme = true;
-    #   };
-    # };
+    # git:
+    #   paging:
+    #     externalDiffCommand: difft --color=always --display=inline --syntax-highlight=off
+    settings = {
+      git.pagint.externalDiffCommand = "difft --color=always --display=inline --syntax-highlight=off";
+      #   gui.theme = {
+      #     lightTheme = true;
+      #   };
+    };
   };
 
   # programs.gnome-terminal = {
