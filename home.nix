@@ -526,7 +526,9 @@ in rec {
     #   paging:
     #     externalDiffCommand: difft --color=always --display=inline --syntax-highlight=off
     settings = {
-      git.pagint.externalDiffCommand = "difft --color=always --display=inline --syntax-highlight=off";
+      # https://github.com/jesseduffield/lazygit/blob/master/docs/Custom_Pagers.md#using-external-diff-commands
+      # git.pagint.externalDiffCommand = "difft --color=always --display=inline --syntax-highlight=off";
+      git.pagint.externalDiffCommand = "difft --color=always";
       #   gui.theme = {
       #     lightTheme = true;
       #   };
@@ -559,6 +561,7 @@ in rec {
     extraPackages = with pkgs; [
       marksman
       taplo
+      (builtins.getFlake "github:estin/simple-completion-language-server").defaultPackage.${pkgs.system}
     ];
     # settings = {
     #   theme = "gruvbox_dark_hard";
@@ -1856,5 +1859,19 @@ in rec {
       map <C-d> set "first-page-column 1:2"
       map ge bottom
     '';
+  };
+
+  programs.sioyek = {
+    enable = true;
+    bindings = {
+      "move_up" = "k";
+      "move_down" = "j";
+      "move_left" = "h";
+      "move_right" = "l";
+      "screen_down" = ["d" ""];
+      "screen_up" = ["u" ""];
+    };
+    config = {
+    };
   };
 }
