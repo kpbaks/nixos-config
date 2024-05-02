@@ -1,4 +1,8 @@
-#!/usr/bin/env -S fish --no-config
+#!/usr/bin/env nix-shell
+#! nix-shell -i fish -p gum git difftastic
+
+# !/usr/bin/env -S fish --no-config
+
 
 set -l reset (set_color normal)
 set -l bold (set_color --bold)

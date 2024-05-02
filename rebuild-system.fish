@@ -1,14 +1,15 @@
-#!/usr/bin/env -S fish --no-config
+#!/usr/bin/env nix-shell
+#! nix-shell -i fish -p gum git difftastic
 
-set -l reset (set_color normal)
-set -l bold (set_color --bold)
-set -l italics (set_color --italics)
-set -l red (set_color red)
-set -l green (set_color green)
-set -l yellow (set_color yellow)
-set -l blue (set_color blue)
-set -l cyan (set_color cyan)
-set -l magenta (set_color magenta)
+set -g reset (set_color normal)
+set -g bold (set_color --bold)
+set -g italics (set_color --italics)
+set -g red (set_color red)
+set -g green (set_color green)
+set -g yellow (set_color yellow)
+set -g blue (set_color blue)
+set -g cyan (set_color cyan)
+set -g magenta (set_color magenta)
 
 set -l scriptdir (status filename | path dirname | path resolve)
 
@@ -54,8 +55,7 @@ if set --query _flag_dry_run
     exit 0
 end
 
-if please nixos-rebuild switch --flake .
-
+if sudo nixos-rebuild switch --flake .
     # FIXME: does not give the correct generation
     set -l generation (nix-env --list-generations | tail -1 | string match --regex --groups-only '^\s+(\d+)')
     set -l message "feat(system): derived generation $generation"

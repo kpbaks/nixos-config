@@ -282,6 +282,8 @@ in rec {
     doas
     cachix
     udev
+    dig
+    nmap
 
     wl-clipboard
     sniffnet
