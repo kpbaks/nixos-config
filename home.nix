@@ -496,7 +496,7 @@ in rec {
     extraConfig = {
       init.defaultBranch = "main";
       push.autosetupremote = true;
-      pull.ff = "only";
+      # pull.ff = "only";
       merge.conflictstyle = "zdiff3";
       # rebase.autostash = true;
       commit.verbose = true;
