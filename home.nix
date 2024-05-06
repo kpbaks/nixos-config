@@ -202,6 +202,7 @@ in rec {
     brotab
     manix
     comma
+    fish
 
     python3
     ouch # {,de}compression tool
