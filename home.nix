@@ -497,6 +497,7 @@ in rec {
       init.defaultBranch = "main";
       push.autosetupremote = true;
       # pull.ff = "only";
+      pull.rebase = false;
       merge.conflictstyle = "zdiff3";
       # rebase.autostash = true;
       commit.verbose = true;
