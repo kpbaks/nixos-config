@@ -61,9 +61,13 @@ in rec {
   # TODO: sync with `configuration.nix`
   home.stateVersion = "23.11";
 
-  # TODO: document all pkgs
+  home.sessionVariables = {
+    PAGER = "moar";
+  };
 
+  # TODO: document all pkgs
   home.packages = with pkgs; [
+    moar # a nice pager
     dogdns # rust alternative to dig
     zed-editor
     upx
