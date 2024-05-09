@@ -62,7 +62,8 @@ in rec {
   home.stateVersion = "23.11";
 
   home.sessionVariables = {
-    PAGER = "moar";
+    PAGER = "${pkgs.moar}/bin/moar";
+    MOAR = "--statusbar=bold --no-linenumbers";
   };
 
   # TODO: document all pkgs
