@@ -68,6 +68,8 @@ in rec {
 
   # TODO: document all pkgs
   home.packages = with pkgs; [
+    inkscape
+    gimp
     moar # a nice pager
     dogdns # rust alternative to dig
     zed-editor
