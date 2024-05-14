@@ -68,6 +68,7 @@ in rec {
 
   # TODO: document all pkgs
   home.packages = with pkgs; [
+    localsend # open source alternative to Apple Airdrop
     inkscape
     gimp
     moar # a nice pager
