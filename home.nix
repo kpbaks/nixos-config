@@ -1047,6 +1047,8 @@ in rec {
     enable = true;
   };
 
+  programs.zsh.enable = true;
+
   services.darkman = {
     enable = true;
     settings = {
