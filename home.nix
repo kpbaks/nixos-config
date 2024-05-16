@@ -1404,9 +1404,9 @@ in rec {
       };
 
       general = {
-        gaps_in = 5;
-        gaps_out = 5;
-        border_size = 2;
+        gaps_in = 2;
+        gaps_out = 2;
+        border_size = 1;
         no_border_on_floating = false;
         layout = "master"; # oneof ["dwindle" "master"]
         resize_on_border = true;
