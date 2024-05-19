@@ -68,6 +68,7 @@ in rec {
 
   # TODO: document all pkgs
   home.packages = with pkgs; [
+    tutanota-desktop
     localsend # open source alternative to Apple Airdrop
     inkscape
     gimp
