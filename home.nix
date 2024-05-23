@@ -220,7 +220,7 @@ in rec {
     python3
     ouch # {,de}compression tool
     inlyne # markdown viewer
-    # neovide # neovim gui
+    neovide # neovim gui
     nil # nix lsp
     taplo # toml formatter/linter/lsp
   ];
