@@ -68,6 +68,8 @@ in rec {
 
   # TODO: document all pkgs
   home.packages = with pkgs; [
+    asciigraph
+    imagemagick
     odin
     lychee
     tutanota-desktop
