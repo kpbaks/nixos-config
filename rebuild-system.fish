@@ -34,7 +34,7 @@ set -l modified_files (git ls-files --modified)
 if not contains -- configuration.nix $modified_files
     set -l current_branch main
     set -l last_commit_hash (git rev-parse --short --verify $current_branch)
-    printf '%serror%s: ./configuration.nix contains to modifications since last commit: %s%s%s\n' $red $reset $yellow $latest_commit_hash $reset
+    printf '%serror%s: ./configuration.nix contains no modifications since last commit: %s%s%s\n' $red $reset $yellow $latest_commit_hash $reset
     exit 1
 end
 

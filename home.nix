@@ -59,7 +59,7 @@ in rec {
   home.homeDirectory = "/home/" + username;
 
   # TODO: sync with `configuration.nix`
-  home.stateVersion = "23.11";
+  home.stateVersion = "24.05";
 
   home.sessionVariables = {
     PAGER = "${pkgs.moar}/bin/moar";
@@ -480,7 +480,7 @@ in rec {
 
   programs.gh = {
     enable = true;
-    gitCredentialHelper.enable = true;
+    gitCredentialHelper.enable = false;
     extensions = with pkgs; [
       gh-eco
       gh-markdown-preview
@@ -1163,12 +1163,18 @@ in rec {
   # };
 
   # xdg-mime query default image/svg+xml
+  # xdg.mimeApps.enable = true;
   xdg.mimeApps.defaultApplications = let
     loupe = "org.gnome.Loupe.desktop";
     browser = "firefox.desktop";
+    image-viewer = loupe;
   in {
     "application/pdf" = ["zathura.desktop" "evince.desktop"];
     "image/svg+xml" = [browser];
+    "image/png" = [image-viewer];
+    "image/jpeg" = [image-viewer];
+    # TODO: create .desktop for `jnv`
+    # "application/json" = [jnv];
   };
 
   xdg.portal = {

@@ -266,7 +266,7 @@ in rec {
     isNormalUser = true;
     description = "Kristoffer Sørensen";
     extraGroups = ["networkmanager" "wheel" "docker" "podman"];
-    packages = with pkgs; []; # managed by home-manager
+    packages = []; # managed by home-manager
   };
 
   fonts.packages = with pkgs; [
@@ -275,23 +275,29 @@ in rec {
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
+    nh # nix helper
+    nix-output-monitor # `nom`
+    nvd # nix version diff
+
+    systemctl-tui
     wget
-    atool
-    helix
-    alejandra
-    doas
+    atool # {,de}compress various compression formats
+    helix # text editor
+    alejandra # nix formatter
+    doas # sudo alternative
     cachix
     udev
-    dig
+    dig # lookup dns name resolving
+    dog # loopup dns name resolving, but in rust!
     nmap
 
     wl-clipboard
     sniffnet
     git
-    lshw
-    pciutils # lscpi
+    lshw # list hardware
+    pciutils # `lscpi`
     # nvtopPackages.full
-    ddcutil
+    ddcutil # control external displays, such as chaning their brightness
   ];
 
   programs.hyprland = {
@@ -319,8 +325,10 @@ in rec {
   # services.netbird.enable = true;
 
   services.flatpak.enable = true;
-  services.espanso.enable = true;
+  #   services.espanso.enable = false;
   services.mullvad-vpn.enable = true;
+
+  security.pam.services.gdm.enableGnomeKeyring = false;
   # services.spotifyd.enable = true;
   # services.surrealdb.enable = true;
   # Enable the OpenSSH daemon.
