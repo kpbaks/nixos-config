@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  inputs,
   ...
 }: let
   name = "Kristoffer Sørensen";
@@ -11,7 +12,7 @@
   tutamail = "kristoffer.pbs@tuta.io";
   email = gmail;
   telephone-number = "21750049";
-  system = "x86_64-linux";
+  # system = "x86_64-linux";
   config_dir = "/home/" + username + "/.config";
   cache_dir = "/home/" + username + "/.cache";
   data_dir = "/home/" + username + "/.local/share";
@@ -25,11 +26,6 @@
   font.monospace = "Iosevka Nerd Font Mono";
 in rec {
   # TODO: consider using https://github.com/chessai/nix-std
-  nixpkgs.overlays = [
-    (import (builtins.fetchTarball {
-      url = "https://github.com/nix-community/neovim-nightly-overlay/archive/master.tar.gz";
-    }))
-  ];
 
   # nix.settings = {
   #   # https://yazi-rs.github.io/docs/installation#cache
@@ -68,6 +64,12 @@ in rec {
 
   # TODO: document all pkgs
   home.packages = with pkgs; [
+    mkchromecast
+    samply
+    sad
+    sd
+    ungoogled-chromium
+    # vivaldi
     asciigraph
     imagemagick
     odin
@@ -104,7 +106,7 @@ in rec {
     nushell
     clipse # tui clipbard manager
     # gnomeExtensions.pano # fancy clipboard manager
-    starship # shell prompt generator
+    # starship # shell prompt generator
     # rerun
     devenv
     dragon
@@ -119,7 +121,7 @@ in rec {
     graphviz
     aria
     wofi
-    rofi-wayland
+    # rofi-wayland
     pavucontrol # audio sink gui
     overskride # bluetooth gui
     wf-recorder # wayland screen recorder
@@ -138,7 +140,7 @@ in rec {
     thunderbird # email client
     # discord
     telegram-desktop # messaging client
-    spotify # music player
+    # spotify # music player
     zotero # citation/bibliography manager
     copyq # clipboard manager
     libnotify # for `notify-send`
@@ -154,7 +156,6 @@ in rec {
     # mako # wayland notification daemon
     cliphist # clipboard history
     wezterm # terminal
-    alacritty # terminal
     alejandra # nix formatter
     eww # custom desktop widgets
     htop # system resource monitor
@@ -179,6 +180,7 @@ in rec {
     bun # javascript runtime and dev tool
     zoxide # intelligent `cd`
     sqlite # sql database in a file
+    litecli # A nicer repl for sqlite
     gum # tool to create rich interactive prompts for shell scripts
     fastfetch # a faster neofetch
     onefetch # git repo fetch
@@ -283,6 +285,7 @@ in rec {
     mods = modifiers: join "|" modifiers;
   in {
     enable = true;
+    catppuccin.enable = true;
     settings = {
       bell = {duration = 200;};
       cursor = {
@@ -390,6 +393,7 @@ in rec {
 
   programs.bat = {
     enable = true;
+    catppuccin.enable = true;
   };
 
   programs.bottom = {
@@ -403,10 +407,13 @@ in rec {
 
   programs.btop = {
     enable = true;
+    catppuccin.enable = true;
   };
 
   programs.cava = {
     enable = true;
+    catppuccin.enable = true;
+    catppuccin.transparent = true;
     settings = {
       general.framerate = 60;
       general.sleep_timer = 3;
@@ -416,20 +423,20 @@ in rec {
       output.alacritty_sync = 0;
       output.orientation = "bottom";
       smoothing.noise_reduction = 88;
-      color = {
-        # background = "'#000000'";
-        # foreground = "'#FFFFFF'";
-        foreground = "'magenta'";
+      # color = {
+      #   # background = "'#000000'";
+      #   # foreground = "'#FFFFFF'";
+      #   foreground = "'magenta'";
 
-        gradient = 1; # on/off
-        gradient_count = 8;
-        gradient_color_1 = "'#59cc33'";
-        gradient_color_2 = "'#80cc33'";
-        gradient_color_3 = "'#a6cc33'";
-        gradient_color_4 = "'#cccc33'";
-        gradient_color_5 = "'#cca633'";
-        gradient_color_6 = "'#cc8033'";
-      };
+      #   gradient = 1; # on/off
+      #   gradient_count = 8;
+      #   gradient_color_1 = "'#59cc33'";
+      #   gradient_color_2 = "'#80cc33'";
+      #   gradient_color_3 = "'#a6cc33'";
+      #   gradient_color_4 = "'#cccc33'";
+      #   gradient_color_5 = "'#cca633'";
+      #   gradient_color_6 = "'#cc8033'";
+      # };
     };
   };
 
@@ -480,7 +487,7 @@ in rec {
 
   programs.gh = {
     enable = true;
-    gitCredentialHelper.enable = false;
+    gitCredentialHelper.enable = true;
     extensions = with pkgs; [
       gh-eco
       gh-markdown-preview
@@ -534,9 +541,13 @@ in rec {
   };
 
   programs.git-cliff.enable = true;
-  programs.gitui.enable = true;
+  programs.gitui = {
+    enable = true;
+    catppuccin.enable = true;
+  };
   programs.lazygit = {
     enable = true;
+    catppuccin.enable = true;
     # git:
     #   paging:
     #     externalDiffCommand: difft --color=always --display=inline --syntax-highlight=off
@@ -571,12 +582,12 @@ in rec {
     enable = true;
     # package = pkgs.helix;
     # https://discourse.nixos.org/t/home-manager-helix-editor-install-helix-using-flake/40503/6
-    package = (builtins.getFlake "github:helix-editor/helix").packages.${pkgs.system}.default;
+    package = inputs.helix.packages.${pkgs.system}.default;
     defaultEditor = true;
     extraPackages = with pkgs; [
       marksman
       taplo
-      (builtins.getFlake "github:estin/simple-completion-language-server").defaultPackage.${pkgs.system}
+      inputs.simple-completion-language-server.defaultPackage.${pkgs.system}
     ];
     # settings = {
     #   theme = "gruvbox_dark_hard";
@@ -698,9 +709,12 @@ in rec {
       );
   };
 
-  home.file.".config/kitty/tokyonight-storm.conf".source = ./extra/kitty/tokyonight-storm.conf;
+  # home.file.".config/kitty/tokyonight-storm.conf".source = ./extra/kitty/tokyonight-storm.conf;
+  # home.file.".config/kitty/catppuccin-latte.conf".source = ./extra/kitty/catppuccin-latte.conf;
+  # home.file.".config/kitty/catppuccin-macchiato.conf".source = ./extra/kitty/catppuccin-macchiato.conf;
   programs.kitty = {
     enable = true;
+    catppuccin.enable = true;
     environment = {
       # LS_COLORS = "1";
     };
@@ -725,8 +739,10 @@ in rec {
       f11 = "toggle_fullscreen";
     };
     extraConfig = ''
-      include tokyonight-storm.conf
-      background_opacity 0.8
+      # include tokyonight-storm.conf
+      # include catppuccin-latte.conf
+      # include catppuccin-macchiato.conf
+      background_opacity 1.0
       # how much to dim text with the DIM/FAINT escape code attribute
       dim_opacity 0.5
 
@@ -761,12 +777,14 @@ in rec {
 
   programs.mpv = {
     enable = true;
+    catppuccin.enable = true;
   };
 
   programs.neovim = {
     enable = true;
     defaultEditor = false;
-    package = pkgs.neovim-nightly;
+    package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
+
     extraPackages = with pkgs; [
       gnumake
       tree-sitter
@@ -826,6 +844,7 @@ in rec {
 
   programs.rio = {
     enable = true;
+    catppuccin.enable = true;
     settings = {
       editor = "hx";
       blinking-cursor = false;
@@ -845,6 +864,11 @@ in rec {
     };
   };
 
+  programs.rofi = {
+    enable = true;
+    catppuccin.enable = true;
+  };
+
   # programs.ruff.enable = true;
 
   programs.ssh = {
@@ -852,12 +876,92 @@ in rec {
     compression = true;
   };
 
-  # TODO: convert to home-manager
-  # programs.starship = {
-  #   enable = true;
-  # catppuccin.enable = true;
-  #   enableFishIntegration = false;
-  # };
+  programs.starship = {
+    enable = true;
+    catppuccin.enable = true;
+    enableTransience = true;
+    # $\{env_var.AGAIN_ENABLED}
+    # $\{env_var.AGAIN_DYNAMIC_ENABLED}
+    settings = {
+      format = ''
+        $shell
+        $jobs
+        $shlvl
+        $character
+      '';
+      right_format = ''
+        $direnv
+        $directory
+        $git_branch
+        $git_commit
+        $git_state
+        $git_metrics
+        $git_status
+        $package
+        $time
+      '';
+      add_newline = false;
+      git_metrics.disabled = true;
+      directory.fish_style_pwd_dir_length = 2;
+      shell = {
+        disabled = false;
+        fish_indicator = "fish";
+        nu_indicator = "nu";
+        bash_indicator = "bash";
+      };
+      localip = {
+        disabled = false;
+        format = "@[$localipv4](bold yellow) ";
+        ssh_only = false;
+      };
+      package = {
+        disabled = false;
+        symbol = "📦";
+        format = "[$symbol$version]($style) ";
+      };
+      time = {
+        disabled = false;
+        style = "cyan";
+        format = "[$time]($style)";
+      };
+      shlvl = {
+        disabled = false;
+        format = "$shlvl level(s) down";
+        threshold = 3;
+      };
+      direnv = {
+        disabled = false;
+        format = "[$symbol$loaded/$allowed]($style) ";
+        style = "bold orange";
+      };
+      # env_var = {
+      #   AGAIN_ENABLED = {
+      #     symbol = "◉";
+      #     style = "bold fg:red";
+      #     default = "";
+      #     format = "[$env_value]($style)";
+      #     description = "again.fish";
+      #     disabled = false;
+      #   };
+      #   AGAIN_DYNAMIC_ENABLED = {
+      #     symbol = "◉";
+      #     style = "bold fg:red";
+      #     default = "";
+      #     format = "[$env_value]($style)";
+      #     description = "again.fish";
+      #     disabled = false;
+      #   };
+      #   DIRENV_FILE = {
+      #     symbol = " ";
+      #     style = "bold fg:cyan";
+      #     default = "";
+      #     format = "[direnv]($style)";
+      #     description = "direnv";
+      #     disabled = false;
+      #   };
+      # };
+    };
+  };
 
   programs.tealdeer = {
     enable = true;
@@ -910,6 +1014,8 @@ in rec {
 
   programs.yazi = {
     enable = true;
+    catppuccin.enable = true;
+    package = inputs.yazi.packages.${pkgs.system}.default;
     settings = {
       manager = {
         ratio = [1 4 3];
@@ -1047,6 +1153,7 @@ in rec {
 
   programs.zellij = {
     enable = true;
+    catppuccin.enable = true;
   };
 
   programs.zoxide = {
@@ -1092,6 +1199,7 @@ in rec {
 
   services.dunst = {
     enable = true;
+    catppuccin.enable = true;
     settings = {
       global = {
         width = "(200,300)";
@@ -1100,18 +1208,18 @@ in rec {
         origin = "top-right";
         transparency = 10;
         progress_bar = true;
-        frame_color = "#eceff1";
+        # frame_color = "#eceff1";
         font = "JetBrains Nerd Font Mono 10";
       };
 
-      urgency_normal = {
-        background = "#37474f";
-        foreground = "#eceff1";
-        timeout = 10;
-      };
-      urgency_critical = {
-        timeout = 0;
-      };
+      # urgency_normal = {
+      #   background = "#37474f";
+      #   foreground = "#eceff1";
+      #   timeout = 10;
+      # };
+      # urgency_critical = {
+      #   timeout = 0;
+      # };
     };
     iconTheme.name = "Adwaita";
     iconTheme.package = pkgs.gnome.adwaita-icon-theme;
@@ -1180,10 +1288,15 @@ in rec {
   xdg.portal = {
     enable = true;
     xdgOpenUsePortal = true;
-    config.preferred = {
-      default = "hyprland";
-      "org.freedesktop.impl.portal.Settings" = "darkman";
+    config = {
+      common = {
+        default = "gtk";
+      };
     };
+    # config.preferred = {
+    #   default = "hyprland";
+    #   "org.freedesktop.impl.portal.Settings" = "darkman";
+    # };
     # config.common.default = "hyprland";
     extraPortals = [
       pkgs.xdg-desktop-portal-gtk
@@ -1536,6 +1649,7 @@ in rec {
 
   programs.waybar = {
     enable = false;
+    catppuccin.enable = true;
     systemd.enable = true;
     settings = {
       mainbar = {
@@ -1761,108 +1875,19 @@ in rec {
 
   # https://haseebmajid.dev/posts/2023-07-25-nixos-kanshi-and-hyprland/
   # "eDP-1" is laptop screen
-  services.kanshi = let
-    # generate-profiles = profiles: builtins.map;
-  in {
+  services.kanshi = {
     enable = true;
     systemdTarget = "hyprland-session.target";
-    # TODO: finish
-    # profiles.docked-at-home.outputs = [
-    #   {
-    #     criteria = "eDP-1";
-    #     scale = 1.0;
-    #     status = "disable";
-    #   }
-    # ];
-
-    # foo = generate-profiles [
-    #   {
-    #     name = "undocked";
-    #     outputs = [
-    #       {
-    #         criteria = "eDP-1";
-    #         scale = 1.0;
-    #         status = "enable";
-    #       }
-    #     ];
-    #   }
-    # ];
-    # profiles = {
-    #   (profile-gen "undocked" [
-
-    #   {
-    #     criteria = "eDP-1";
-    #     scale = 1.0;
-    #     status = "enable";
-    #   }
-    #   ])
-    # };
-    profiles.undocked.outputs = [
+    settings = [
       {
-        criteria = "eDP-1";
-        scale = 1.0;
-        status = "enable";
-      }
-    ];
-    # screen in Pernille's office at AU
-    # profiles.screen-2023-nr09.outputs = [
-    #   {
-    #     criteria = "HDMI-A-1";
-    #     position = "300,0";
-    #     mode = "1920x1080@60.00Hz";
-    #     status = "enable";
-    #   }
-    #   {
-    #     criteria = "eDP-1";
-    #     position = "0,1080";
-    #     status = "enable";
-    #   }
-    # ];
-
-    profiles.dell-in-malthes-office.outputs = [
-      {
-        # criteria = "DELL P2210";
-        criteria = "Dell Inc. DELL P2210 W416K13J1PYM"; # "description:" on `hyprctl monitors`
-        position = "460,0";
-        # mode = "1680@59.88300";
-        status = "enable";
-      }
-
-      {
-        criteria = "eDP-1";
-        position = "0,1050";
-        status = "enable";
-      }
-    ];
-
-    profiles.lg-in-malthes-office.outputs = [
-      {
-        # criteria = "DELL P2210";
-        criteria = "LG Electronics LG FULL HD"; # "description:" on `hyprctl monitors`
-        position = "460,0";
-        # mode = "1680@59.88300";
-        status = "enable";
-      }
-
-      {
-        criteria = "eDP-1";
-        position = "0,1050";
-        status = "enable";
-      }
-    ];
-
-    profiles.kevork-phillips.outputs = [
-      {
-        criteria = "Philips Consumer Electronics Company Philips 200CW AU20739015912"; # "description:" on `hyprctl monitors`
-        position = "460,0";
-        # mode = "1680@59.88300";
-        status = "enable";
-      }
-
-      {
-        criteria = "eDP-1";
-        position = "0,1050";
-        status = "enable";
+        profile.name = "undocked";
+        profile.outputs = [
+          {
+            criteria = "eDP-1";
+            scale = 1.0;
+            status = "enable";
+          }
+        ];
       }
     ];
   };

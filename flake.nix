@@ -2,34 +2,32 @@
   description = "@kpbaks' NixOS configuration";
 
   inputs = {
-    # nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    # nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
-    # home-manager.url = "github:nix-community/home-manager/release-23.11";
     home-manager.url = "github:nix-community/home-manager/master";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
+    simple-completion-language-server.url = "github:estin/simple-completion-language-server";
     yazi.url = "github:sxyazi/yazi";
     catppuccin.url = "github:catppuccin/nix";
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     helix.url = "github:helix-editor/helix";
-
+    stylix.url = "github:danth/stylix";
+    # TODO: use in home.nix
+    # niri.url =  "https://github.com/sodiboo/niri-flake";
     # anyrun.url = "github:Kirottu/anyrun";
     # anyrun.inputs.nixpkgs.follows = "nixpkgs";
-    # TODO: use in home.nix
     # atdo.url = "github:kpbaks/atdo";
     # atdo.inputs.nixpkgs.follows = "nixpkgs";
-
-    # https://github.com/estin/simple-completion-language-server/blob/main/flake.nix
   };
 
   outputs = {
     self,
     nixpkgs,
     home-manager,
-    yazi,
-    catppuccin,
-    helix,
+    # yazi,
+    # catppuccin,
+    # helix,
     # anyrun,
     ...
   } @ inputs: let
@@ -37,24 +35,34 @@
     USER = "kpbaks";
     system = "x86_64-linux";
     overlays = [
-      inputs.neovim-nightly-overlay.overlay
+      # inputs.neovim-nightly-overlay.overlay
     ];
-    pkgs = nixpkgs.legacyPackages.${system};
-  in {
-    nixosConfigurations.${HOSTNAME} = nixpkgs.lib.nixosSystem {
-      inherit system;
-      modules = [./configuration.nix];
+    pkgs = import nixpkgs {
+      inherit system overlays;
     };
+    # pkgs = nixpkgs.legacyPackages.${system};
+  in {
+    # nixosConfigurations.${HOSTNAME} = nixpkgs.lib.nixosSystem {
+    #   inherit system;
+    #   modules = [./configuration.nix];
+    # };
     homeConfigurations = {
       "${USER}@${HOSTNAME}" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
+        extraSpecialArgs = {inherit inputs;};
         modules = [
-          # catppuccin.homeManagerModules.catppuccin
           ./home.nix
+          # inputs.stylix.homeManagerModules.stylix
+          inputs.catppuccin.homeManagerModules.catppuccin
+          (
+            {...}: {
+              catppuccin.flavor = "macchiato";
+              catppuccin.accent = "lavender";
+            }
+          )
           # (
-          #   # TODO: verify this works
-          #   {pkgs, ...}: {
-          #     home.packages = [yazi.packages.${pkgs.system}.default];
+          #   {...}: {
+          #     home.packages = [inputs.yazi.packages.${pkgs.system}.default];
           #   }
           # )
         ];
