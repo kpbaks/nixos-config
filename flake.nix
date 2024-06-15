@@ -6,6 +6,9 @@
     home-manager.url = "github:nix-community/home-manager/master";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
+    niri.url = "github:sodiboo/niri-flake";
+    niri.inputs.nixpkgs.follows = "nixpkgs";
+
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     simple-completion-language-server.url = "github:estin/simple-completion-language-server";
     yazi.url = "github:sxyazi/yazi";
@@ -15,8 +18,9 @@
     stylix.url = "github:danth/stylix";
     # TODO: use in home.nix
     # niri.url =  "https://github.com/sodiboo/niri-flake";
-    # anyrun.url = "github:Kirottu/anyrun";
-    # anyrun.inputs.nixpkgs.follows = "nixpkgs";
+    anyrun.url = "github:Kirottu/anyrun";
+    anyrun.inputs.nixpkgs.follows = "nixpkgs";
+    ags.url = "github:Aylur/ags";
     # atdo.url = "github:kpbaks/atdo";
     # atdo.inputs.nixpkgs.follows = "nixpkgs";
   };
@@ -60,6 +64,7 @@
               catppuccin.accent = "lavender";
             }
           )
+          # inputs.anyrun.homeManagerModules.default
           # (
           #   {...}: {
           #     home.packages = [inputs.yazi.packages.${pkgs.system}.default];

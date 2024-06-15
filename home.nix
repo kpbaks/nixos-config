@@ -26,6 +26,23 @@
   font.monospace = "Iosevka Nerd Font Mono";
 in rec {
   # TODO: consider using https://github.com/chessai/nix-std
+  imports = [inputs.ags.homeManagerModules.default];
+
+  nixpkgs.config.allowUnfree = true;
+
+  programs.ags = {
+    enable = true;
+
+    # null or path, leave as null if you don't want hm to manage the config
+    configDir = null;
+
+    # additional packages to add to gjs's runtime
+    extraPackages = with pkgs; [
+      gtksourceview
+      webkitgtk
+      accountsservice
+    ];
+  };
 
   # nix.settings = {
   #   # https://yazi-rs.github.io/docs/installation#cache
@@ -64,11 +81,17 @@ in rec {
 
   # TODO: document all pkgs
   home.packages = with pkgs; [
+    zoom-us
+    resvg
+    miller
+
+    # pympress
+    mission-center
     mkchromecast
     samply
     sad
     sd
-    ungoogled-chromium
+    # ungoogled-chromium
     # vivaldi
     asciigraph
     imagemagick
@@ -140,7 +163,7 @@ in rec {
     thunderbird # email client
     # discord
     telegram-desktop # messaging client
-    # spotify # music player
+    spotify # music player
     zotero # citation/bibliography manager
     copyq # clipboard manager
     libnotify # for `notify-send`
@@ -173,6 +196,7 @@ in rec {
     fd # `find` replacement
     jaq # `jq` replacement
     jnv # interactive JSON filter using `jq`
+    jless # interactive JSON viewer
     jqp # `jq` expr editor
     fx # interactive JSON pager
     yq-go # `jq` but for yaml
@@ -237,8 +261,10 @@ in rec {
     size = 16;
   };
 
+  gtk.theme.name = "Adwaita";
+  gtk.theme.package = pkgs.gnome.gnome-themes-extra;
+
   # sourced every time the `julia` is started
-  # home.file.".julia/config/startup.jl".source = ./startup.jl;
   home.file.".julia/config/startup.jl".text = let
     startup-packages = [
       "LinearAlgebra"
@@ -247,16 +273,13 @@ in rec {
       # "OhMyREPL"
     ];
   in ''
-    using LinearAlgebra
-    using Statistics
-    using Random
-    # using OhMyREPL # `Pkg.add("OhMyREPL")`
+    ${pkgs.lib.concatStringsSep "\n" (map (pkg: "using ${pkg}") startup-packages)}
 
     atreplinit() do repl
-    	println("loaded:")
-        for pkg in ["LinearAlgebra", "Statistics", "Random"]
-            println(" -	$pkg")
-        end
+      println("loaded:")
+      for pkg in [${pkgs.lib.concatStringsSep ", " (map (pkg: ''"${pkg}"'') startup-packages)}]
+        println(" - $pkg")
+      end
     end
   '';
 
@@ -272,9 +295,7 @@ in rec {
     options = null;
   };
 
-  # programs.atuin = {
-  #   enable = true;
-  # };
+  programs.atuin.enable = false;
 
   # https://alacritty.org/config-alacritty.html
   programs.alacritty = let
@@ -866,7 +887,7 @@ in rec {
 
   programs.rofi = {
     enable = true;
-    catppuccin.enable = true;
+    # catppuccin.enable = true;
   };
 
   # programs.ruff.enable = true;
@@ -883,23 +904,8 @@ in rec {
     # $\{env_var.AGAIN_ENABLED}
     # $\{env_var.AGAIN_DYNAMIC_ENABLED}
     settings = {
-      format = ''
-        $shell
-        $jobs
-        $shlvl
-        $character
-      '';
-      right_format = ''
-        $direnv
-        $directory
-        $git_branch
-        $git_commit
-        $git_state
-        $git_metrics
-        $git_status
-        $package
-        $time
-      '';
+      format = ''$shell$jobs$shlvl$character'';
+      right_format = ''$direnv$directory$git_branch$git_commit$git_state$git_metrics$git_status$package$time'';
       add_newline = false;
       git_metrics.disabled = true;
       directory.fish_style_pwd_dir_length = 2;
@@ -1512,10 +1518,11 @@ in rec {
       # };
       #
       input = {
-        kb_layout = "us";
+        kb_layout = "us,dk";
+        kb_options = "grp:win_space_toggle";
         # kb_layout = "us,dk";
         # kb_options = "grp:alt_shift_toggle, caps:swapescape";
-        kb_options = "grp:alt_shift_toggle";
+        # kb_options = "grp:alt_shift_toggle";
         # https://wiki.hyprland.org/Configuring/Variables/#follow-mouse-cursor
         follow_mouse = 1;
         touchpad = {
