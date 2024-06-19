@@ -2,6 +2,7 @@
   config,
   pkgs,
   inputs,
+  username,
   ...
 }: let
   name = "Kristoffer Sørensen";
@@ -20,8 +21,6 @@
   join = lib.strings.concatStringsSep;
   mapjoin = lib.strings.concatMapStringsSep;
   range = from: to: builtins.genList (i: from + i) (to - from);
-  pipe = lib.pipe;
-  tostring = builtins.toString;
   merge = list: builtins.foldl' (acc: it: acc // it) {} list;
   font.monospace = "Iosevka Nerd Font Mono";
 in rec {
@@ -81,7 +80,6 @@ in rec {
 
   # TODO: document all pkgs
   home.packages = with pkgs; [
-    zoom-us
     resvg
     miller
 
@@ -559,6 +557,7 @@ in rec {
     };
 
     lfs.enable = true;
+    ignores = ["**/.envrc" "**/.direnv"];
   };
 
   programs.git-cliff.enable = true;
@@ -1928,5 +1927,9 @@ in rec {
     };
     config = {
     };
+  };
+
+  programs.niri = {
+    enable = true;
   };
 }

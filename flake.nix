@@ -5,6 +5,16 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager.url = "github:nix-community/home-manager/master";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    nixos-hardware.url = "github:NixOS/nixos-hardware";
+    nix-index-database.url = "github:nix-community/nix-index-database";
+    nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
+
+    # TODO: plasma-manager
+    plasma-manager = {
+      url = "github:pjones/plasma-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
 
     niri.url = "github:sodiboo/niri-flake";
     niri.inputs.nixpkgs.follows = "nixpkgs";
@@ -16,8 +26,6 @@
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     helix.url = "github:helix-editor/helix";
     stylix.url = "github:danth/stylix";
-    # TODO: use in home.nix
-    # niri.url =  "https://github.com/sodiboo/niri-flake";
     anyrun.url = "github:Kirottu/anyrun";
     anyrun.inputs.nixpkgs.follows = "nixpkgs";
     ags.url = "github:Aylur/ags";
@@ -29,16 +37,13 @@
     self,
     nixpkgs,
     home-manager,
-    # yazi,
-    # catppuccin,
-    # helix,
-    # anyrun,
     ...
   } @ inputs: let
-    HOSTNAME = "nixos";
-    USER = "kpbaks";
+    hostname = "nixos";
+    username = "kpbaks";
     system = "x86_64-linux";
     overlays = [
+      inputs.niri.overlays.niri
       # inputs.neovim-nightly-overlay.overlay
     ];
     pkgs = import nixpkgs {
@@ -46,18 +51,31 @@
     };
     # pkgs = nixpkgs.legacyPackages.${system};
   in {
-    # nixosConfigurations.${HOSTNAME} = nixpkgs.lib.nixosSystem {
-    #   inherit system;
-    #   modules = [./configuration.nix];
-    # };
+    # nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
+    nixosConfigurations.default = nixpkgs.lib.nixosSystem {
+      inherit system;
+      specialArgs = {inherit inputs;};
+      modules = [
+        ./configuration.nix
+        inputs.stylix.nixosModules.stylix
+      ];
+    };
+
     homeConfigurations = {
-      "${USER}@${HOSTNAME}" = home-manager.lib.homeManagerConfiguration {
+      "${username}@${hostname}" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
-        extraSpecialArgs = {inherit inputs;};
+        extraSpecialArgs = {inherit inputs username;};
         modules = [
+          # {
+          #   home = {
+          #     inherit username;
+          #     homeDirectory = "/home/${username}";
+          #   };
+          # }
           ./home.nix
-          # inputs.stylix.homeManagerModules.stylix
+          inputs.niri.homeModules.niri
           inputs.catppuccin.homeManagerModules.catppuccin
+          inputs.plasma-manager.homeManagerModules.plasma-manager
           (
             {...}: {
               catppuccin.flavor = "macchiato";

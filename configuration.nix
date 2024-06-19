@@ -62,6 +62,15 @@ in rec {
   # system.autoUpgrade.enable = true;
   # system.autoUpgrade.allowReboot = true;
 
+  # allow perf as user
+  boot.kernel.sysctl."kernel.perf_event_paranoid" = -1;
+  boot.kernel.sysctl."kernel.kptr_restrict" = pkgs.lib.mkForce 0;
+
+  # so perf can find kernel modules
+  systemd.tmpfiles.rules = [
+    "L /lib - - - - /run/current/system/lib"
+  ];
+
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.enableContainers = true;
@@ -95,6 +104,14 @@ in rec {
     settings = {};
   };
 
+  boot.binfmt.registrations.appimage = {
+    wrapInterpreterInShell = false;
+    interpreter = "${pkgs.appimage-run}/bin/appimage-run";
+    recognitionType = "magic";
+    offset = 0;
+    mask = ''\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff'';
+    magicOrExtension = ''\x7fELF....AI\x02'';
+  };
   # hardware.nvidia = {
   #   # Modesetting is required.
   #   modesetting.enable = true;
@@ -123,6 +140,13 @@ in rec {
   # };
 
   specialisation = {
+    gaming.configuration = {
+      system.nixos.tags = ["gaming"];
+      # Nvidia Configuration
+      services.xserver.videoDrivers = ["nvidia"];
+      hardware.opengl.enable = true;
+    };
+
     # TODO: works but bevy breaks down when used as renderer
     nvidia.configuration = {
       system.nixos.tags = ["nvidia"];
@@ -132,7 +156,16 @@ in rec {
 
       # Optionally, you may need to select the appropriate driver version for your specific GPU.
       # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
-      hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
+      # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
+
+      hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.mkDriver {
+        version = "555.52.04";
+        sha256_64bit = "sha256-nVOubb7zKulXhux9AruUTVBQwccFFuYGWrU1ZiakRAI=";
+        sha256_aarch64 = pkgs.lib.fakeSha256;
+        openSha256 = pkgs.lib.fakeSha256;
+        settingsSha256 = "sha256-PMh5efbSEq7iqEMBr2+VGQYkBG73TGUh6FuDHZhmwHk=";
+        persistencedSha256 = pkgs.lib.fakeSha256;
+      };
       # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
 
       # nvidia-drm.modeset=1 is required for some wayland compositors, e.g. sway
@@ -201,13 +234,14 @@ in rec {
   # Enable the X11 windowing system.
   services.xserver.enable = true;
   # Enable the KDE Plasma Desktop Environment.
-  # services.xserver.displayManager.sddm.enable = true;
+  services.displayManager.sddm.enable = true;
   # services.desktopManager.plasma6.enable = true;
   # services.xserver.desktopManager.plasma5.enable = true;
   # services.xserver.desktopManager.gnome.enable = true;
   # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
+  # services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
+  services.desktopManager.plasma6.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb.layout = "dk";
@@ -228,6 +262,7 @@ in rec {
   };
 
   # Configure console keymap
+  # TODO: change to en-us
   console.keyMap = "dk-latin1";
 
   # Enable CUPS to print documents.
@@ -271,14 +306,18 @@ in rec {
 
   fonts.packages = with pkgs; [
     (nerdfonts.override {fonts = ["JetBrainsMono" "FiraCode" "Iosevka" "VictorMono"];})
+    cantarell-fonts
+    # line-awesome
+    font-awesome
+    # font-awesome_5
   ];
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
+    chase
     nh # nix helper
     nix-output-monitor # `nom`
     nvd # nix version diff
-
     systemctl-tui
     wget
     atool # {,de}compress various compression formats
@@ -290,10 +329,12 @@ in rec {
     dig # lookup dns name resolving
     dog # loopup dns name resolving, but in rust!
     nmap
+    tmux
 
     wl-clipboard
     sniffnet
     git
+    gh
     lshw # list hardware
     pciutils # `lscpi`
     # nvtopPackages.full
@@ -328,7 +369,39 @@ in rec {
   #   services.espanso.enable = false;
   services.mullvad-vpn.enable = true;
 
+  # security.pam.services.gdm.enableGnomeKeyring = false;
   security.pam.services.gdm.enableGnomeKeyring = false;
+  programs.seahorse.enable = false;
+  # services.gnome.gnome-keyring.enable = false;
+  programs.ssh.askPassword = "${pkgs.x11_ssh_askpass}/libexec/x11-ssh-askpass";
+
+  programs.firejail = {
+    enable = true;
+    wrappedBinaries = {
+      librewolf = {
+        executable = "${pkgs.librewolf}/bin/librewolf";
+        profile = "${pkgs.firejail}/etc/firejail/librewolf.profile";
+        extraArgs = [
+          # Required for U2F USB stick
+          "--ignore=private-dev"
+          # Enforce dark mode
+          "--env=GTK_THEME=Adwaita:dark"
+          # Enable system notifications
+          "--dbus-user.talk=org.freedesktop.Notifications"
+        ];
+      };
+    };
+  };
+
+  hardware.steam-hardware.enable = true;
+  programs.steam = {
+    enable = true;
+    # extraPackages = with pkgs; [
+    #   gamescope
+    # ];
+    # remotePlay.openFirewall = false;
+  };
+
   # services.spotifyd.enable = true;
   # services.surrealdb.enable = true;
   # Enable the OpenSSH daemon.
