@@ -9,25 +9,30 @@
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
 
-    # TODO: plasma-manager
     plasma-manager = {
       url = "github:pjones/plasma-manager";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
 
+    # TODO: use
     niri.url = "github:sodiboo/niri-flake";
     niri.inputs.nixpkgs.follows = "nixpkgs";
 
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     simple-completion-language-server.url = "github:estin/simple-completion-language-server";
+    # TODO: use
     yazi.url = "github:sxyazi/yazi";
     catppuccin.url = "github:catppuccin/nix";
+    # TODO: use
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     helix.url = "github:helix-editor/helix";
+    # TODO: use
     stylix.url = "github:danth/stylix";
+    # TODO: use
     anyrun.url = "github:Kirottu/anyrun";
     anyrun.inputs.nixpkgs.follows = "nixpkgs";
+    # TODO: use
     ags.url = "github:Aylur/ags";
     # atdo.url = "github:kpbaks/atdo";
     # atdo.inputs.nixpkgs.follows = "nixpkgs";
@@ -48,16 +53,19 @@
     ];
     pkgs = import nixpkgs {
       inherit system overlays;
+      config.allowUnfree = true;
     };
     # pkgs = nixpkgs.legacyPackages.${system};
   in {
-    # nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
-    nixosConfigurations.default = nixpkgs.lib.nixosSystem {
+    formatter.${system} = pkgs.alejandra;
+    nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
+      # nixosConfigurations.default = nixpkgs.lib.nixosSystem {
       inherit system;
       specialArgs = {inherit inputs;};
       modules = [
         ./configuration.nix
-        inputs.stylix.nixosModules.stylix
+        # inputs.stylix.nixosModules.stylix
+        inputs.niri.nixosModules.niri
       ];
     };
 

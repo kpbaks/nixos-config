@@ -80,6 +80,7 @@ in rec {
 
   # TODO: document all pkgs
   home.packages = with pkgs; [
+    fuzzel
     resvg
     miller
 
@@ -762,7 +763,7 @@ in rec {
       # include tokyonight-storm.conf
       # include catppuccin-latte.conf
       # include catppuccin-macchiato.conf
-      background_opacity 1.0
+      background_opacity 0.85
       # how much to dim text with the DIM/FAINT escape code attribute
       dim_opacity 0.5
 
@@ -1931,5 +1932,70 @@ in rec {
 
   programs.niri = {
     enable = true;
+    settings = {
+      input.focus-follows-mouse = true;
+      input.touchpad.dwt = true;
+      input.warp-mouse-to-focus = true;
+      prefer-no-csd = true;
+      environment = {
+        QT_QPA_PLATFORM = "wayland";
+        DISPLAY = null;
+        NIXOS_OZONE_WL = "1";
+      };
+    };
+    settings.spawn-at-startup = builtins.map (s: {command = pkgs.lib.strings.splitString " " s;}) [
+      "swww-daemon"
+      "waybar"
+      "kitty"
+      "udiskie"
+      "dunst"
+      "eww daemon"
+      "wlsunset -t 4000 -T 6500 -S 06:30 -s 18:30"
+      "wluma"
+    ];
+    # https://github.com/sodiboo/niri-flake/blob/main/docs.md#programsnirisettingsbinds
+    settings.binds = with config.lib.niri.actions; let
+      sh = spawn "sh" "-c";
+      fish = spawn "fish --no-config --command";
+      nu = spawn "nu" "-c";
+      playerctl = spawn "playerctl";
+      brightnessctl = spawn "brightnessctl";
+    in {
+      "XF86AudioRaiseVolume".action = spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+";
+      "XF86AudioLowerVolume".action = spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-";
+      "XF86AudioPlay".action = playerctl "play-pause";
+      "XF86AudioNext".action = playerctl "next";
+      "XF86AudioPrev".action = playerctl "previous";
+      "XF86AudioStop".action = playerctl "stop";
+      "XF86MonBrightnessUp".action = brightnessctl "set 10%+";
+      "XF86MonBrightnessDown".action = brightnessctl "set 10%-";
+
+      # "Mod+D".action = spawn "fuzzel";
+      "Mod+1".action = focus-workspace 1;
+      # "Mod+?".action = show-hotkey-overlay;
+      "Mod+K".action = spawn "kitty";
+      "Mod+F".action = spawn "firefox";
+      "Mod+T".action = spawn "telegram-desktop";
+      "Mod+S".action = spawn "spotify";
+      "Mod+D".action = spawn "webcord";
+      "Mod+E".action = spawn "dolphin";
+      "f11".action = fullscreen-window;
+
+      # "Mod+Shift+E".action = quit;
+      # "Mod+Ctrl+Shift+E".action = quit {skip-confirmation = true;};
+
+      "Mod+Plus".action = set-column-width "+10%";
+      "Mod+Minus".action = set-column-width "-10%";
+      "Mod+Left".action = focus-column-left;
+      "Mod+Right".action = focus-column-right;
+      "Mod+Ctrl+Left".action = move-column-left;
+      "Mod+Ctrl+Right".action = move-column-right;
+
+      # "Mod+Shift+/".action = show-hotkey-overlay;
+      "Mod+Q".action = close-window;
+
+      # Mod+TouchpadScrollDown { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02+"; }
+      # Mod+TouchpadScrollUp   { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02-"; }
+    };
   };
 }

@@ -4,6 +4,7 @@
 {
   config,
   pkgs,
+  inputs,
   ...
 }
 :
@@ -346,11 +347,15 @@ in rec {
     xwayland.enable = true;
   };
 
-  programs.river.enable = true;
+  programs.niri = {
+    enable = true;
+  };
 
-  qt.enable = true;
-  qt.style = "breeze";
-  qt.platformTheme = "kde";
+  # programs.river.enable = true;
+
+  # qt.enable = true;
+  # qt.style = "breeze";
+  # qt.platformTheme = "kde";
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -393,12 +398,13 @@ in rec {
     };
   };
 
+  programs.gamescope.enable = true;
   hardware.steam-hardware.enable = true;
   programs.steam = {
     enable = true;
-    # extraPackages = with pkgs; [
-    #   gamescope
-    # ];
+    extraPackages = with pkgs; [
+      gamescope
+    ];
     # remotePlay.openFirewall = false;
   };
 
@@ -506,4 +512,46 @@ in rec {
   security.sudo.extraConfig = ''
     Defaults env_reset,pwfeedback
   '';
+
+  # TODO: create systemd timer for `nix run 'nixpkgs#nix-index'`
+
+  # stylix = {
+  #   enable = true;
+  #   fonts = {
+  #     # monospace = {
+  #     #   # package = pkgs.nerdfotns
+
+  #     # };
+  #     serif = {
+  #       package = pkgs.dejavu_fonts;
+  #       name = "DejaVu Serif";
+  #     };
+
+  #     sansSerif = {
+  #       package = pkgs.dejavu_fonts;
+  #       name = "DejaVu Sans";
+  #     };
+
+  #     # TODO: jetbrains mono
+  #     monospace = {
+  #       package = pkgs.dejavu_fonts;
+  #       name = "DejaVu Sans Mono";
+  #     };
+
+  #     emoji = {
+  #       package = pkgs.noto-fonts-emoji;
+  #       name = "Noto Color Emoji";
+  #     };
+  #   };
+  #   # image = ./assets/imgs/macos-sequoia-dark.png;
+  #   # image = ./macos-sequoia-light.png;
+  #   opacity = {
+  #     applications = 1.0;
+  #     desktop = 1.0;
+  #     terminal = 0.9;
+  #   };
+  #   polarity = "dark"; # or "light"
+  #   targets.fish.enable = false;
+  # };
+  # stylix.targets.niri.enable = true;
 }
