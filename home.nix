@@ -80,10 +80,16 @@ in rec {
 
   # TODO: document all pkgs
   home.packages = with pkgs; [
+    wl-color-picker
+    # element
+    element-desktop
+    gping
+    nixd
+    kdePackages.plasma-workspace # for krunner
     fuzzel
     resvg
     miller
-
+    csview
     # pympress
     mission-center
     mkchromecast
@@ -91,7 +97,7 @@ in rec {
     sad
     sd
     # ungoogled-chromium
-    # vivaldi
+    vivaldi
     asciigraph
     imagemagick
     odin
@@ -110,6 +116,8 @@ in rec {
     pastel
     vivid
     wdisplays
+    nwg-dock
+    nwg-drawer
     nwg-displays
     daktilo # turn your keyboard into a typewriter!
     # lemmyknow # identify anything
@@ -467,7 +475,7 @@ in rec {
 
   # programs.eww = {
   #   enable = true;
-  #   configDir = home.homeDirectory + "/.config/eww";
+  #   configDir = ./eww;
   # };
 
   programs.firefox = {
@@ -602,14 +610,16 @@ in rec {
   programs.helix = {
     enable = true;
     # package = pkgs.helix;
-    # https://discourse.nixos.org/t/home-manager-helix-editor-install-helix-using-flake/40503/6
     package = inputs.helix.packages.${pkgs.system}.default;
     defaultEditor = true;
-    extraPackages = with pkgs; [
-      marksman
-      taplo
-      inputs.simple-completion-language-server.defaultPackage.${pkgs.system}
-    ];
+    extraPackages = with pkgs;
+      [
+        marksman
+        taplo
+      ]
+      ++ [
+        inputs.simple-completion-language-server.defaultPackage.${pkgs.system}
+      ];
     # settings = {
     #   theme = "gruvbox_dark_hard";
     #   editor = {
@@ -1933,6 +1943,11 @@ in rec {
   programs.niri = {
     enable = true;
     settings = {
+      input.keyboard.xkb = {
+        layout = "us,dk";
+        # options = "grp:win_space_toggle,compose:ralt,ctrl:nocaps";
+        options = "compose:ralt,ctrl:nocaps";
+      };
       input.focus-follows-mouse = true;
       input.touchpad.dwt = true;
       input.warp-mouse-to-focus = true;
@@ -1942,27 +1957,58 @@ in rec {
         DISPLAY = null;
         NIXOS_OZONE_WL = "1";
       };
+      layout = {
+        gaps = 10; # px
+        center-focused-column = "always";
+      };
+      screenshot-path = "~/Pictures/screenshots/screenshot-%Y-%m-%d %H-%M-%S.png";
     };
-    settings.spawn-at-startup = builtins.map (s: {command = pkgs.lib.strings.splitString " " s;}) [
+    settings.spawn-at-startup = map (s: {command = pkgs.lib.strings.splitString " " s;}) [
       "swww-daemon"
       "waybar"
       "kitty"
+      "spotify"
+      "telegram-desktop"
       "udiskie"
       "dunst"
       "eww daemon"
+      "eww ~/.config/eww/bar open bar"
       "wlsunset -t 4000 -T 6500 -S 06:30 -s 18:30"
       "wluma"
+      # "copyq --start-server"
+      "copyq"
     ];
     # https://github.com/sodiboo/niri-flake/blob/main/docs.md#programsnirisettingsbinds
     settings.binds = with config.lib.niri.actions; let
       sh = spawn "sh" "-c";
-      fish = spawn "fish --no-config --command";
+      fish = spawn "fish" "--no-config" "-c";
       nu = spawn "nu" "-c";
       playerctl = spawn "playerctl";
       brightnessctl = spawn "brightnessctl";
+      wpctl = spawn "wpctl"; # wireplumber
+      bluetoothctl = spawn "bluetoothctl";
+      run-flatpak = spawn "flatpak" "run";
+      run-in-kitty = spawn "kitty";
+      # focus-workspace-keybinds = builtins.listToAttrs (map:
+      #   (n: {
+      #     name = "Mod+${toString n}";
+      #     value = {action = "focus-workspace ${toString n}";};
+      #   }) (range 1 10));
     in {
-      "XF86AudioRaiseVolume".action = spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+";
-      "XF86AudioLowerVolume".action = spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-";
+      "XF86AudioRaiseVolume".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+";
+      "XF86AudioLowerVolume".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-";
+      "XF86AudioMute" = {
+        action = wpctl "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle";
+        allow-when-locked = true;
+      };
+      "XF86AudioMicMute" = {
+        action = wpctl "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle";
+        allow-when-locked = true;
+      };
+
+      "Mod+TouchpadScrollDown".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02+";
+      "Mod+TouchpadScrollUp".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02-";
+
       "XF86AudioPlay".action = playerctl "play-pause";
       "XF86AudioNext".action = playerctl "next";
       "XF86AudioPrev".action = playerctl "previous";
@@ -1972,6 +2018,17 @@ in rec {
 
       # "Mod+D".action = spawn "fuzzel";
       "Mod+1".action = focus-workspace 1;
+      "Mod+2".action = focus-workspace 2;
+      "Mod+3".action = focus-workspace 3;
+      "Mod+4".action = focus-workspace 4;
+      "Mod+5".action = focus-workspace 5;
+      "Mod+6".action = focus-workspace 6;
+      "Mod+7".action = focus-workspace 7;
+      "Mod+8".action = focus-workspace 8;
+      "Mod+9".action = focus-workspace 9;
+
+      # inherit (focus-workspace-keybinds) ${builtins.attrNames focus-workspace-keybinds};
+
       # "Mod+?".action = show-hotkey-overlay;
       "Mod+K".action = spawn "kitty";
       "Mod+F".action = spawn "firefox";
@@ -1979,6 +2036,7 @@ in rec {
       "Mod+S".action = spawn "spotify";
       "Mod+D".action = spawn "webcord";
       "Mod+E".action = spawn "dolphin";
+      "Mod+B".action = spawn "overskride";
       "f11".action = fullscreen-window;
 
       # "Mod+Shift+E".action = quit;
@@ -1990,12 +2048,249 @@ in rec {
       "Mod+Right".action = focus-column-right;
       "Mod+Ctrl+Left".action = move-column-left;
       "Mod+Ctrl+Right".action = move-column-right;
+      "Mod+Ctrl+Up".action = move-window-up;
+      "Mod+Ctrl+Down".action = move-window-down;
 
-      # "Mod+Shift+/".action = show-hotkey-overlay;
+      # TODO:
+      #       Mod+Home { focus-column-first; }
+      # Mod+End  { focus-column-last; }
+      # Mod+Ctrl+Home { move-column-to-first; }
+      # Mod+Ctrl+End  { move-column-to-last; }
+
+      # Mod+Shift+Left  { focus-monitor-left; }
+      # Mod+Shift+Down  { focus-monitor-down; }
+      # Mod+Shift+Up    { focus-monitor-up; }
+      # Mod+Shift+Right { focus-monitor-right; }
+      # Mod+Shift+H     { focus-monitor-left; }
+      # Mod+Shift+J     { focus-monitor-down; }
+      # Mod+Shift+K     { focus-monitor-up; }
+      # Mod+Shift+L     { focus-monitor-right; }
+
+      "Mod+Shift+Left".action = focus-monitor-left;
+      "Mod+Shift+Down".action = focus-monitor-down;
+      "Mod+Shift+Up".action = focus-monitor-up;
+      "Mod+Shift+Right".action = focus-monitor-right;
+      "Mod+Shift+H".action = focus-monitor-left;
+      "Mod+Shift+J".action = focus-monitor-down;
+      "Mod+Shift+K".action = focus-monitor-up;
+      "Mod+Shift+L".action = focus-monitor-right;
+
+      # Mod+Shift+Ctrl+Left  { move-column-to-monitor-left; }
+      # Mod+Shift+Ctrl+Down  { move-column-to-monitor-down; }
+      # Mod+Shift+Ctrl+Up    { move-column-to-monitor-up; }
+      # Mod+Shift+Ctrl+Right { move-column-to-monitor-right; }
+      # Mod+Shift+Ctrl+H     { move-column-to-monitor-left; }
+      # Mod+Shift+Ctrl+J     { move-column-to-monitor-down; }
+      # Mod+Shift+Ctrl+K     { move-column-to-monitor-up; }
+      # Mod+Shift+Ctrl+L     { move-column-to-monitor-right; }
+
+      #  Mod+Page_Down      { focus-workspace-down; }
+      # Mod+Page_Up        { focus-workspace-up; }
+
+      "Mod+Shift+Slash".action = show-hotkey-overlay;
       "Mod+Q".action = close-window;
+      "Mod+V".action = spawn "copyq" "menu";
+      "Mod+M".action = maximize-column;
 
-      # Mod+TouchpadScrollDown { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02+"; }
-      # Mod+TouchpadScrollUp   { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02-"; }
+      "Mod+Comma".action = consume-window-into-column;
+      "Mod+Period".action = expel-window-from-column;
+
+      # // Actions to switch layouts.
+      #    // Note: if you uncomment these, make sure you do NOT have
+      #    // a matching layout switch hotkey configured in xkb options above.
+      #    // Having both at once on the same hotkey will break the switching,
+      #    // since it will switch twice upon pressing the hotkey (once by xkb, once by niri).
+      # // Mod+Space       { switch-layout "next"; }
+      # // Mod+Shift+Space { switch-layout "prev"; }
+
+      "Mod+Space".action = switch-layout "next";
+      "Mod+Shift+Space".action = switch-layout "prev";
+
+      "Print".action = screenshot;
+      "Ctrl+Print".action = screenshot-screen;
+      "Alt+Print".action = screenshot-window;
+
+      # // Switches focus between the current and the previous workspace.
+      "Mod+Tab".action = focus-workspace-previous;
+      # "Mod+Return".action = spawn "anyrun";
+      # "Mod+Return".action = fish "pidof anyrun; and pkill anyrun; or anyrun";
+      "Mod+Return".action = fish "pidof nwg-drawer; and pkill nwg-drawer; or nwg-drawer -ovl -fm dolphin";
     };
+    # // focus-workspace-keybinds;
+  };
+
+  # TODO: use source instead of .text
+  home.file.".config/fastfetch/config.jsonc".text = ''
+    {
+        "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+        // "logo": {
+        //     "source": "~/.config/fastfetch/xero.png",
+        //     "type": "auto",
+        //     "height": 15,
+        //     "width": 30,
+        //     "padding": {
+        //         "top": 5,
+        //         "left": 3
+        //     }
+        // },
+        "modules": [
+            "break",
+            {
+                "type": "custom",
+                "format": "\u001b[90m┌──────────────────────Hardware──────────────────────┐"
+            },
+            {
+                "type": "host",
+                "key": " PC",
+                "keyColor": "green"
+            },
+            {
+                "type": "cpu",
+                "key": "│ ├",
+                "keyColor": "green"
+            },
+            {
+                "type": "gpu",
+                "key": "│ ├󰍛",
+                "keyColor": "green"
+            },
+            {
+                "type": "memory",
+                "key": "│ ├󰍛",
+                "keyColor": "green"
+            },
+            {
+                "type": "disk",
+                "key": "└ └",
+                "keyColor": "green"
+            },
+            {
+                "type": "custom",
+                "format": "\u001b[90m└────────────────────────────────────────────────────┘"
+            },
+            "break",
+            {
+                "type": "custom",
+                "format": "\u001b[90m┌──────────────────────Software──────────────────────┐"
+            },
+            {
+                "type": "os",
+                "key": " OS",
+                "keyColor": "yellow"
+            },
+            {
+                "type": "kernel",
+                "key": "│ ├",
+                "keyColor": "yellow"
+            },
+            {
+                "type": "bios",
+                "key": "│ ├",
+                "keyColor": "yellow"
+            },
+            {
+                "type": "packages",
+                "key": "│ ├󰏖",
+                "keyColor": "yellow"
+            },
+            {
+                "type": "shell",
+                "key": "└ └",
+                "keyColor": "yellow"
+            },
+            "break",
+            {
+                "type": "de",
+                "key": " DE",
+                "keyColor": "blue"
+            },
+            {
+                "type": "lm",
+                "key": "│ ├",
+                "keyColor": "blue"
+            },
+            {
+                "type": "wm",
+                "key": "│ ├",
+                "keyColor": "blue"
+            },
+            {
+                "type": "wmtheme",
+                "key": "│ ├󰉼",
+                "keyColor": "blue"
+            },
+            {
+                "type": "terminal",
+                "key": "└ └",
+                "keyColor": "blue"
+            },
+            {
+                "type": "custom",
+                "format": "\u001b[90m└────────────────────────────────────────────────────┘"
+            },
+            "break",
+            {
+                "type": "custom",
+                "format": "\u001b[90m┌────────────────────Uptime / Age / DT────────────────────┐"
+            },
+            {
+                "type": "command",
+                "key": "  OS Age ",
+                "keyColor": "magenta",
+                "text": "birth_install=$(stat -c %W /); current=$(date +%s); time_progression=$((current - birth_install)); days_difference=$((time_progression / 86400)); echo $days_difference days"
+            },
+            {
+                "type": "uptime",
+                "key": "  Uptime ",
+                "keyColor": "magenta"
+            },
+            {
+                "type": "datetime",
+                "key": "  DateTime ",
+                "keyColor": "magenta"
+            },
+            {
+                "type": "custom",
+                "format": "\u001b[90m└─────────────────────────────────────────────────────────┘"
+            },
+            "break",
+        ]
+    }
+  '';
+
+  programs.anyrun = {
+    enable = true;
+    config = {
+      plugins = [
+        # An array of all the plugins you want, which either can be paths to the .so files, or their packages
+        inputs.anyrun.packages.${pkgs.system}.applications
+        # ./some_plugin.so
+        # "${inputs.anyrun.packages.${pkgs.system}.anyrun-with-all-plugins}/lib/kidex"
+      ];
+      x = {fraction = 0.5;};
+      y = {fraction = 0.3;};
+      width = {fraction = 0.3;};
+      hideIcons = false;
+      ignoreExclusiveZones = false;
+      # layer = "overlay";
+      layer = "top";
+      hidePluginInfo = false;
+      closeOnClick = false;
+      showResultsImmediately = true;
+      maxEntries = null;
+    };
+    # extraCss = ''
+    #   .some_class {
+    #     background: red;
+    #   }
+    # '';
+
+    # extraConfigFiles."some-plugin.ron".text = ''
+    #   Config(
+    #     // for any other plugin
+    #     // this file will be put in ~/.config/anyrun/some-plugin.ron
+    #     // refer to docs of xdg.configFile for available options
+    #   )
+    # '';
   };
 }
