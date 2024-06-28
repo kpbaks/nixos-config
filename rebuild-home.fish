@@ -59,7 +59,7 @@ end
 
 set -l hm_switch_opts --print-build-logs --cores '(math (nproc) - 1)'
 # set -l expr gum spin --title "building derivation..." -- home-manager switch $hm_switch_opts --file ./home.nix
-set -l expr home-manager switch $hm_switch_opts --file ./home.nix
+set -l expr home-manager switch $hm_switch_opts --flake . # --file ./home.nix
 # home-manager switch --flake .
 
 if set --query _flag_verbose

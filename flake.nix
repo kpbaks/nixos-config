@@ -20,13 +20,17 @@
     niri.inputs.nixpkgs.follows = "nixpkgs";
 
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
+    helix = {
+      url = "github:helix-editor/helix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     simple-completion-language-server.url = "github:estin/simple-completion-language-server";
     # TODO: use
     yazi.url = "github:sxyazi/yazi";
     catppuccin.url = "github:catppuccin/nix";
     # TODO: use
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
-    helix.url = "github:helix-editor/helix";
     # TODO: use
     stylix.url = "github:danth/stylix";
     # TODO: use
@@ -47,6 +51,7 @@
     hostname = "nixos";
     username = "kpbaks";
     system = "x86_64-linux";
+    # system = builtins.currentSystem;
     overlays = [
       inputs.niri.overlays.niri
       # inputs.neovim-nightly-overlay.overlay
@@ -74,14 +79,9 @@
         inherit pkgs;
         extraSpecialArgs = {inherit inputs username;};
         modules = [
-          # {
-          #   home = {
-          #     inherit username;
-          #     homeDirectory = "/home/${username}";
-          #   };
-          # }
           ./home.nix
           inputs.niri.homeModules.niri
+          inputs.anyrun.homeManagerModules.default
           inputs.catppuccin.homeManagerModules.catppuccin
           inputs.plasma-manager.homeManagerModules.plasma-manager
           (

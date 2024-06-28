@@ -75,11 +75,12 @@ in rec {
 
   home.sessionVariables = {
     PAGER = "${pkgs.moar}/bin/moar";
-    MOAR = "--statusbar=bold --no-linenumbers";
+    MOAR = "-statusbar=bold -no-linenumbers -quit-if-one-screen";
   };
 
   # TODO: document all pkgs
   home.packages = with pkgs; [
+    newsflash # rss reader
     wl-color-picker
     # element
     element-desktop
@@ -827,6 +828,10 @@ in rec {
       stylua # formatter
       selene # linter
       lua-language-server # lsp
+      lua51Packages.lua
+      libgit2
+      luajit
+      luajitPackages.luarocks
     ];
   };
 
@@ -1963,6 +1968,19 @@ in rec {
       };
       screenshot-path = "~/Pictures/screenshots/screenshot-%Y-%m-%d %H-%M-%S.png";
     };
+
+    # settings.outputs."eDP-1".scale = 1.0;
+    settings.outputs."eDP-1" = {
+      position.y = 1440;
+      position.x = 0;
+    };
+    settings.outputs."DP-6" = {
+      position = {
+        x = 0;
+        y = 0;
+      };
+    };
+
     settings.spawn-at-startup = map (s: {command = pkgs.lib.strings.splitString " " s;}) [
       "swww-daemon"
       "waybar"
@@ -1972,7 +1990,7 @@ in rec {
       "udiskie"
       "dunst"
       "eww daemon"
-      "eww ~/.config/eww/bar open bar"
+      "eww ~/.config/eww/bar open bar" # FIX: not always open, and i want on multiple monitors
       "wlsunset -t 4000 -T 6500 -S 06:30 -s 18:30"
       "wluma"
       # "copyq --start-server"
@@ -2016,7 +2034,6 @@ in rec {
       "XF86MonBrightnessUp".action = brightnessctl "set 10%+";
       "XF86MonBrightnessDown".action = brightnessctl "set 10%-";
 
-      # "Mod+D".action = spawn "fuzzel";
       "Mod+1".action = focus-workspace 1;
       "Mod+2".action = focus-workspace 2;
       "Mod+3".action = focus-workspace 3;
@@ -2046,6 +2063,8 @@ in rec {
       "Mod+Minus".action = set-column-width "-10%";
       "Mod+Left".action = focus-column-left;
       "Mod+Right".action = focus-column-right;
+      "Mod+Up".action = focus-window-up;
+      "Mod+Down".action = focus-window-down;
       "Mod+Ctrl+Left".action = move-column-left;
       "Mod+Ctrl+Right".action = move-column-right;
       "Mod+Ctrl+Up".action = move-window-up;
@@ -2056,16 +2075,10 @@ in rec {
       # Mod+End  { focus-column-last; }
       # Mod+Ctrl+Home { move-column-to-first; }
       # Mod+Ctrl+End  { move-column-to-last; }
-
-      # Mod+Shift+Left  { focus-monitor-left; }
-      # Mod+Shift+Down  { focus-monitor-down; }
-      # Mod+Shift+Up    { focus-monitor-up; }
-      # Mod+Shift+Right { focus-monitor-right; }
-      # Mod+Shift+H     { focus-monitor-left; }
-      # Mod+Shift+J     { focus-monitor-down; }
-      # Mod+Shift+K     { focus-monitor-up; }
-      # Mod+Shift+L     { focus-monitor-right; }
-
+      "Mod+Home".action = focus-column-first;
+      "Mod+End".action = focus-column-last;
+      "Mod+Ctrl+Home".action = move-column-to-first;
+      "Mod+Ctrl+End".action = move-column-to-last;
       "Mod+Shift+Left".action = focus-monitor-left;
       "Mod+Shift+Down".action = focus-monitor-down;
       "Mod+Shift+Up".action = focus-monitor-up;
@@ -2084,6 +2097,15 @@ in rec {
       # Mod+Shift+Ctrl+K     { move-column-to-monitor-up; }
       # Mod+Shift+Ctrl+L     { move-column-to-monitor-right; }
 
+      "Mod+Shift+Ctrl+Left".action = move-column-to-monitor-left;
+      "Mod+Shift+Ctrl+Down".action = move-column-to-monitor-down;
+      "Mod+Shift+Ctrl+Up".action = move-column-to-monitor-up;
+      "Mod+Shift+Ctrl+Right".action = move-column-to-monitor-right;
+      # "Mod+Shift+Ctrl+H".action = move-column-to-monitor-left;
+      # "Mod+Shift+Ctrl+J".action = move-column-to-monitor-down;
+      # "Mod+Shift+Ctrl+K".action = move-column-to-monitor-up;
+      # "Mod+Shift+Ctrl+L".action = move-column-to-monitor-right;
+
       #  Mod+Page_Down      { focus-workspace-down; }
       # Mod+Page_Up        { focus-workspace-up; }
 
@@ -2091,6 +2113,16 @@ in rec {
       "Mod+Q".action = close-window;
       "Mod+V".action = spawn "copyq" "menu";
       "Mod+M".action = maximize-column;
+
+      # // There are also commands that consume or expel a single window to the side.
+      "Mod+BracketLeft".action = consume-or-expel-window-left;
+      "Mod+BracketRight".action = consume-or-expel-window-right;
+
+      # Mod+R { switch-preset-column-width; }
+      # Mod+Shift+R { reset-window-height; }
+
+      "Mod+R".action = switch-preset-column-width;
+      "Mod+Shift+R".action = reset-window-height;
 
       "Mod+Comma".action = consume-window-into-column;
       "Mod+Period".action = expel-window-from-column;
@@ -2119,144 +2151,10 @@ in rec {
     # // focus-workspace-keybinds;
   };
 
-  # TODO: use source instead of .text
-  home.file.".config/fastfetch/config.jsonc".text = ''
-    {
-        "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
-        // "logo": {
-        //     "source": "~/.config/fastfetch/xero.png",
-        //     "type": "auto",
-        //     "height": 15,
-        //     "width": 30,
-        //     "padding": {
-        //         "top": 5,
-        //         "left": 3
-        //     }
-        // },
-        "modules": [
-            "break",
-            {
-                "type": "custom",
-                "format": "\u001b[90m┌──────────────────────Hardware──────────────────────┐"
-            },
-            {
-                "type": "host",
-                "key": " PC",
-                "keyColor": "green"
-            },
-            {
-                "type": "cpu",
-                "key": "│ ├",
-                "keyColor": "green"
-            },
-            {
-                "type": "gpu",
-                "key": "│ ├󰍛",
-                "keyColor": "green"
-            },
-            {
-                "type": "memory",
-                "key": "│ ├󰍛",
-                "keyColor": "green"
-            },
-            {
-                "type": "disk",
-                "key": "└ └",
-                "keyColor": "green"
-            },
-            {
-                "type": "custom",
-                "format": "\u001b[90m└────────────────────────────────────────────────────┘"
-            },
-            "break",
-            {
-                "type": "custom",
-                "format": "\u001b[90m┌──────────────────────Software──────────────────────┐"
-            },
-            {
-                "type": "os",
-                "key": " OS",
-                "keyColor": "yellow"
-            },
-            {
-                "type": "kernel",
-                "key": "│ ├",
-                "keyColor": "yellow"
-            },
-            {
-                "type": "bios",
-                "key": "│ ├",
-                "keyColor": "yellow"
-            },
-            {
-                "type": "packages",
-                "key": "│ ├󰏖",
-                "keyColor": "yellow"
-            },
-            {
-                "type": "shell",
-                "key": "└ └",
-                "keyColor": "yellow"
-            },
-            "break",
-            {
-                "type": "de",
-                "key": " DE",
-                "keyColor": "blue"
-            },
-            {
-                "type": "lm",
-                "key": "│ ├",
-                "keyColor": "blue"
-            },
-            {
-                "type": "wm",
-                "key": "│ ├",
-                "keyColor": "blue"
-            },
-            {
-                "type": "wmtheme",
-                "key": "│ ├󰉼",
-                "keyColor": "blue"
-            },
-            {
-                "type": "terminal",
-                "key": "└ └",
-                "keyColor": "blue"
-            },
-            {
-                "type": "custom",
-                "format": "\u001b[90m└────────────────────────────────────────────────────┘"
-            },
-            "break",
-            {
-                "type": "custom",
-                "format": "\u001b[90m┌────────────────────Uptime / Age / DT────────────────────┐"
-            },
-            {
-                "type": "command",
-                "key": "  OS Age ",
-                "keyColor": "magenta",
-                "text": "birth_install=$(stat -c %W /); current=$(date +%s); time_progression=$((current - birth_install)); days_difference=$((time_progression / 86400)); echo $days_difference days"
-            },
-            {
-                "type": "uptime",
-                "key": "  Uptime ",
-                "keyColor": "magenta"
-            },
-            {
-                "type": "datetime",
-                "key": "  DateTime ",
-                "keyColor": "magenta"
-            },
-            {
-                "type": "custom",
-                "format": "\u001b[90m└─────────────────────────────────────────────────────────┘"
-            },
-            "break",
-        ]
-    }
-  '';
+  # FIX
+  # home.file.".config/fastfetch/config.jsonc".source = ./config/fastfetch/config.jsonc;
+  # home.file.".config/fastfetch/config.jsonc".source = ./fastfetch.config.jsonc;
+  # home.file.".config/fastfetch/config.jsonc".source = ./foo;
 
   programs.anyrun = {
     enable = true;

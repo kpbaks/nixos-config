@@ -19,18 +19,23 @@ in rec {
     ./hardware-configuration.nix
   ];
 
-  nix = {
-    settings = {
-      experimental-features = ["nix-command" "flakes"];
-      substituters = [
-        "https://cache.nixos.org"
-        "https://nix-community.cachix.org"
-      ];
-      trusted-public-keys = [
-        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      ];
-      trusted-substituters = ["https://cache.nixos.org"];
-    };
+  nix.settings = {
+    experimental-features = ["nix-command" "flakes"];
+    builders-use-substitutes = true;
+    substituters = [
+      "https://cache.nixos.org"
+      "https://nix-community.cachix.org"
+    ];
+    extra-substituters = [
+      "https://anyrun.cachix.org"
+    ];
+    trusted-public-keys = [
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    ];
+    extra-trusted-public-keys = [
+      "anyrun.cachix.org-1:pqBobmOjI7nKlsUMV25u9QHa9btJK65/C8vnO3p346s="
+    ];
+    trusted-substituters = ["https://cache.nixos.org"];
   };
 
   nix.settings.trusted-users = [
@@ -145,7 +150,7 @@ in rec {
       system.nixos.tags = ["gaming"];
       # Nvidia Configuration
       services.xserver.videoDrivers = ["nvidia"];
-      hardware.opengl.enable = true;
+      hardware.graphics.enable = true;
     };
 
     # TODO: works but bevy breaks down when used as renderer
@@ -255,11 +260,9 @@ in rec {
   #   ${pkgs.lib.getBin pkgs.xorg.xrandr}/bin/xrandr --setprovideroutputsource 2 0
   # '';
 
-  # Enable OpenGL
-  hardware.opengl = {
+  hardware.graphics = {
     enable = true;
-    driSupport = true;
-    driSupport32Bit = true;
+    enable32Bit = true;
   };
 
   # Configure console keymap
@@ -347,9 +350,7 @@ in rec {
     xwayland.enable = true;
   };
 
-  programs.niri = {
-    enable = true;
-  };
+  programs.niri.enable = true;
 
   # programs.river.enable = true;
 
