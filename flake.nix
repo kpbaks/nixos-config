@@ -15,9 +15,17 @@
       inputs.home-manager.follows = "home-manager";
     };
 
-    # TODO: use
     niri.url = "github:sodiboo/niri-flake";
     niri.inputs.nixpkgs.follows = "nixpkgs";
+    hyprland.url = "github:hyprwm/Hyprland";
+    hyprgrass = {
+      url = "github:horriblename/hyprgrass";
+      inputs.hyprland.follows = "hyprland"; # IMPORTANT
+    };
+    # TODO: use
+    sops-nix.url = "github:Mic92/sops-nix";
+    # TODO: use
+    nur.url = "github:nix-community/NUR";
 
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     helix = {
@@ -36,6 +44,8 @@
     # TODO: use
     anyrun.url = "github:Kirottu/anyrun";
     anyrun.inputs.nixpkgs.follows = "nixpkgs";
+    anyrun-nixos-options.url = "github:n3oney/anyrun-nixos-options";
+
     # TODO: use
     ags.url = "github:Aylur/ags";
     # atdo.url = "github:kpbaks/atdo";
@@ -71,6 +81,7 @@
         ./configuration.nix
         # inputs.stylix.nixosModules.stylix
         inputs.niri.nixosModules.niri
+        inputs.sops-nix.nixosModules.sops
       ];
     };
 

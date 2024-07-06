@@ -1,5 +1,6 @@
 {
   config,
+  # osConfig,
   pkgs,
   inputs,
   username,
@@ -28,6 +29,9 @@ in rec {
   imports = [inputs.ags.homeManagerModules.default];
 
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.permittedInsecurePackages = [
+    "electron-28.3.3" # needed for `logseq` 05-07-2024
+  ];
 
   programs.ags = {
     enable = true;
@@ -80,6 +84,15 @@ in rec {
 
   # TODO: document all pkgs
   home.packages = with pkgs; [
+    logseq
+    smassh # TUI based typing test application inspired by MonkeyType
+    kondo #  cleans dependencies and build artifacts from your projects.
+    # TODO: integrate with nvim
+    statix # nix linter
+    deadnix # detect unused nix code
+    tickrs #  Realtime ticker data in your terminal 📈
+    ticker #  Terminal stock ticker with live updates and position tracking
+    mop #  Stock market tracker for hackers.
     newsflash # rss reader
     wl-color-picker
     # element
@@ -693,12 +706,22 @@ in rec {
     # };
   };
 
+  # # TODO: get to work
+  # accounts.email.accounts.gmail = {
+  #   address = "kristoffer.pbs@gmail.com";
+  #   realName = "Kristoffer Plagborg Bak Sørensen";
+  #   primary = true;
+  #   flavor = "gmail.com";
+  #   passwordCommand = pkgs.writeScript "email-password" "echo ...";
+  #   himalaya.enable = true;
+  #   thunderbird.enable = true;
+  # };
+
   programs.himalaya = {
     enable = true;
+    settings = {};
   };
-  # services.himalaya-watch = {
-  #   enable = true;
-  # };
+  services.himalaya-watch.enable = true;
 
   programs.jq.enable = true;
   programs.jujutsu.enable = true;
@@ -844,6 +867,7 @@ in rec {
   # programs.nushell.enable = true;
   programs.pandoc.enable = true;
   programs.pet.enable = true;
+  # TODO: use catppuccin colors
   programs.ripgrep = {
     enable = true;
     arguments = [
@@ -946,7 +970,7 @@ in rec {
         format = "[$time]($style)";
       };
       shlvl = {
-        disabled = false;
+        disabled = true;
         format = "$shlvl level(s) down";
         threshold = 3;
       };
@@ -1048,8 +1072,55 @@ in rec {
       };
       # which = {sort_by = true;};
     };
+    keymap = let
+      cd = key: dir: {
+        run = "cd ${dir}";
+        on = ["g"] ++ (builtins.filter (x: x != "" && x != []) (builtins.split "" key)); # why split function so weird ...
+        desc = "Go to ${dir}";
+      };
+    in {
+      manager.prepend_keymap = let
+        keymap = {
+          keys,
+          run,
+          desc ? "",
+        }: let on = []; in {inherit run desc on;};
+      in [
+        {
+          # FIXME: `--all does not work here`
+          run = ''shell "ripdrag --all --and-exit $@" --confirm'';
+          on = ["<c-d>"];
+          desc = "Open selected files with `ripdrag`";
+        }
+        {
+          run = "arrow 999999999";
+          on = ["g" "e"];
+          desc = "Move cursor to end";
+        }
+        {
+          run = "help";
+          on = ["?"];
+          desc = "Open help overview";
+        }
+        {
+          run = "close";
+          on = ["q"];
+          desc = "Close yazi";
+        }
+        # (keymap {})
+        (cd "m" "~/Music")
+        (cd "p" "~/Pictures")
+        (cd "v" "~/Videos")
+        (cd "." "~/dotfiles")
+        (cd "s" "~/Pictures/screenshots")
+        (cd "Do" "~/development/own")
+        (cd "Df" "~/development/forks")
+        (cd "Dc" "~/development/cloned")
+      ];
+    };
   };
 
+  # TODO: use
   # programs.thunderbird = {
   #   enable = true;
   # };
@@ -1324,7 +1395,7 @@ in rec {
       pkgs.xdg-desktop-portal-kde
       pkgs.xdg-desktop-portal-hyprland
       pkgs.xdg-desktop-portal-wlr
-      # pkgs.xdg-desktop-portal-cosmic
+      pkgs.xdg-desktop-portal-cosmic
     ];
   };
 
@@ -1964,189 +2035,274 @@ in rec {
       };
       layout = {
         gaps = 10; # px
-        center-focused-column = "always";
+        # center-focused-column = "on-overflow";
+        center-focused-column = "never";
+        # center-focused-column = "always";
+        preset-column-widths = [
+          {proportion = 1.0 / 3.0;}
+          {proportion = 1.0 / 2.0;}
+          {proportion = 2.0 / 3.0;}
+        ];
+        default-column-width = {proportion = 1.0 / 3.0;};
       };
       screenshot-path = "~/Pictures/screenshots/screenshot-%Y-%m-%d %H-%M-%S.png";
-    };
+      window-rules = [
+        {
+          draw-border-with-background = false;
+          # draw each corner as rounded with the same radius
+          geometry-corner-radius = let
+            r = 8.0;
+          in {
+            top-left = r;
+            top-right = r;
+            bottom-left = r;
+            bottom-right = r;
+          };
+          clip-to-geometry = true;
+        }
+        {
+          # dim unfocused windows
+          matches = [{is-focused = false;}];
+          opacity = 0.95;
+        }
+        {
+          # FIXME: does not match private browsing in firefox
+          matches = [
+            {
+              app-id = "^firefox$";
+              title = "Private Browsing";
+            }
+          ];
+          border.active.color = "purple";
+        }
+      ];
 
-    # settings.outputs."eDP-1".scale = 1.0;
-    settings.outputs."eDP-1" = {
-      position.y = 1440;
-      position.x = 0;
-    };
-    settings.outputs."DP-6" = {
-      position = {
-        x = 0;
-        y = 0;
+      # settings.outputs."eDP-1".scale = 1.0;
+      outputs."eDP-1" = {
+        position.y = 1440;
+        position.x = 0;
       };
-    };
-
-    settings.spawn-at-startup = map (s: {command = pkgs.lib.strings.splitString " " s;}) [
-      "swww-daemon"
-      "waybar"
-      "kitty"
-      "spotify"
-      "telegram-desktop"
-      "udiskie"
-      "dunst"
-      "eww daemon"
-      "eww ~/.config/eww/bar open bar" # FIX: not always open, and i want on multiple monitors
-      "wlsunset -t 4000 -T 6500 -S 06:30 -s 18:30"
-      "wluma"
-      # "copyq --start-server"
-      "copyq"
-    ];
-    # https://github.com/sodiboo/niri-flake/blob/main/docs.md#programsnirisettingsbinds
-    settings.binds = with config.lib.niri.actions; let
-      sh = spawn "sh" "-c";
-      fish = spawn "fish" "--no-config" "-c";
-      nu = spawn "nu" "-c";
-      playerctl = spawn "playerctl";
-      brightnessctl = spawn "brightnessctl";
-      wpctl = spawn "wpctl"; # wireplumber
-      bluetoothctl = spawn "bluetoothctl";
-      run-flatpak = spawn "flatpak" "run";
-      run-in-kitty = spawn "kitty";
-      # focus-workspace-keybinds = builtins.listToAttrs (map:
-      #   (n: {
-      #     name = "Mod+${toString n}";
-      #     value = {action = "focus-workspace ${toString n}";};
-      #   }) (range 1 10));
-    in {
-      "XF86AudioRaiseVolume".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+";
-      "XF86AudioLowerVolume".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-";
-      "XF86AudioMute" = {
-        action = wpctl "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle";
-        allow-when-locked = true;
-      };
-      "XF86AudioMicMute" = {
-        action = wpctl "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle";
-        allow-when-locked = true;
+      outputs."DP-6" = {
+        position = {
+          x = 0;
+          y = 0;
+        };
       };
 
-      "Mod+TouchpadScrollDown".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02+";
-      "Mod+TouchpadScrollUp".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02-";
+      spawn-at-startup = map (s: {command = pkgs.lib.strings.splitString " " s;}) [
+        "swww-daemon"
+        # "waybar"
+        "kitty"
+        "spotify"
+        "telegram-desktop"
+        "udiskie"
+        "dunst"
+        "eww daemon"
+        "eww ~/.config/eww/bar open bar" # FIX: not always open, and i want on multiple monitors
+        "wlsunset -t 4000 -T 6500 -S 06:30 -s 18:30"
+        "wluma"
+        "copyq"
+      ];
 
-      "XF86AudioPlay".action = playerctl "play-pause";
-      "XF86AudioNext".action = playerctl "next";
-      "XF86AudioPrev".action = playerctl "previous";
-      "XF86AudioStop".action = playerctl "stop";
-      "XF86MonBrightnessUp".action = brightnessctl "set 10%+";
-      "XF86MonBrightnessDown".action = brightnessctl "set 10%-";
+      # https://github.com/sodiboo/nix-config/blob/3d25eaf71cc27a0159fd3449c9d20ac4a8a873b5/niri.mod.nix#L196C11-L232C14
+      animations.shaders.window-resize = ''
+        vec4 resize_color(vec3 coords_curr_geo, vec3 size_curr_geo) {
+            vec3 coords_next_geo = niri_curr_geo_to_next_geo * coords_curr_geo;
 
-      "Mod+1".action = focus-workspace 1;
-      "Mod+2".action = focus-workspace 2;
-      "Mod+3".action = focus-workspace 3;
-      "Mod+4".action = focus-workspace 4;
-      "Mod+5".action = focus-workspace 5;
-      "Mod+6".action = focus-workspace 6;
-      "Mod+7".action = focus-workspace 7;
-      "Mod+8".action = focus-workspace 8;
-      "Mod+9".action = focus-workspace 9;
+            vec3 coords_stretch = niri_geo_to_tex_next * coords_curr_geo;
+            vec3 coords_crop = niri_geo_to_tex_next * coords_next_geo;
 
-      # inherit (focus-workspace-keybinds) ${builtins.attrNames focus-workspace-keybinds};
+            // We can crop if the current window size is smaller than the next window
+            // size. One way to tell is by comparing to 1.0 the X and Y scaling
+            // coefficients in the current-to-next transformation matrix.
+            bool can_crop_by_x = niri_curr_geo_to_next_geo[0][0] <= 1.0;
+            bool can_crop_by_y = niri_curr_geo_to_next_geo[1][1] <= 1.0;
 
-      # "Mod+?".action = show-hotkey-overlay;
-      "Mod+K".action = spawn "kitty";
-      "Mod+F".action = spawn "firefox";
-      "Mod+T".action = spawn "telegram-desktop";
-      "Mod+S".action = spawn "spotify";
-      "Mod+D".action = spawn "webcord";
-      "Mod+E".action = spawn "dolphin";
-      "Mod+B".action = spawn "overskride";
-      "f11".action = fullscreen-window;
+            vec3 coords = coords_stretch;
+            if (can_crop_by_x)
+                coords.x = coords_crop.x;
+            if (can_crop_by_y)
+                coords.y = coords_crop.y;
 
-      # "Mod+Shift+E".action = quit;
-      # "Mod+Ctrl+Shift+E".action = quit {skip-confirmation = true;};
+            vec4 color = texture2D(niri_tex_next, coords.st);
 
-      "Mod+Plus".action = set-column-width "+10%";
-      "Mod+Minus".action = set-column-width "-10%";
-      "Mod+Left".action = focus-column-left;
-      "Mod+Right".action = focus-column-right;
-      "Mod+Up".action = focus-window-up;
-      "Mod+Down".action = focus-window-down;
-      "Mod+Ctrl+Left".action = move-column-left;
-      "Mod+Ctrl+Right".action = move-column-right;
-      "Mod+Ctrl+Up".action = move-window-up;
-      "Mod+Ctrl+Down".action = move-window-down;
+            // However, when we crop, we also want to crop out anything outside the
+            // current geometry. This is because the area of the shader is unspecified
+            // and usually bigger than the current geometry, so if we don't fill pixels
+            // outside with transparency, the texture will leak out.
+            //
+            // When stretching, this is not an issue because the area outside will
+            // correspond to client-side decoration shadows, which are already supposed
+            // to be outside.
+            if (can_crop_by_x && (coords_curr_geo.x < 0.0 || 1.0 < coords_curr_geo.x))
+                color = vec4(0.0);
+            if (can_crop_by_y && (coords_curr_geo.y < 0.0 || 1.0 < coords_curr_geo.y))
+                color = vec4(0.0);
 
-      # TODO:
-      #       Mod+Home { focus-column-first; }
-      # Mod+End  { focus-column-last; }
-      # Mod+Ctrl+Home { move-column-to-first; }
-      # Mod+Ctrl+End  { move-column-to-last; }
-      "Mod+Home".action = focus-column-first;
-      "Mod+End".action = focus-column-last;
-      "Mod+Ctrl+Home".action = move-column-to-first;
-      "Mod+Ctrl+End".action = move-column-to-last;
-      "Mod+Shift+Left".action = focus-monitor-left;
-      "Mod+Shift+Down".action = focus-monitor-down;
-      "Mod+Shift+Up".action = focus-monitor-up;
-      "Mod+Shift+Right".action = focus-monitor-right;
-      "Mod+Shift+H".action = focus-monitor-left;
-      "Mod+Shift+J".action = focus-monitor-down;
-      "Mod+Shift+K".action = focus-monitor-up;
-      "Mod+Shift+L".action = focus-monitor-right;
+            return color;
+        }
+      '';
 
-      # Mod+Shift+Ctrl+Left  { move-column-to-monitor-left; }
-      # Mod+Shift+Ctrl+Down  { move-column-to-monitor-down; }
-      # Mod+Shift+Ctrl+Up    { move-column-to-monitor-up; }
-      # Mod+Shift+Ctrl+Right { move-column-to-monitor-right; }
-      # Mod+Shift+Ctrl+H     { move-column-to-monitor-left; }
-      # Mod+Shift+Ctrl+J     { move-column-to-monitor-down; }
-      # Mod+Shift+Ctrl+K     { move-column-to-monitor-up; }
-      # Mod+Shift+Ctrl+L     { move-column-to-monitor-right; }
+      # https://github.com/sodiboo/niri-flake/blob/main/docs.md#programsnirisettingsbinds
+      binds = with config.lib.niri.actions; let
+        sh = spawn "sh" "-c";
+        fish = spawn "fish" "--no-config" "-c";
+        nu = spawn "nu" "-c";
+        playerctl = spawn "playerctl";
+        brightnessctl = spawn "brightnessctl";
+        wpctl = spawn "wpctl"; # wireplumber
+        bluetoothctl = spawn "bluetoothctl";
+        run-flatpak = spawn "flatpak" "run";
+        run-in-kitty = spawn "kitty";
+        run-in-sh-within-kitty = spawn "kitty" "sh" "-c";
+        # focus-workspace-keybinds = builtins.listToAttrs (map:
+        #   (n: {
+        #     name = "Mod+${toString n}";
+        #     value = {action = "focus-workspace ${toString n}";};
+        #   }) (range 1 10));
+      in {
+        "XF86AudioRaiseVolume".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+";
+        "XF86AudioLowerVolume".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-";
+        "XF86AudioMute" = {
+          action = wpctl "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle";
+          allow-when-locked = true;
+        };
+        "XF86AudioMicMute" = {
+          action = wpctl "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle";
+          allow-when-locked = true;
+        };
 
-      "Mod+Shift+Ctrl+Left".action = move-column-to-monitor-left;
-      "Mod+Shift+Ctrl+Down".action = move-column-to-monitor-down;
-      "Mod+Shift+Ctrl+Up".action = move-column-to-monitor-up;
-      "Mod+Shift+Ctrl+Right".action = move-column-to-monitor-right;
-      # "Mod+Shift+Ctrl+H".action = move-column-to-monitor-left;
-      # "Mod+Shift+Ctrl+J".action = move-column-to-monitor-down;
-      # "Mod+Shift+Ctrl+K".action = move-column-to-monitor-up;
-      # "Mod+Shift+Ctrl+L".action = move-column-to-monitor-right;
+        "Mod+TouchpadScrollDown".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02+";
+        "Mod+TouchpadScrollUp".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02-";
 
-      #  Mod+Page_Down      { focus-workspace-down; }
-      # Mod+Page_Up        { focus-workspace-up; }
+        "XF86AudioPlay".action = playerctl "play-pause";
+        "XF86AudioNext".action = playerctl "next";
+        "XF86AudioPrev".action = playerctl "previous";
+        "XF86AudioStop".action = playerctl "stop";
+        "XF86MonBrightnessUp".action = brightnessctl "set" "10%+";
+        "XF86MonBrightnessDown".action = brightnessctl "set" "10%-";
+        "Mod+Shift+TouchpadScrollDown".action = brightnessctl "set" "5%+";
+        "Mod+Shift+TouchpadScrollUp".action = brightnessctl "set" "5%-";
 
-      "Mod+Shift+Slash".action = show-hotkey-overlay;
-      "Mod+Q".action = close-window;
-      "Mod+V".action = spawn "copyq" "menu";
-      "Mod+M".action = maximize-column;
+        "Mod+1".action = focus-workspace 1;
+        "Mod+2".action = focus-workspace 2;
+        "Mod+3".action = focus-workspace 3;
+        "Mod+4".action = focus-workspace 4;
+        "Mod+5".action = focus-workspace 5;
+        "Mod+6".action = focus-workspace 6;
+        "Mod+7".action = focus-workspace 7;
+        "Mod+8".action = focus-workspace 8;
+        "Mod+9".action = focus-workspace 9;
 
-      # // There are also commands that consume or expel a single window to the side.
-      "Mod+BracketLeft".action = consume-or-expel-window-left;
-      "Mod+BracketRight".action = consume-or-expel-window-right;
+        # inherit (focus-workspace-keybinds) ${builtins.attrNames focus-workspace-keybinds};
 
-      # Mod+R { switch-preset-column-width; }
-      # Mod+Shift+R { reset-window-height; }
+        # "Mod+?".action = show-hotkey-overlay;
+        "Mod+K".action = spawn "kitty";
+        "Mod+F".action = spawn "firefox";
+        "Mod+T".action = spawn "telegram-desktop";
+        "Mod+S".action = spawn "spotify";
+        "Mod+D".action = spawn "webcord";
+        # "Mod+E".action = run-in-kitty "yazi";
+        "Mod+E".action = run-in-sh-within-kitty "cd ~/Downloads; yazi";
+        # "Mod+E".action = spawn "dolphin";
+        "Mod+B".action = spawn "overskride";
+        "f11".action = fullscreen-window;
 
-      "Mod+R".action = switch-preset-column-width;
-      "Mod+Shift+R".action = reset-window-height;
+        # "Mod+Shift+E".action = quit;
+        # "Mod+Ctrl+Shift+E".action = quit {skip-confirmation = true;};
 
-      "Mod+Comma".action = consume-window-into-column;
-      "Mod+Period".action = expel-window-from-column;
+        "Mod+Plus".action = set-column-width "+10%";
+        "Mod+Minus".action = set-column-width "-10%";
+        "Mod+Left".action = focus-column-left;
+        "Mod+Right".action = focus-column-right;
+        "Mod+Up".action = focus-window-up;
+        "Mod+Down".action = focus-window-down;
+        "Mod+Ctrl+Left".action = move-column-left;
+        "Mod+Ctrl+Right".action = move-column-right;
+        "Mod+Ctrl+Up".action = move-window-up;
+        "Mod+Ctrl+Down".action = move-window-down;
 
-      # // Actions to switch layouts.
-      #    // Note: if you uncomment these, make sure you do NOT have
-      #    // a matching layout switch hotkey configured in xkb options above.
-      #    // Having both at once on the same hotkey will break the switching,
-      #    // since it will switch twice upon pressing the hotkey (once by xkb, once by niri).
-      # // Mod+Space       { switch-layout "next"; }
-      # // Mod+Shift+Space { switch-layout "prev"; }
+        "Mod+H".action = focus-column-left;
+        "Mod+L".action = focus-column-right;
+        # "Mod+K".action = focus-window-up;
+        # "Mod+J".action = focus-window-down;
+        "Mod+Ctrl+H".action = move-column-left;
+        "Mod+Ctrl+L".action = move-column-right;
+        # "Mod+Ctrl+K".action = move-window-up;
+        # "Mod+Ctrl+J".action = move-window-down;
 
-      "Mod+Space".action = switch-layout "next";
-      "Mod+Shift+Space".action = switch-layout "prev";
+        # TODO:
+        #       Mod+Home { focus-column-first; }
+        # Mod+End  { focus-column-last; }
+        # Mod+Ctrl+Home { move-column-to-first; }
+        # Mod+Ctrl+End  { move-column-to-last; }
+        "Mod+Home".action = focus-column-first;
+        "Mod+End".action = focus-column-last;
+        "Mod+Ctrl+Home".action = move-column-to-first;
+        "Mod+Ctrl+End".action = move-column-to-last;
+        "Mod+Shift+Left".action = focus-monitor-left;
+        "Mod+Shift+Down".action = focus-monitor-down;
+        "Mod+Shift+Up".action = focus-monitor-up;
+        "Mod+Shift+Right".action = focus-monitor-right;
+        "Mod+Shift+H".action = focus-monitor-left;
+        "Mod+Shift+J".action = focus-monitor-down;
+        "Mod+Shift+K".action = focus-monitor-up;
+        "Mod+Shift+L".action = focus-monitor-right;
 
-      "Print".action = screenshot;
-      "Ctrl+Print".action = screenshot-screen;
-      "Alt+Print".action = screenshot-window;
+        "Mod+Shift+Ctrl+Left".action = move-column-to-monitor-left;
+        "Mod+Shift+Ctrl+Down".action = move-column-to-monitor-down;
+        "Mod+Shift+Ctrl+Up".action = move-column-to-monitor-up;
+        "Mod+Shift+Ctrl+Right".action = move-column-to-monitor-right;
+        "Mod+Shift+Ctrl+H".action = move-column-to-monitor-left;
+        "Mod+Shift+Ctrl+J".action = move-column-to-monitor-down;
+        "Mod+Shift+Ctrl+K".action = move-column-to-monitor-up;
+        "Mod+Shift+Ctrl+L".action = move-column-to-monitor-right;
 
-      # // Switches focus between the current and the previous workspace.
-      "Mod+Tab".action = focus-workspace-previous;
-      # "Mod+Return".action = spawn "anyrun";
-      # "Mod+Return".action = fish "pidof anyrun; and pkill anyrun; or anyrun";
-      "Mod+Return".action = fish "pidof nwg-drawer; and pkill nwg-drawer; or nwg-drawer -ovl -fm dolphin";
+        "Mod+Shift+Slash".action = show-hotkey-overlay;
+        "Mod+Q".action = close-window;
+        "Mod+V".action = spawn "copyq" "menu";
+        "Mod+M".action = maximize-column;
+
+        # // There are also commands that consume or expel a single window to the side.
+        "Mod+BracketLeft".action = consume-or-expel-window-left;
+        "Mod+BracketRight".action = consume-or-expel-window-right;
+
+        # Mod+R { switch-preset-column-width; }
+        # Mod+Shift+R { reset-window-height; }
+
+        "Mod+R".action = switch-preset-column-width;
+        "Mod+Shift+R".action = reset-window-height;
+
+        "Mod+Comma".action = consume-window-into-column;
+        "Mod+Period".action = expel-window-from-column;
+
+        # // Actions to switch layouts.
+        #    // Note: if you uncomment these, make sure you do NOT have
+        #    // a matching layout switch hotkey configured in xkb options above.
+        #    // Having both at once on the same hotkey will break the switching,
+        #    // since it will switch twice upon pressing the hotkey (once by xkb, once by niri).
+        # // Mod+Space       { switch-layout "next"; }
+        # // Mod+Shift+Space { switch-layout "prev"; }
+
+        "Mod+Space".action = switch-layout "next";
+        "Mod+Shift+Space".action = switch-layout "prev";
+
+        "Mod+Page_Down".action = focus-workspace-down;
+        "Mod+Page_Up".action = focus-workspace-up;
+
+        "Mod+U".action = focus-workspace-down;
+        "Mod+I".action = focus-workspace-up;
+
+        "Print".action = screenshot;
+        "Ctrl+Print".action = screenshot-screen;
+        "Alt+Print".action = screenshot-window;
+
+        # // Switches focus between the current and the previous workspace.
+        "Mod+Tab".action = focus-workspace-previous;
+        # "Mod+Return".action = spawn "anyrun";
+        # "Mod+Return".action = fish "pidof anyrun; and pkill anyrun; or anyrun";
+        "Mod+Return".action = fish "pidof nwg-drawer; and pkill nwg-drawer; or nwg-drawer -ovl -fm dolphin";
+      };
     };
     # // focus-workspace-keybinds;
   };
@@ -2162,6 +2318,7 @@ in rec {
       plugins = [
         # An array of all the plugins you want, which either can be paths to the .so files, or their packages
         inputs.anyrun.packages.${pkgs.system}.applications
+        inputs.anyrun-nixos-options.packages.${pkgs.system}.default
         # ./some_plugin.so
         # "${inputs.anyrun.packages.${pkgs.system}.anyrun-with-all-plugins}/lib/kidex"
       ];
@@ -2170,17 +2327,40 @@ in rec {
       width = {fraction = 0.3;};
       hideIcons = false;
       ignoreExclusiveZones = false;
-      # layer = "overlay";
-      layer = "top";
+      layer = "overlay";
+      # layer = "top";
       hidePluginInfo = false;
-      closeOnClick = false;
+      closeOnClick = true;
       showResultsImmediately = true;
-      maxEntries = null;
+      maxEntries = 10;
     };
     # extraCss = ''
     #   .some_class {
     #     background: red;
     #   }
+    # '';
+    # FIXME: `osConfig` not found
+    # extraConfigFiles."nixos-options.ron".text = let
+    #   #               ↓ home-manager refers to the nixos configuration as osConfig
+    #   nixos-options = osConfig.system.build.manual.optionsJSON + "/share/doc/nixos/options.json";
+    #   # merge your options
+    #   options = builtins.toJSON {
+    #     ":nix" = [nixos-options];
+    #   };
+    #   # or alternatively if you wish to read any other documentation options, such as home-manager
+    #   # get the docs-json package from the home-manager flake
+    #   # hm-options = inputs.home-manager.packages.${pkgs.system}.docs-json + "/share/doc/home-manager/options.json";
+    #   # options = builtins.toJSON {
+    #   #   ":nix" = [nixos-options];
+    #   #   ":hm" = [hm-options];
+    #   #   ":something-else" = [some-other-option];
+    #   #   ":nall" = [nixos-options hm-options some-other-option];
+    #   # };
+    # in ''
+    #   Config(
+    #       // add your option paths
+    #       options: ${options},
+    #    )
     # '';
 
     # extraConfigFiles."some-plugin.ron".text = ''
