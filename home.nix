@@ -5,10 +5,10 @@
   inputs,
   username,
   ...
-}: let
+} @ args: let
   name = "Kristoffer Sørensen";
   full-name = "Kristoffer Plagborg Bak Sørensen";
-  username = "kpbaks";
+  # username = "kpbaks";
   gmail = "kristoffer.pbs@gmail.com";
   aumail = "201908140@post.au.dk";
   tutamail = "kristoffer.pbs@tuta.io";
@@ -18,12 +18,174 @@
   config_dir = "/home/" + username + "/.config";
   cache_dir = "/home/" + username + "/.cache";
   data_dir = "/home/" + username + "/.local/share";
+  city = "Aarhus";
+  country = "Denmark";
   lib = pkgs.lib;
   join = lib.strings.concatStringsSep;
   mapjoin = lib.strings.concatMapStringsSep;
   range = from: to: builtins.genList (i: from + i) (to - from);
   merge = list: builtins.foldl' (acc: it: acc // it) {} list;
   font.monospace = "Iosevka Nerd Font Mono";
+  monitors.laptop = "eDP-1";
+  monitors.acer = "DP-5";
+  terminal = pkgs.lib.getExe pkgs.kitty;
+  # TODO: present more nicely maybe with the `tabulate` package
+  scripts.PYTHONSTARTUP = pkgs.writers.writePython3Bin "pythonstartup.py" {flakeIgnore = ["E501"];} ''
+    import pkgutil
+    import sys
+    from typing import Set
+
+
+    def get_stdlib_modules() -> Set[str]:
+        """Get a set of standard library module names."""
+        stdlib_path = next(p for p in sys.path if 'site-packages' not in p and 'dist-packages' not in p)
+        stdlib_modules = {name for _, name, _ in pkgutil.iter_modules([stdlib_path])}
+        return stdlib_modules
+
+
+    def get_installed_modules() -> Set[str]:
+        """Get a set of installed module names."""
+        installed_modules = {name for _, name, _ in pkgutil.iter_modules()}
+        return installed_modules
+
+
+    def get_external_modules() -> Set[str]:
+        """Get a set of external (non-standard library) module names."""
+        stdlib_modules = get_stdlib_modules()
+        installed_modules = get_installed_modules()
+        external_modules = installed_modules - stdlib_modules
+        return external_modules
+
+
+    external_modules = get_external_modules()
+    print("External packages (not in stdlib):")
+    for module in sorted(external_modules):
+        print(module)
+  '';
+  scripts.wb-reload = pkgs.writers.writeBashBin "wb-reload" ''
+    if ! ${pkgs.procps}/bin/pkill -USR2 waybar; then
+      ${pkgs.libnotify}/bin/notify-send --transient "waybar" "waybar is not running"
+    fi
+  '';
+
+  scripts.wb-toggle-visibility = pkgs.writers.writeBashBin "wb-toggle-visibility" ''
+    if ! ${pkgs.procps}/bin/pkill -USR1 waybar; then
+      # ${pkgs.libnotify}/bin/notify-send --transient --category= "waybar" "waybar is not running"
+      ${pkgs.libnotify}/bin/notify-send --transient "waybar" "waybar is not running"
+    fi
+  '';
+
+  scripts.wb-watch-config-and-reload = pkgs.writers.writeBashBin "wb-watch-config-and-reload" ''
+    if ${pkgs.procps}/bin/pgrep waybar; then
+      ${pkgs.watchexec}/bin/watchexec --watch /home/${username}/.config/waybar ${pkgs.lib.getExe scripts.wb-reload}
+    else
+      ${pkgs.libnotify}/bin/notify-send --transient "waybar" "waybar is not running"
+    fi
+  '';
+
+  scripts.foobar = pkgs.writers.writeFish "foobar" ''echo foobar'';
+
+  scripts.spotify-cover-art =
+    pkgs.writers.writeFishBin "spotify-cover-art" {}
+    /*
+    fish
+    */
+    ''
+      set -l cdn (${pkgs.playerctl}/bin/playerctl -p spotify metadata mpris:artUrl)
+      if test -z $cdn
+        # spotify not running
+        exit
+      end
+      set -l cover /tmp/cover.jpeg
+      ${pkgs.curl}/bin/curl --silent "$cdn" --output $cover
+      echo $cover
+      # if isatty stdout
+      #   ${pkgs.timg}/bin/timg --center $cover
+      # else
+      #   echo $cover
+      # end
+    '';
+
+  scripts.bluetoothctl-startup =
+    pkgs.writers.writeFishBin "bluetoothctl-startup" {}
+    /*
+    fish
+    */
+    ''
+      set -l reset (set_color normal)
+      set -l red (set_color red)
+      set -l blue (set_color blue)
+      set -l green (set_color green)
+      set -l yellow (set_color yellow)
+      set -l cyan (set_color cyan)
+      set -l magenta (set_color magenta)
+      set -l bold (set_color --bold)
+
+      ${pkgs.bluez}/bin/bluetoothctl help
+      echo
+
+      set -l devices (${pkgs.bluez}/bin/bluetoothctl devices)
+
+      echo "devices: $(count $devices)"
+
+      printf '%s\n' $devices | while read _device mac name
+        echo $mac | read -d : a b c d e f
+        printf '- %s%s%s:%s%s%s:%s%s%s:%s%s%s:%s%s%s:%s%s%s' $green $a $reset $yellow $b $reset $red $c $reset $blue $d $reset $cyan $e $reset $magenta $f $reset
+        printf ' %s%s%s\n' $bold $name $reset
+      end
+      echo
+
+      # start bluetoothctl repl
+      ${pkgs.bluez}/bin/bluetoothctl
+    '';
+  scripts.show-session =
+    pkgs.writers.writeFishBin "show-session" {}
+    /*
+    fish
+    */
+    ''
+
+      set -l reset (set_color normal)
+      set -l red (set_color red)
+      set -l blue (set_color blue)
+      set -l green (set_color green)
+      set -l yellow (set_color yellow)
+      set -l cyan (set_color cyan)
+      set -l magenta (set_color magenta)
+      set -l bold (set_color --bold)
+
+      set -l properties
+      set -l values
+      ${pkgs.systemd}/bin/loginctl show-session | while read -d = property value
+        set -a properties $property
+        set -a values $value
+      end
+
+      set -l length_of_longest_property 0
+      for p in $properties
+        set length_of_longest_property (math "max $length_of_longest_property,$(string length $p)")
+      end
+
+      for i in (seq (count $properties))
+        set -l p $properties[$i]
+        set -l v $values[$i]
+        set -l rpad (math "$length_of_longest_property - $(string length $p)")
+        set rpad (string repeat --count $rpad ' ')
+
+        set -l v_color $reset
+        if test $v = yes
+          set v_color $green
+        else if test $v = no
+          set v_color $red
+        else if string match --regex --quiet '^\d+$' -- $v
+          set v_color $magenta
+        else if string match --regex --quiet '^\d+(s|min)$' -- $v
+          set v_color $yellow
+        end
+
+        printf '%s%s%s%s = %s%s%s\n' $bold $p $reset $rpad $v_color $v $reset
+      end
+    '';
 in rec {
   # TODO: consider using https://github.com/chessai/nix-std
   imports = [inputs.ags.homeManagerModules.default];
@@ -80,10 +242,22 @@ in rec {
   home.sessionVariables = {
     PAGER = "${pkgs.moar}/bin/moar";
     MOAR = "-statusbar=bold -no-linenumbers -quit-if-one-screen";
+    # https://docs.python.org/3/using/cmdline.html#envvar-PYTHONSTARTUP
+    PYTHONSTARTUP = pkgs.lib.getExe scripts.PYTHONSTARTUP;
   };
 
   # TODO: document all pkgs
   home.packages = with pkgs; [
+    scripts.PYTHONSTARTUP
+    scripts.bluetoothctl-startup
+    scripts.spotify-cover-art
+    scripts.show-session
+    scripts.wb-reload
+    scripts.wb-toggle-visibility
+    scripts.wb-watch-config-and-reload
+    helvum # GTK-based patchbay for pipewire
+    watchexec
+    # rerun # FIXME: does not compile
     logseq
     smassh # TUI based typing test application inspired by MonkeyType
     kondo #  cleans dependencies and build artifacts from your projects.
@@ -159,7 +333,7 @@ in rec {
     parallel
     libwebp # why do 'r/wallpaper' upload all its images in `webp`
     # tabnine
-    waybar
+    # waybar
     # grit
     d2
     graphviz
@@ -195,7 +369,8 @@ in rec {
     pamixer # control audio levels
     playerctl # media player controller
     timg # terminal image viewer
-    swww # wayland wallpaper setter
+    # swww # wayland wallpaper setter
+    inputs.swww.packages.${pkgs.system}.swww
     # swaynotificationcenter # wayland notification daemon
     # mako # wayland notification daemon
     cliphist # clipboard history
@@ -216,6 +391,7 @@ in rec {
     numbat # scientific units calculator repl
     fd # `find` replacement
     jaq # `jq` replacement
+    jd-diff-patch # diff json objects
     jnv # interactive JSON filter using `jq`
     jless # interactive JSON viewer
     jqp # `jq` expr editor
@@ -882,7 +1058,7 @@ in rec {
       # Set the colors.
       "--colors=line:none"
       "--colors=line:style:bold"
-
+      # inputs.catppuccin
       "--smart-case"
     ];
   };
@@ -1165,9 +1341,9 @@ in rec {
 
       "editor.fontLigatures" = true;
 
-      "editor.formatOnSave" = false;
+      "editor.formatOnSave" = true;
       "editor.minimap.autohide" = false;
-      "editor.minimap.enabled" = false;
+      "editor.minimap.enabled" = true;
       "editor.minimap.side" = "right";
       "editor.wordWrap" = "on";
       "editor.renderWhitespace" = "trailing";
@@ -1187,9 +1363,9 @@ in rec {
       "files.trimFinalNewlines" = true;
       "files.eol" = "\n";
       "files.insertFinalNewline" = true;
-      "files.trimTrailingWhitespace" = false;
+      "files.trimTrailingWhitespace" = true;
 
-      "workbench.commandPalette.experimental.suggestCommands" = false;
+      "workbench.commandPalette.experimental.suggestCommands" = true;
       "workbench.commandPalette.preserveInput" = false;
       "workbench.list.smoothScrolling" = true;
 
@@ -1211,6 +1387,13 @@ in rec {
       "[nix]"."editor.tabSize" = 2;
       "tabnine.experimentalAutoImports" = true;
       "tabnine.debounceMilliseconds" = 1000;
+      "jupyter.executionAnalysis.enabled" = true;
+      "jupyter.themeMatplotlibPlots" = false;
+      "notebook.formatOnCellExecution" = true;
+      "notebook.formatOnSave.enabled" = true;
+      "notebook.insertFinalNewline" = true;
+      "notebook.lineNumbers" = "on";
+      "notebook.output.minimalErrorRendering" = false;
     };
     keybindings = let
       ctrl = key: "ctrl+" + key;
@@ -1254,6 +1437,7 @@ in rec {
 
   programs.zsh.enable = true;
 
+  # FIXME: does not do anything
   services.darkman = {
     enable = true;
     settings = {
@@ -1739,219 +1923,632 @@ in rec {
   };
 
   # home.file.".config/waybar/nix-logo.png".source = ./nix-logo.png;
+  # xdg.configFile."waybar-nixos-logo.png".source = ./nixos-logo.png;
 
   programs.waybar = {
-    enable = false;
+    enable = true;
     catppuccin.enable = true;
+    catppuccin.mode = "prependImport";
     systemd.enable = true;
-    settings = {
+    settings = let
+      height = 24;
+    in {
       mainbar = {
         layer = "top";
         position = "top";
         spacing = 4; # px
-        height = 42;
-        margin-top = 5;
-        margin-bottom = 5;
+        inherit height;
+        output = builtins.attrValues monitors;
+        # margin-top = 5;
+        # margin-bottom = 5;
         modules-left = [
-          # "image#nix-logo"
-          "hyprland/workspaces"
-          "tray"
+          # "systemd-failed-units"
+          # "keyboard-state"
+          "image#nixos-logo"
+          "backlight"
+          "pulseaudio"
+          # "wireplumber"
+          # "pulseaudio/slider"
+          "mpris"
+          "image/spotify-cover-art"
+          # "cava" # FIXME: get to work
         ];
         modules-center = [
-          # "hyprland/window"
-          "pulseaudio"
-          # "pulseaudio/slider"
+          # "wlr/taskbar"
+          "tray"
+          "clock"
+          "privacy"
         ];
         modules-right = [
-          "keyboard-state"
+          "power-profiles-daemon"
+          # "idle_inhibitor"
           "battery"
-          "clock"
-          "network"
-          # "tray"
-          "cpu"
+          "disk"
           "memory"
+          # "load"
+          "cpu"
+          # "custom/gpu-usage"
           "temperature"
-          "group/group-power"
+          "bluetooth"
+          "network"
         ];
-        "group/group-power" = {
-          orientation = "inherit";
-          drawer = {
-            transition-duration = 500;
-            children-class = "not-power";
-            transition-left-to-right = false;
+        battery = {
+          format = "{capacity}% {icon} ";
+          format-icons = ["" "" "" "" ""];
+        };
+        memory = {
+          interval = 30;
+          format = "{used:0.1f}GiB / {total:0.1f}GiB  ";
+          # on-click = "btop";
+          on-click = "${terminal} ${pkgs.lib.getExe pkgs.btop}";
+          states = {
+            warning = 70; # percent
+            critical = 95; # percent
           };
-          modules = [
-            "custom/power"
-            "custom/quit"
-            "custom/lock"
-            "custom/reboot"
-          ];
+        };
+        systemd-failed-units = {
+          hide-on-ok = false;
+          format = "systemd ✗ {nr_failed}";
+          format-ok = "✓";
+          system = true;
+          user = true;
+        };
+        clock = {
+          interval = 60;
+          format = "{:%H:%M} ";
+          format-alt = "{:%A; %B %d; %Y (%R)}  ";
+          tooltip-format = "<tt><small>{calendar}</small></tt>";
+          calendar = {
+            mode = "year";
+            mode-mon-col = 3;
+            weeks-pos = "right";
+            on-scroll = 1;
+            format = {
+              months = "<span color='#ffead3'><b>{}</b></span>";
+              days = "<span color='#ecc6d9'><b>{}</b></span>";
+              weeks = "<span color='#99ffdd'><b>W{}</b></span>";
+              weekdays = "<span color='#ffcc66'><b>{}</b></span>";
+              today = "<span color='#ff6699'><b><u>{}</u></b></span>";
+            };
+          };
+          actions = {
+            on-click-right = "mode";
+            on-click-forward = "tz_up";
+            on-click-backward = "tz_down";
+            on-scroll-up = "shift_up";
+            on-scroll-down = "shift_down";
+          };
         };
 
-        "custom/quit" = {
-          format = "󰗼";
-          tooltip = false;
-          on-click = "hyprctl dispatch exit";
-        };
-        "custom/lock" = {
-          format = "󰍁";
-          tooltip = false;
-          on-click = "swaylock";
-        };
-        "custom/reboot" = {
-          format = "󰜉";
-          tooltip = false;
-          on-click = "systemctl reboot";
-        };
-
-        "custom/power" = {
-          format = "";
-          tooltip = false;
-          on-click = "shutdown now";
+        pulseaudio = {
+          format = "{volume}% {icon} ";
+          format-bluetooth = "{volume}% {icon} ";
+          format-muted = "";
+          format-icons = {
+            # "alsa_output.pci-0000_00_1f.3.analog-stereo"= "";
+            # "alsa_output.pci-0000_00_1f.3.analog-stereo-muted"= "";
+            headphone = "";
+            hands-free = "";
+            headset = "";
+            phone = "";
+            phone-muted = "";
+            portable = "";
+            car = "";
+            default = ["" ""];
+          };
+          scroll-step = 1;
+          on-click = "pavucontrol";
+          ignored-sinks = ["Easy Effects Sink"];
         };
         "pulseaudio/slider" = {
           min = 0;
           max = 100;
           orientation = "horizontal";
         };
-        # "image#nix-logo" = {
-        #   path = home.homeDirectory + "/.config/waybar/nix-logo.png";
-        #   size = 32;
-        #   interval = 60 * 60 * 24;
-        #   on-click = "xdg-open 'https://nixos.org/'";
-        #   tooltip = true;
-        # };
-        "hyprland/workspaces" = {
-          # format = "{icon}";
-          format = "{name}: {icon}";
-          format-icons = {
-            "1" = "";
-            "2" = "";
-            "3" = "";
-            "4" = "";
-            "5" = "";
-            "active" = "";
-            "default" = "";
-          };
-        };
-        "hyprland/window" = {
-          format = "👉 {}";
-          rewrite = {
-            "(.*) — Mozilla Firefox" = "🌎 $1";
-            "(.*) - fish" = "><> [$1]";
-          };
-          separate-outputs = true;
-        };
-        pulseaudio = {
+        wireplumber = {
           format = "{volume}% {icon}";
-          format-bluetooth = "{volume}% {icon}";
-          format-bluetooth-muted = "{icon} {format_source}";
-          format-muted = "{format_source}";
-          format-source = "";
-          format-source-muted = "";
-          format-icons = {
-            headphone = "";
-            hands-free = "";
-            headset = "";
-            phone = "";
-            portable = "";
-            car = "";
-            default = ["" "" ""];
+          format-muted = "";
+          on-click = "helvum";
+          format-icons = ["" "" ""];
+        };
+
+        network = {
+          # "interface"= "wlp2s0";
+          format = "{ifname}";
+          format-wifi = "{essid} ({signalStrength}%)  ";
+          format-ethernet = "{ipaddr}/{cidr} 󰊗 ";
+          format-disconnected = ""; # An empty format will hide the module.
+          tooltip-format = "{ifname} via {gwaddr} 󰊗 ";
+          tooltip-format-wifi = "{essid} ({signalStrength}%)  ";
+          tooltip-format-ethernet = "{ifname}  ";
+          tooltip-format-disconnected = "Disconnected";
+          max-length = 50;
+          on-click = "nmtui";
+        };
+
+        mpris = {
+          # "format"= "{player_icon}  <b>{dynamic}</b>";
+          # "format-paused"= "{status_icon}  <i>{dynamic}</i>";
+          format = "{player_icon}  <b>{title} - {artist} - ({length})</b>";
+          format-paused = "{player_icon}  <i>{title} - {artist} - ({length})</i>";
+          player-icons = {
+            default = "▶";
+            mpv = "🎵";
+            spotify = "";
+            youtube = "";
           };
-          on-click = "pavucontrol";
+          status-icons = {
+            paused = "⏸";
+            playing = "▶";
+          };
+          # "ignored-players"= ["firefox"]
         };
-        keyboard-state = {
-          numlock = true;
-          capslock = true;
-          format = " {name} {icon}";
+
+        power-profiles-daemon = {
+          format = "{icon}   {profile}";
+          tooltip-format = "Power profile= {profile}\nDriver= {driver}";
+          tooltip = true;
           format-icons = {
-            locked = "";
-            unlocked = "";
+            default = "";
+            performance = "";
+            balanced = "";
+            power-saver = "";
           };
         };
-        battery = {
-          format = "{capacity}% {icon}";
-          format-icons = ["" "" "" "" ""];
-        };
+
         cpu = {
-          format = "{usage}% ";
+          interval = 5;
           tooltip = false;
+          on-click = "${terminal} ${pkgs.lib.getExe pkgs.btop}";
+          format = "{icon0}{icon1}{icon2}{icon3}{icon4}{icon5}{icon6}{icon7}";
+          format-icons = [
+            "<span color='#69ff94'>▁</span>" # green
+            "<span color='#2aa9ff'>▂</span>" # blue
+            "<span color='#f8f8f2'>▃</span>" # white
+            "<span color='#f8f8f2'>▄</span>" # white
+            "<span color='#ffffa5'>▅</span>" # yellow
+            "<span color='#ffffa5'>▆</span>" # yellow
+            "<span color='#ff9977'>▇</span>" # orange
+            "<span color='#dd532e'>█</span>" # red
+          ];
         };
-        memory = {
-          format = "{}% ";
-        };
-        clock = {
-          format-alt = "{:%a, %d. %b  %H:%M}";
-        };
+
         tray = {
-          icon-size = 20;
+          icon-size = 16;
           spacing = 10;
+        };
+        privacy = {
+          icon-spacing = 4;
+          icon-size = 18;
+          transition-duration = 250;
+          modules = [
+            {
+              type = "screenshare";
+              tooltip = true;
+              tooltip-icon-size = 24;
+            }
+            {
+              type = "audio-out";
+              tooltip = true;
+              tooltip-icon-size = 24;
+            }
+            {
+              type = "audio-in";
+              tooltip = true;
+              tooltip-icon-size = 24;
+            }
+          ];
+        };
+
+        temperature = {
+          # thermal-zone = 2;
+          # hwmon-path = "/sys/class/hwmon/hwmon2/temp1_input";
+          # critical-threshold = 80;
+          # format-critical = "{temperatureC}°C ";
+          format = "{temperatureC}°C ";
+        };
+
+        disk = {
+          interval = 60;
+          format = " {used} / {total}";
+          path = "/";
+        };
+        # https=//www.nerdfonts.com/cheat-sheet?q=moon
+        backlight = {
+          device = "intel_backlight";
+          format = "{percent}% {icon}";
+          format-icons = ["" "" "" "" "" "" "" "" "" "" "" "" "" ""];
+        };
+
+        # FIXME: still not work
+        "image/spotify-cover-art" = {
+          # TODO
+          exec = pkgs.lib.getExe scripts.spotify-cover-art;
+          # exec = "spotify-cover-art";
+          # "exec"= "bash -c 'spotify-cover-art'";
+          # // "exec"="~/.config/waybar/custom/spotify/album_art.sh";
+          size = height;
+          interval = 30;
+        };
+
+        # "group/group-power" = {
+        #   orientation = "inerit";
+        #   drawer = {
+        #     transition-duration = 500;
+        #     children-class = "not-power";
+        #     transition-left-to-right = false;
+        #   };
+        #   modules = [
+        #     "custom/power"
+        #     "custom/quit"
+        #     "custom/lock"
+        #     "custom/reboot"
+        #   ];
+        # };
+
+        # "custom/quit" = {
+        #   format = "󰗼";
+        #   tooltip = false;
+        #   on-click = "hyprctl dispatch exit";
+        # };
+        # "custom/lock" = {
+        #   format = "󰍁";
+        #   tooltip = false;
+        #   on-click = "swaylock";
+        # };
+        # "custom/reboot" = {
+        #   format = "󰜉";
+        #   tooltip = false;
+        #   on-click = "systemctl reboot";
+        # };
+
+        # "custom/power" = {
+        #   format = "";
+        #   tooltip = false;
+        #   on-click = "shutdown now";
+        # };
+        "image#nixos-logo" = {
+          path = home.homeDirectory + "/.config/waybar/nixos-logo.png";
+          size = 32;
+          # interval = 60 * 60 * 24;
+          on-click = "${pkgs.xdg-utils}/bin/xdg-open 'https://nixos.org/'";
+          tooltip = true;
         };
       };
     };
-    style = let
-      padding = "4px 10px";
-    in ''
-      * {
-        /* font-family: Source Code Pro; */
-        font-family: JetBrainsMono Nerd Font;
-        /* font-family: monospace; */
-        font-size: 16px;
-        border: none;
-      }
+    style =
+      /*
+      css
+      */
+      ''
+                        * {
+                            /* border: none; */
+                            border-radius: 5px;
+                            /* padding: 2px 0px; */
+                            font-family: Font Awesome, Roboto, Arial, sans-serif;
+                            font-size: 16px;
+                            color: @text;
+                            /* color: #ffffff; */
+                            /* min-height: 0; */
+                        }
 
-      window#waybar {
-        background-color: rgba(40, 42, 54, 0.4);
-        border-bottom: 1px solid rgba(40, 42, 55, 0.1);
-        border-radius: 0px;
-        color: #f8f8f2;
-      }
+                        window#waybar {
+                            font-family: FontAwesome, monospace;
+                            background-color: transparent;
+                            border-bottom: 0px;
+                            color: #ebdbb2;
+                            transition-property: background-color;
+                            transition-duration: .5s;
+                        }
 
-      #workspaces {
-        padding: 0 0.5em;
-        background-color: @surface0;
-        color: @text;
-        margin: 0.25em;
-      }
+                        window#waybar.hidden {
+                            opacity: 0.2;
+                        }
 
-      #workspaces button.empty {
-        color: @overlay0;
-      }
+                        window#waybar.empty #window {
+                            background-color: transparent;
+                        }
 
-      #workspaces button.visible {
-        color: @blue;
-      }
+                        .modules-right {
+                            margin: 10px 10px 0 0;
+                        }
+                        .modules-center {
+                            margin: 10px 0 0 0;
+                        }
+                        .modules-left {
+                            margin: 10px 0 0 10px;
+                        }
 
-      #workspaces button.active {
-        color: @green;
-      }
+                        button {
+                            border: none;
+                        }
 
-      #workspaces button.urgent {
-        background-color: @red;
-        border-radius: 1em;
-        color: @text;
-      }
+                        #tray menu {
+                            font-family: sans-serif;
+                        }
 
-      #image {
-        padding: 0.5em 0;
-      }
+                        tooltip {
+                          background: rgba(43, 48, 59, 0.5);
+                          border: 1px solid rgba(100, 114, 125, 0.5);
+                        }
+                        tooltip label {
+                          color: white;
+                        }
+
+                        #workspaces button {
+                            padding: 0 5px;
+                            background: transparent;
+                            color: white;
+                            border-bottom: 3px solid transparent;
+                        }
+
+                        #workspaces button.focused {
+                            background: #64727D;
+                            border-bottom: 3px solid white;
+                        }
+
+                        /* #mode, #clock, #battery #keyboard-state { */
+                            /* padding: 2px 6px; */
+                            /* border-radius: 25%; */
+                        /* } */
+
+                        /* #clock, */
+                        /* #battery, */
+                        /* #cpu, */
+                        /* #memory, */
+                        /* #temperature, */
+                        /* #network, */
+                        /* #pulseaudio, */
+                        /* #custom-media, */
+                        /* #tray, */
+                        /* #mode, */
+                        /* #custom-power, */
+                        /* #custom-menu, */
+                        /* #idle_inhibitor { */
+                            /* padding: 0 10px; */
+                        /* } */
 
 
-      #clock,
-      #battery,
-      #cpu,
-      #memory,
-      #disk,
-      #temperature,
-      #backlight,
-      #network,
-      #pulseaudio,
-      #tray,
-      #mode {
-        padding: 0 10px;
-        color: @text;
-      }
-    '';
+                        #idle_inhibitor,
+                        #cava,
+                        #scratchpad,
+                        #mode,
+                        #window,
+                        #clock,
+                        #battery,
+                        #backlight,
+                        #wireplumber,
+                        #tray,
+                        #privacy,
+                        #temperature,
+                        #mpris,
+                        #bluetooth,
+                        #power-profiles-daemon,
+                        #pulseaudio,
+                        #pulseaudio-slider,
+                        #memory,
+                        #disk,
+                        #cpu,
+                        /* #custom-gpu-usage, */
+                        #network,
+                        #taskbar,
+                        #load {
+                            padding: 8px 10px;
+                            /* background-color: #282828; */
+                            background-color: alpha(@mantle, 0.75);
+                        /* #191C19 */
+                            color: @text;
+                        }
+
+
+                        #battery.charging, #battery.plugged {
+                            background-color: #98971a;
+                            color: #282828;
+                        }
+
+                        #mpris.playing {
+                            background-color: @green;
+                        }
+
+                        #mpris.paused {
+                            background-color: rgba(80, 80, 80, 0.5);
+                        }
+
+                        #mpris.stopped {
+                            background-color: @red;
+                        }
+
+                        #mpris.spotify {
+                            background-color: #20D465;
+                            color: black;
+                        }
+
+                        /* #mpris.youtube { */
+                        #mpris.firefox {
+                            background-color: #FB0B08;
+                            color: black;
+                        }
+
+                        label:focus {
+                            background-color: #000000;
+                        }
+
+                        #bluetooth.on {
+                          background-color: @teal;
+                        }
+
+        /*    bluetooth */
+        /*    bluetooth.disabled */
+        /*    bluetooth.off */
+        /*    bluetooth.on */
+        /*    bluetooth.connected */
+        /*    bluetooth.discoverable */
+        /*    bluetooth.discovering */
+        /*    bluetooth.pairable */
+
+
+
+                        #tray > .passive {
+                            -gtk-icon-effect: dim;
+                        }
+
+                        #tray > .needs-attention {
+                            -gtk-icon-effect: highlight;
+                        }
+
+                        #mode {
+                            background-color: #689d6a;
+                            color: #282828;
+                            /* box-shadow: inset 0 -3px #ffffff; */
+                        }
+
+                        /* #mode { */
+                            /* background: #64727D; */
+                            /* border-bottom: 3px solid white; */
+                        /* } */
+
+                        /* #clock { */
+                            /* background-color: #64727D; */
+                        /* } */
+
+                        /* #battery { */
+                            /* background-color: #ffffff; */
+                            /* color: black; */
+                        /* } */
+
+                        /* #battery.charging { */
+                            /* color: white; */
+                            /* background-color: #26A65B; */
+                        /* } */
+
+                        /* @keyframes blink { */
+                            /* to { */
+                                /* background-color: #ffffff; */
+                                /* color: black; */
+                            /* } */
+                        /* } */
+
+                        #battery.warning:not(.charging) {
+                            background: #f53c3c;
+                            color: white;
+                            animation-name: blink;
+                            animation-duration: 0.5s;
+                            animation-timing-function: steps(12);
+                            animation-iteration-count: infinite;
+                            animation-direction: alternate;
+                        }
+
+                        /* #systemd-failed-units { */
+                          /* color: red; */
+                        /* } */
+
+                        /* #systemd-failed-units.ok { */
+                          /* color: green; */
+                        /* } */
+
+                        /* #keyboard-state { */
+
+                        /* } */
+
+                        /* #bluetooth.on { */
+                            /* color: green; */
+                        /* } */
+
+                        /* #bluetooth.off { */
+                            /* color: red; */
+                        /* } */
+
+
+                        /* #bluetooth */
+                        /* #bluetooth.disabled */
+                        /* #bluetooth.off */
+                        /* #bluetooth.on */
+                        /* #bluetooth.connected */
+                        /* #bluetooth.discoverable */
+                        /* #bluetooth.discovering */
+                        /* #bluetooth.pairable */
+
+                        #network.disabled {
+                            color: @mauve;
+                        }
+
+                        #network.enabled {
+                            color: @green;
+                        }
+
+
+                        /* #network */
+                        /* #network.disabled */
+                        /* #network.disconnected */
+                        /* #network.linked */
+                        /* #network.ethernet */
+                        /* #network.wifi */
+
+                #power-profiles-daemon {
+                    color: @crust;
+                }
+
+                #power-profiles-daemon.performance {
+                    background-color: @red;
+                }
+
+                #power-profiles-daemon.balanced {
+                    background-color: @peach;
+                }
+
+                #power-profiles-daemon.power-saver {
+                    background-color: @green;
+                }
+
+                #power-profiles-daemon.default {
+                    background-color: @sky;
+                }
+
+
+
+                        /* #pulseaudio */
+                        /* #pulseaudio.bluetooth */
+                        /* #pulseaudio.muted */
+                        /* #pulseaudio.source-muted */
+
+                        /* #pulseaudio-slider slider { */
+                            /* min-height: 0px; */
+                            /* min-width: 0px; */
+                            /* opacity: 0; */
+                            /* background-image: none; */
+                            /* border: none; */
+                            /* box-shadow: none; */
+                        /* } */
+                        /* #pulseaudio-slider trough { */
+                            /* min-height: 80px; */
+                            /* min-width: 10px; */
+                            /* border-radius: 5px; */
+                            /* background-color: black; */
+                        /* } */
+                        /* #pulseaudio-slider highlight { */
+                            /* min-width: 10px; */
+                            /* border-radius: 5px; */
+                            /* background-color: green; */
+                        /* } */
+
+
+                        /* #network */
+                        /* #network.disabled */
+                        /* #network.disconnected */
+                        /* #network.linked */
+                        /* #network.ethernet */
+                        /* #network.wifi */
+
+                        #temperature.critical {
+                            background-color: @red;
+                            color: @crust;
+                        }
+
+                        #memory.warning { background-color: @flamingo; }
+                        #memory.critical { background-color: @red; }
+
+
+      '';
   };
 
   # TODO: create and submit a home-manager module for this
@@ -2016,6 +2613,13 @@ in rec {
     };
   };
 
+  # TODO: save path as a let binding to use in niri config
+  home.file.".local/share/bluetoothctl/init-script".text = ''
+    devices
+    list
+    scan on
+  '';
+
   programs.niri = {
     enable = true;
     settings = {
@@ -2032,7 +2636,12 @@ in rec {
         QT_QPA_PLATFORM = "wayland";
         DISPLAY = null;
         NIXOS_OZONE_WL = "1";
+        XDG_CURRENT_DESKTOP = "niri";
+        XDG_SESSION_TYPE = "wayland";
+        MOZ_ENABLE_WAYLAND = "1";
+        QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
       };
+
       layout = {
         gaps = 10; # px
         # center-focused-column = "on-overflow";
@@ -2043,7 +2652,17 @@ in rec {
           {proportion = 1.0 / 2.0;}
           {proportion = 2.0 / 3.0;}
         ];
-        default-column-width = {proportion = 1.0 / 3.0;};
+        # default-column-width = {proportion = 1.0 / 3.0;};
+        default-column-width = {proportion = 1.0 / 2.0;};
+        focus-ring = {
+          enable = true;
+          width = 4;
+          active.gradient = {
+            from = "#80c8ff";
+            to = "#d3549a";
+            angle = 45;
+          };
+        };
       };
       screenshot-path = "~/Pictures/screenshots/screenshot-%Y-%m-%d %H-%M-%S.png";
       window-rules = [
@@ -2077,28 +2696,27 @@ in rec {
         }
       ];
 
-      # settings.outputs."eDP-1".scale = 1.0;
-      outputs."eDP-1" = {
+      outputs.${monitors.laptop} = {
         position.y = 1440;
         position.x = 0;
+        scale = 1.0;
       };
-      outputs."DP-6" = {
-        position = {
-          x = 0;
-          y = 0;
-        };
+      outputs.${monitors.acer} = {
+        scale = 1.0;
+        position.x = 0;
+        position.y = 0;
       };
 
       spawn-at-startup = map (s: {command = pkgs.lib.strings.splitString " " s;}) [
         "swww-daemon"
-        # "waybar"
+        "waybar"
         "kitty"
-        "spotify"
+        # "spotify"
         "telegram-desktop"
         "udiskie"
         "dunst"
-        "eww daemon"
-        "eww ~/.config/eww/bar open bar" # FIX: not always open, and i want on multiple monitors
+        # "eww daemon"
+        # "eww ~/.config/eww/bar open bar" # FIX: not always open, and i want on multiple monitors
         "wlsunset -t 4000 -T 6500 -S 06:30 -s 18:30"
         "wluma"
         "copyq"
@@ -2153,7 +2771,7 @@ in rec {
         wpctl = spawn "wpctl"; # wireplumber
         bluetoothctl = spawn "bluetoothctl";
         run-flatpak = spawn "flatpak" "run";
-        run-in-kitty = spawn "kitty";
+        run-in-terminal = spawn "kitty";
         run-in-sh-within-kitty = spawn "kitty" "sh" "-c";
         # focus-workspace-keybinds = builtins.listToAttrs (map:
         #   (n: {
@@ -2197,16 +2815,21 @@ in rec {
         # inherit (focus-workspace-keybinds) ${builtins.attrNames focus-workspace-keybinds};
 
         # "Mod+?".action = show-hotkey-overlay;
-        "Mod+K".action = spawn "kitty";
+        "Mod+T".action = spawn "kitty";
         "Mod+F".action = spawn "firefox";
-        "Mod+T".action = spawn "telegram-desktop";
+        "Mod+G".action = spawn "telegram-desktop";
         "Mod+S".action = spawn "spotify";
         "Mod+D".action = spawn "webcord";
         # "Mod+E".action = run-in-kitty "yazi";
         "Mod+E".action = run-in-sh-within-kitty "cd ~/Downloads; yazi";
         # "Mod+E".action = spawn "dolphin";
-        "Mod+B".action = spawn "overskride";
+        # "Mod+B".action = spawn "overskride";
+        "Mod+B".action = run-in-terminal (pkgs.lib.getExe scripts.bluetoothctl-startup);
+        # "Mod+B".action = run-in-terminal "bluetoothctl" "--init-script" "/home/${username}/.local/share/bluetoothctl/init-script";
+
+        # (pkgs.lib.getExe bluetoothctl-init-script);
         "f11".action = fullscreen-window;
+        "Mod+f11".action = spawn (pkgs.lib.getExe scripts.wb-toggle-visibility);
 
         # "Mod+Shift+E".action = quit;
         # "Mod+Ctrl+Shift+E".action = quit {skip-confirmation = true;};
@@ -2224,12 +2847,12 @@ in rec {
 
         "Mod+H".action = focus-column-left;
         "Mod+L".action = focus-column-right;
-        # "Mod+K".action = focus-window-up;
-        # "Mod+J".action = focus-window-down;
+        "Mod+K".action = focus-window-up;
+        "Mod+J".action = focus-window-down;
         "Mod+Ctrl+H".action = move-column-left;
         "Mod+Ctrl+L".action = move-column-right;
-        # "Mod+Ctrl+K".action = move-window-up;
-        # "Mod+Ctrl+J".action = move-window-down;
+        "Mod+Ctrl+K".action = move-window-up;
+        "Mod+Ctrl+J".action = move-window-down;
 
         # TODO:
         #       Mod+Home { focus-column-first; }
@@ -2302,6 +2925,8 @@ in rec {
         # "Mod+Return".action = spawn "anyrun";
         # "Mod+Return".action = fish "pidof anyrun; and pkill anyrun; or anyrun";
         "Mod+Return".action = fish "pidof nwg-drawer; and pkill nwg-drawer; or nwg-drawer -ovl -fm dolphin";
+
+        "Mod+Shift+P".action = power-off-monitors;
       };
     };
     # // focus-workspace-keybinds;
@@ -2370,5 +2995,87 @@ in rec {
     #     // refer to docs of xdg.configFile for available options
     #   )
     # '';
+  };
+
+  # TODO: get to work
+  # TODO: create dns alias
+  services.glance.enable = true;
+  services.glance.settings = {
+    server.port = 5678;
+    server.host = "localhost";
+    pages = [
+      {
+        columns = [
+          {
+            size = "small";
+            widgets = [
+              {type = "calendar";}
+              {
+                cache = "3h";
+                collapse-after = 3;
+                feeds = [
+                  {url = "https://ciechanow.ski/atom.xml";}
+                  {
+                    title = "Josh Comeau";
+                    url = "https://www.joshwcomeau.com/rss.xml";
+                  }
+                  {url = "https://samwho.dev/rss.xml";}
+                  {url = "https://awesomekling.github.io/feed.xml";}
+                  {
+                    title = "Ahmad Shadeed";
+                    url = "https://ishadeed.com/feed.xml";
+                  }
+                ];
+                limit = 10;
+                type = "rss";
+              }
+              {
+                channels = ["theprimeagen" "cohhcarnage" "christitustech" "blurbs" "asmongold" "jembawls"];
+                type = "twitch-channels";
+              }
+            ];
+          }
+          {
+            size = "full";
+            widgets = [
+              {type = "hacker-news";}
+              {
+                channels = ["UCR-DXc1voovS8nhAvccRZhg" "UCv6J_jJa8GJqFwQNgNrMuww" "UCOk-gHyjcWZNj3Br4oxwh0A"];
+                type = "videos";
+              }
+              {
+                subreddit = "selfhosted";
+                type = "reddit";
+              }
+            ];
+          }
+          {
+            size = "small";
+            widgets = [
+              {
+                location = "Aarhus, Denmark";
+                type = "weather";
+              }
+              {
+                markets = let
+                  ticker = name: symbol: {inherit name symbol;};
+                in [
+                  (ticker "S&P 500" "SPY")
+                  (ticker "NVIDIA" "NVDA")
+                  (ticker "Apple" "AAPL")
+                  (ticker "Bitcoin" "BTC-USD")
+                  (ticker "Microsoft" "MSFT")
+                  (ticker "Google" "GOOGL")
+                  (ticker "AMD" "AMD")
+                  (ticker "Reddit" "RDDT")
+                ];
+                type = "markets";
+              }
+            ];
+          }
+        ];
+        name = "Home";
+      }
+    ];
   };
 }

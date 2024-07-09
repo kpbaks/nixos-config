@@ -1,6 +1,19 @@
 {
   description = "@kpbaks' NixOS configuration";
 
+  # https://github.com/NixOS/nix/issues/4945#issuecomment-1869931785
+  # inputs = let
+  #   dep = url: { inherit url; inputs.nixpkgs.follows = "nixpkgs"; };
+  # in {
+  #   nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  #   nix-darwin = (dep "github:LnL7/nix-darwin");
+  #   home-manager = (dep "github:nix-community/home-manager");
+  #   zig = (dep "github:Cloudef/nix-zig-stdenv");
+  #   zls = (dep "github:zigtools/zls");
+  #   hyprland = (dep "github:hyprwm/Hyprland");
+  #   eww = (dep "github:elkowar/eww");
+  # };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager.url = "github:nix-community/home-manager/master";
@@ -50,6 +63,7 @@
     ags.url = "github:Aylur/ags";
     # atdo.url = "github:kpbaks/atdo";
     # atdo.inputs.nixpkgs.follows = "nixpkgs";
+    swww.url = "github:LGFae/swww";
   };
 
   outputs = {

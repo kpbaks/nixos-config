@@ -307,6 +307,7 @@ in rec {
     extraGroups = ["networkmanager" "wheel" "docker" "podman"];
     packages = []; # managed by home-manager
   };
+  users.groups.input.members = [username];
 
   fonts.packages = with pkgs; [
     (nerdfonts.override {fonts = ["JetBrainsMono" "FiraCode" "Iosevka" "VictorMono"];})

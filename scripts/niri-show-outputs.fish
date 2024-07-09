@@ -29,9 +29,11 @@ set -l ymax $ymin
 
 begin
     echo '<svg xmlns="http://www.w3.org/2000/svg" version="1.1">'
-    set -l jq_expr '.[] | [.name, .logical.x, .logical.y, .logical.width, .logical.height] | @csv'
+    set -l jq_expr '.[] | [.name, .logical.x, .logical.y, .logical.width, .logical.height, .logical.scale] | @csv'
     set -l i 1
-    niri msg --json outputs | jaq -r $jq_expr | while read -d , name x y width height
+    niri msg --json outputs | jaq -r $jq_expr | while read -d , name x y width height scale
+        echo "name: $name"
+        echo "x: $x, y: $y, width: $width, height: $height, scale: $scale" >&2
         set -l fill $fills[$i]
         set -l stroke $strokes[$i]
         set i (math "$i + 1 % $(count $fills)")
@@ -42,11 +44,6 @@ begin
         set y_scaled (math "$y * $scale + $y_offset")
         set width_scaled (math "$width * $scale")
         set height_scaled (math "$height * $scale")
-
-        # echo "x_scaled: $x_scaled" >&2
-        # echo "y_scaled: $y_scaled" >&2
-        # echo "width_scaled: $width_scaled" >&2
-        # echo "height_scaled: $height_scaled" >&2
 
         if test (math $x_scaled + $width_scaled) -gt $xmax
             set xmax (math $x_scaled + $width_scaled)
@@ -72,7 +69,7 @@ begin
         printf "<text x='%d' y='%d' text-anchor='end' font-size='$font_size' $shared_text_properties> %spx</text>\n" (math $x_scaled - $label_offset) $height_center $height
 
         # Add text for display name in the center of the rectangle
-        printf "<text x='%d' y='%d' font-size='20' text-anchor='middle' $shared_text_properties> %s</text>\n" (math $x_scaled + $width_scaled / 2) (math $y_scaled + $height_scaled / 2) $name
+        printf "<text x='%d' y='%d' font-size='20' text-anchor='middle' $shared_text_properties> %s (scale: %s)</text>\n" (math $x_scaled + $width_scaled / 2) (math $y_scaled + $height_scaled / 2) $name $scale
 
     end
 
