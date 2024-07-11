@@ -8,27 +8,38 @@
 } @ args: let
   name = "Kristoffer Sørensen";
   full-name = "Kristoffer Plagborg Bak Sørensen";
-  # username = "kpbaks";
   gmail = "kristoffer.pbs@gmail.com";
   aumail = "201908140@post.au.dk";
   tutamail = "kristoffer.pbs@tuta.io";
   email = gmail;
   telephone-number = "21750049";
-  # system = "x86_64-linux";
+  city = "Aarhus";
+  country = "Denmark";
+
+  # TODO: remove the `xdg` property can be used for these
   config_dir = "/home/" + username + "/.config";
   cache_dir = "/home/" + username + "/.cache";
   data_dir = "/home/" + username + "/.local/share";
-  city = "Aarhus";
-  country = "Denmark";
   lib = pkgs.lib;
   join = lib.strings.concatStringsSep;
   mapjoin = lib.strings.concatMapStringsSep;
   range = from: to: builtins.genList (i: from + i) (to - from);
   merge = list: builtins.foldl' (acc: it: acc // it) {} list;
   font.monospace = "Iosevka Nerd Font Mono";
+  # font.serif = ""; # IBM Plex Sans
+  # font.sans = ""; # IBM Plex Sans
   monitors.laptop = "eDP-1";
   monitors.acer = "DP-5";
   terminal = pkgs.lib.getExe pkgs.kitty;
+  # palette.catppuccin = pkgs.lib.importJSON (config.catppuccin.sources.palette + "/palette.json").${config.catppuccin.flavor}.colors;
+  flavor = "macchiato";
+  # palette.catppuccin.sky.hex = string
+  # palette.catppuccin.sky.rgb = {r, g, b}
+  # palette.catppuccin.sky.hsl = {h, s, l}
+
+  # https://github.com/catppuccin/nix/issues/285
+  palette.catppuccin = (pkgs.lib.importJSON (config.catppuccin.sources.palette + "/palette.json")).${config.catppuccin.flavor}.colors;
+
   # TODO: present more nicely maybe with the `tabulate` package
   scripts.PYTHONSTARTUP = pkgs.writers.writePython3Bin "pythonstartup.py" {flakeIgnore = ["E501"];} ''
     import pkgutil
@@ -83,7 +94,7 @@
     fi
   '';
 
-  scripts.foobar = pkgs.writers.writeFish "foobar" ''echo foobar'';
+  # scripts.foobar = pkgs.writers.writeFish "foobar" ''echo foobar'';
 
   scripts.spotify-cover-art =
     pkgs.writers.writeFishBin "spotify-cover-art" {}
@@ -186,28 +197,46 @@
         printf '%s%s%s%s = %s%s%s\n' $bold $p $reset $rpad $v_color $v $reset
       end
     '';
+  scripts.scripts = let
+    inherit (builtins) attrNames concatStringsSep;
+  in
+    pkgs.writers.writeFishBin "scripts" {}
+    /*
+    fish
+    */
+    ''
+      set -l scripts ${concatStringsSep " " (attrNames scripts)}
+      set -l reset (set_color normal)
+      set -l blue (set_color blue)
+      for s in $scripts
+        printf '%s%s%s\n' $blue $s $reset
+      end
+    '';
 in rec {
   # TODO: consider using https://github.com/chessai/nix-std
-  imports = [inputs.ags.homeManagerModules.default];
+  imports = [
+    # inputs.ags.homeManagerModules.default
+  ];
 
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.permittedInsecurePackages = [
     "electron-28.3.3" # needed for `logseq` 05-07-2024
+    "electron-27.3.11"
   ];
 
-  programs.ags = {
-    enable = true;
+  # programs.ags = {
+  #   enable = true;
 
-    # null or path, leave as null if you don't want hm to manage the config
-    configDir = null;
+  #   # null or path, leave as null if you don't want hm to manage the config
+  #   configDir = null;
 
-    # additional packages to add to gjs's runtime
-    extraPackages = with pkgs; [
-      gtksourceview
-      webkitgtk
-      accountsservice
-    ];
-  };
+  #   # additional packages to add to gjs's runtime
+  #   extraPackages = with pkgs; [
+  #     gtksourceview
+  #     webkitgtk
+  #     accountsservice
+  #   ];
+  # };
 
   # nix.settings = {
   #   # https://yazi-rs.github.io/docs/installation#cache
@@ -247,213 +276,215 @@ in rec {
   };
 
   # TODO: document all pkgs
-  home.packages = with pkgs; [
-    scripts.PYTHONSTARTUP
-    scripts.bluetoothctl-startup
-    scripts.spotify-cover-art
-    scripts.show-session
-    scripts.wb-reload
-    scripts.wb-toggle-visibility
-    scripts.wb-watch-config-and-reload
-    helvum # GTK-based patchbay for pipewire
-    watchexec
-    # rerun # FIXME: does not compile
-    logseq
-    smassh # TUI based typing test application inspired by MonkeyType
-    kondo #  cleans dependencies and build artifacts from your projects.
-    # TODO: integrate with nvim
-    statix # nix linter
-    deadnix # detect unused nix code
-    tickrs #  Realtime ticker data in your terminal 📈
-    ticker #  Terminal stock ticker with live updates and position tracking
-    mop #  Stock market tracker for hackers.
-    newsflash # rss reader
-    wl-color-picker
-    # element
-    element-desktop
-    gping
-    nixd
-    kdePackages.plasma-workspace # for krunner
-    fuzzel
-    resvg
-    miller
-    csview
-    # pympress
-    mission-center
-    mkchromecast
-    samply
-    sad
-    sd
-    # ungoogled-chromium
-    vivaldi
-    asciigraph
-    imagemagick
-    odin
-    lychee
-    tutanota-desktop
-    localsend # open source alternative to Apple Airdrop
-    inkscape
-    gimp
-    moar # a nice pager
-    dogdns # rust alternative to dig
-    zed-editor
-    upx
-    ripdrag # drag and drop files from the terminal
-    caddy # Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS
-    # charm-freeze
-    pastel
-    vivid
-    wdisplays
-    nwg-dock
-    nwg-drawer
-    nwg-displays
-    daktilo # turn your keyboard into a typewriter!
-    # lemmyknow # identify anything
-    the-way # termial snippet-manager
-    appflowy # open source alternative to notion
-    macchina # neofetch like program
-    neovim-remote # TODO: create `darkman` script to toggle light/dark mode with `set background=dark`
-    lurk # like `strace` but with colors
-    kdiff3
-    meld
-    spotify-player
-    micro
-    procs
-    # jitsi
-    # jitsi-meet
-    nushell
-    clipse # tui clipbard manager
-    # gnomeExtensions.pano # fancy clipboard manager
-    # starship # shell prompt generator
-    # rerun
-    devenv
-    dragon
-    ffmpeg
-    ffmpegthumbnailer
-    parallel
-    libwebp # why do 'r/wallpaper' upload all its images in `webp`
-    # tabnine
-    # waybar
-    # grit
-    d2
-    graphviz
-    aria
-    wofi
-    # rofi-wayland
-    pavucontrol # audio sink gui
-    overskride # bluetooth gui
-    wf-recorder # wayland screen recorder
-    wl-screenrec # wayland screen recorder
-    # ianny
-    wluma
-    wlsunset # set screen gamma (aka. night light) based on time of day
-    poppler_utils # pdf utilities
-    webcord # fork of discord, with newer electron version, to support screen sharing
-    hyprshot # screenshot tool designed to integrate with hyprland
-    grim # wayland screenshot tool
-    slurp # wayland tool to make a screen selection
-    udiskie # daemon used to automatically mount external drives like USBs
-    # flameshot
-    brightnessctl # control screen brightness
-    thunderbird # email client
-    # discord
-    telegram-desktop # messaging client
-    spotify # music player
-    zotero # citation/bibliography manager
-    copyq # clipboard manager
-    libnotify # for `notify-send`
-    swaylock
-    hyprlock # wayland screen lock
-    hypridle # hyprlands idle daemon
-    hyprpicker # wlroots-compatible wayland color picker
-    pamixer # control audio levels
-    playerctl # media player controller
-    timg # terminal image viewer
-    # swww # wayland wallpaper setter
-    inputs.swww.packages.${pkgs.system}.swww
-    # swaynotificationcenter # wayland notification daemon
-    # mako # wayland notification daemon
-    cliphist # clipboard history
-    wezterm # terminal
-    alejandra # nix formatter
-    eww # custom desktop widgets
-    htop # system resource monitor
-    just # command runner
-    cmake # C/C++ build system generator
-    ninja # small build system with a focus on speed
-    kate # text editor
-    julia # scientific programming language
-    duf # disk usage viewer
-    du-dust # calculate directory sizes. `du` replacement
-    eza # `ls` replacement
-    tokei # count SLOC in a directory
-    hexyl # hex editor
-    numbat # scientific units calculator repl
-    fd # `find` replacement
-    jaq # `jq` replacement
-    jd-diff-patch # diff json objects
-    jnv # interactive JSON filter using `jq`
-    jless # interactive JSON viewer
-    jqp # `jq` expr editor
-    fx # interactive JSON pager
-    yq-go # `jq` but for yaml
-    htmlq # `jq` but for html
-    bun # javascript runtime and dev tool
-    zoxide # intelligent `cd`
-    sqlite # sql database in a file
-    litecli # A nicer repl for sqlite
-    gum # tool to create rich interactive prompts for shell scripts
-    fastfetch # a faster neofetch
-    onefetch # git repo fetch
-    zip
-    unzip
-    file
-    anki # flashcard app
-    mpv # media player
-    grc # "generic colorizer" improves the output of many commands by adding colors
-    bitwarden # password manager
-    bitwarden-cli # bitwarden cli
-    pass # password manager
-    pre-commit # git hook manager
-    glow # terminal markdown previewer
-    hyperfine # powerful cli benchmark tool
-    nickel # configuration language
-    nls # nickel language server
+  home.packages = with pkgs;
+    (builtins.attrValues scripts)
+    ++ [
+      # scripts.PYTHONSTARTUP
+      # scripts.bluetoothctl-startup
+      # scripts.spotify-cover-art
+      # scripts.show-session
+      # scripts.wb-reload
+      # scripts.wb-toggle-visibility
+      # scripts.wb-watch-config-and-reload
+      # scripts.scripts
+      helvum # GTK-based patchbay for pipewire
+      watchexec
+      # rerun # FIXME: does not compile
+      logseq
+      smassh # TUI based typing test application inspired by MonkeyType
+      kondo #  cleans dependencies and build artifacts from your projects.
+      # TODO: integrate with nvim
+      statix # nix linter
+      deadnix # detect unused nix code
+      tickrs #  Realtime ticker data in your terminal 📈
+      ticker #  Terminal stock ticker with live updates and position tracking
+      mop #  Stock market tracker for hackers.
+      newsflash # rss reader
+      wl-color-picker
+      # element
+      element-desktop
+      gping
+      nixd
+      kdePackages.plasma-workspace # for krunner
+      fuzzel
+      resvg
+      miller
+      csview
+      # pympress
+      mission-center
+      mkchromecast
+      samply
+      sad
+      sd
+      # ungoogled-chromium
+      vivaldi
+      asciigraph
+      imagemagick
+      odin
+      lychee
+      tutanota-desktop
+      localsend # open source alternative to Apple Airdrop
+      inkscape
+      gimp
+      moar # a nice pager
+      dogdns # rust alternative to dig
+      # TODO: use home-manager module when ready
+      zed-editor
+      upx
+      ripdrag # drag and drop files from the terminal
+      caddy # Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS
+      # charm-freeze
+      pastel
+      vivid
+      wdisplays
+      nwg-dock
+      nwg-drawer
+      nwg-displays
+      daktilo # turn your keyboard into a typewriter!
+      # lemmyknow # identify anything
+      the-way # termial snippet-manager
+      # appflowy # open source alternative to notion
+      macchina # neofetch like program
+      neovim-remote # TODO: create `darkman` script to toggle light/dark mode with `set background=dark`
+      lurk # like `strace` but with colors
+      kdiff3
+      meld
+      spotify-player
+      micro
+      procs
+      # jitsi
+      # jitsi-meet
+      nushell
+      clipse # tui clipbard manager
+      # gnomeExtensions.pano # fancy clipboard manager
+      # starship # shell prompt generator
+      # rerun
+      devenv
+      # dragon
+      ffmpeg
+      ffmpegthumbnailer
+      parallel
+      libwebp # why do 'r/wallpaper' upload all its images in `webp`
+      # tabnine
+      # waybar
+      # grit
+      d2
+      graphviz
+      aria
+      wofi
+      # rofi-wayland
+      pavucontrol # audio sink gui
+      overskride # bluetooth gui
+      wf-recorder # wayland screen recorder
+      wl-screenrec # wayland screen recorder
+      # ianny
+      wluma
+      wlsunset # set screen gamma (aka. night light) based on time of day
+      poppler_utils # pdf utilities
+      webcord # fork of discord, with newer electron version, to support screen sharing
+      hyprshot # screenshot tool designed to integrate with hyprland
+      grim # wayland screenshot tool
+      slurp # wayland tool to make a screen selection
+      udiskie # daemon used to automatically mount external drives like USBs
+      # flameshot
+      brightnessctl # control screen brightness
+      thunderbird # email client
+      # discord
+      telegram-desktop # messaging client
+      spotify # music player
+      zotero # citation/bibliography manager
+      copyq # clipboard manager
+      libnotify # for `notify-send`
+      swaylock
+      hyprlock # wayland screen lock
+      hypridle # hyprlands idle daemon
+      hyprpicker # wlroots-compatible wayland color picker
+      pamixer # control audio levels
+      playerctl # media player controller
+      timg # terminal image viewer
+      # swww # wayland wallpaper setter
+      inputs.swww.packages.${pkgs.system}.swww
+      # swaynotificationcenter # wayland notification daemon
+      # mako # wayland notification daemon
+      cliphist # clipboard history
+      # wezterm # terminal
+      alejandra # nix formatter
+      eww # custom desktop widgets
+      htop # system resource monitor
+      just # command runner
+      cmake # C/C++ build system generator
+      ninja # small build system with a focus on speed
+      kate # text editor
+      julia # scientific programming language
+      duf # disk usage viewer
+      du-dust # calculate directory sizes. `du` replacement
+      eza # `ls` replacement
+      tokei # count SLOC in a directory
+      hexyl # hex editor
+      numbat # scientific units calculator repl
+      fd # `find` replacement
+      jaq # `jq` replacement
+      jd-diff-patch # diff json objects
+      jnv # interactive JSON filter using `jq`
+      jless # interactive JSON viewer
+      jqp # `jq` expr editor
+      fx # interactive JSON pager
+      yq-go # `jq` but for yaml
+      htmlq # `jq` but for html
+      bun # javascript runtime and dev tool
+      zoxide # intelligent `cd`
+      sqlite # sql database in a file
+      litecli # A nicer repl for sqlite
+      gum # tool to create rich interactive prompts for shell scripts
+      fastfetch # a faster neofetch
+      onefetch # git repo fetch
+      zip
+      unzip
+      file
+      anki # flashcard app
+      mpv # media player
+      grc # "generic colorizer" improves the output of many commands by adding colors
+      # bitwarden # password manager
+      # bitwarden-cli # bitwarden cli
+      pass # password manager
+      pre-commit # git hook manager
+      glow # terminal markdown previewer
+      hyperfine # powerful cli benchmark tool
+      nickel # configuration language
+      nls # nickel language server
 
-    gcc
-    gdb
-    mold # modern linker
-    rustup # rust toolchain manager
-    # firefox-devedition
+      gcc
+      gdb
+      mold # modern linker
+      rustup # rust toolchain manager
+      rclone # rsync for cloud storage
+      croc # easily and securely transfer files and folders from one computer to another
+      sshx
+      gnuplot # plotting utility
+      findutils # find, locate
+      vulkan-tools # vulkan utilities
 
-    rclone # rsync for cloud storage
-    croc # easily and securely transfer files and folders from one computer to another
-    sshx
-    gnuplot # plotting utility
-    findutils # find, locate
-    vulkan-tools # vulkan utilities
+      obs-studio # screen recording and streaming
 
-    obs-studio # screen recording and streaming
+      # brotab
+      manix
+      comma
+      fish
 
-    brotab
-    manix
-    comma
-    fish
-
-    python3
-    ouch # {,de}compression tool
-    inlyne # markdown viewer
-    neovide # neovim gui
-    nil # nix lsp
-    taplo # toml formatter/linter/lsp
-  ];
+      python3
+      ouch # {,de}compression tool
+      # inlyne # markdown viewer
+      # neovide # neovim gui
+      # nil # nix lsp
+      taplo # toml formatter/linter/lsp
+    ];
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
   # https://github.com/hyprwm/hyprpicker/issues/51#issuecomment-2016368757
   home.pointerCursor = {
     gtk.enable = true;
-    package = pkgs.gnome.adwaita-icon-theme;
+    package = pkgs.adwaita-icon-theme;
     name = "Adwaita";
     size = 16;
   };
@@ -970,9 +1001,6 @@ in rec {
       f11 = "toggle_fullscreen";
     };
     extraConfig = ''
-      # include tokyonight-storm.conf
-      # include catppuccin-latte.conf
-      # include catppuccin-macchiato.conf
       background_opacity 0.85
       # how much to dim text with the DIM/FAINT escape code attribute
       dim_opacity 0.5
@@ -986,6 +1014,7 @@ in rec {
       modify_font = "underline_thickness 100%";
       # modify_font = "strikethrough_position 2px";
       undercurl_style = "thick-sparse";
+      confirm_os_window_close = 0;
 
       scrollback_lines = 10000;
       enable_audio_bell = false;
@@ -1043,10 +1072,21 @@ in rec {
   # programs.nushell.enable = true;
   programs.pandoc.enable = true;
   programs.pet.enable = true;
-  # TODO: use catppuccin colors
+
   programs.ripgrep = {
     enable = true;
-    arguments = [
+    arguments = let
+      # https://github.com/BurntSushi/ripgrep/blob/master/FAQ.md#how-do-i-configure-ripgreps-colors
+      hex2ripgrep-color = hex: let
+        ss = builtins.substring;
+        hex' = ss 1 6 hex; # strip leading `#` e.g. "#aabbee" -> "aabbee"
+        # extract each channel into a 2 char string
+        r = ss 0 2 hex';
+        g = ss 2 2 hex';
+        b = ss 4 2 hex';
+      in
+        builtins.concatStringsSep "," (map (channel: "0x${channel}") [r g b]);
+    in [
       # Don't let ripgrep vomit really long lines to my terminal, and show a preview.
       "--max-columns=150"
       "--max-columns-preview"
@@ -1055,28 +1095,19 @@ in rec {
       "web:*.{html,css,js}*"
       # Search hidden files/directories by default
       "--hidden"
+      "--hyperlink-format=default"
       # Set the colors.
-      "--colors=line:none"
-      "--colors=line:style:bold"
-      # inputs.catppuccin
+      "--colors=line:fg:${hex2ripgrep-color palette.catppuccin.teal.hex}"
+      "--colors=column:fg:${hex2ripgrep-color palette.catppuccin.maroon.hex}"
+      "--colors=path:fg:${hex2ripgrep-color palette.catppuccin.sky.hex}"
+      "--colors=match:none"
+      "--colors=match:bg:${hex2ripgrep-color palette.catppuccin.peach.hex}"
+      "--colors=match:fg:${hex2ripgrep-color palette.catppuccin.crust.hex}"
+      "--colors=match:style:bold"
+
       "--smart-case"
     ];
   };
-
-  # home.file.".config/ripgrep/ripgreprc".text = ''
-
-  #   # Search hidden files/directories by default
-  #   --hidden
-
-  #   # Set the colors.
-  #   --colors=line:none
-  #   --colors=line:style:bold
-
-  #   # Because who cares about case!?
-  #   --smart-case
-  # '';
-
-  # home.sessionVariables.RIPGREP_CONFIG_PATH = home.homeDirectory + "/.config/ripgrep/ripgreprc";
 
   programs.rio = {
     enable = true;
@@ -1328,7 +1359,17 @@ in rec {
       # github.copilot-chat
       # tabnine.tabnine-vscode
     ];
-    userSettings = {
+    userSettings = let
+      # TODO: get to work
+      # flatten-attrs = attrs: prefix:
+      #   let inherit (builtins) attrNames concatStringSep isAttrs;
+      #   flatten = name: value:
+      #     if isAttrs value then
+      #       flatten-attrs value (concatStringSep "." [prefix name])
+      #     else
+      #       { (concatStringsSep "." [prefix name]) = value; };
+      #   in builtins.foldl' (acc: name: acc // flatten name (attrs.${name})) {} (attrNames attrs);
+    in {
       "editor.tabSize" = 4;
       "editor.fontSize" = 14;
       "editor.cursorStyle" = "line";
@@ -1394,6 +1435,7 @@ in rec {
       "notebook.insertFinalNewline" = true;
       "notebook.lineNumbers" = "on";
       "notebook.output.minimalErrorRendering" = false;
+      "jupyter.askForKernelRestart" = false;
     };
     keybindings = let
       ctrl = key: "ctrl+" + key;
@@ -1931,7 +1973,7 @@ in rec {
     catppuccin.mode = "prependImport";
     systemd.enable = true;
     settings = let
-      height = 24;
+      height = 48;
     in {
       mainbar = {
         layer = "top";
@@ -1975,6 +2017,18 @@ in rec {
         battery = {
           format = "{capacity}% {icon} ";
           format-icons = ["" "" "" "" ""];
+        };
+        bluetooth = {
+          format = " {status}";
+          format-connected = " {device_alias}";
+          format-connected-battery = " {device_alias} {device_battery_percentage}%";
+          # "format-device-preference"= [ "device1"; "device2" ]; // preference list deciding the displayed device
+          tooltip-format = "{controller_alias}\t{controller_address}\n\n{num_connections} connected";
+          tooltip-format-connected = "{controller_alias}\t{controller_address}\n\n{num_connections} connected\n\n{device_enumerate}";
+          tooltip-format-enumerate-connected = "{device_alias}\t{device_address}";
+          tooltip-format-enumerate-connected-battery = "{device_alias}\t{device_address}\t{device_battery_percentage}%";
+          on-click = pkgs.lib.getExe scripts.bluetoothctl-startup;
+          # on-click = "${pkgs.bluez}/bin/bluetoothctl "
         };
         memory = {
           interval = 30;
@@ -2365,7 +2419,8 @@ in rec {
 
                         /* #mpris.youtube { */
                         #mpris.firefox {
-                            background-color: #FB0B08;
+                            /* background-color: #FB0B08; */
+                            background-color: @peach;
                             color: black;
                         }
 
@@ -2374,7 +2429,18 @@ in rec {
                         }
 
                         #bluetooth.on {
+                          color: @teal;
+                        }
+
+                        #bluetooth.connected {
                           background-color: @teal;
+                          color: @text;
+                        }
+                        #bluetooth.disabled {
+                          color: @surface2;
+                        }
+                        #bluetooth.off {
+                          color: @surface2;
                         }
 
         /*    bluetooth */
@@ -2544,8 +2610,8 @@ in rec {
                             color: @crust;
                         }
 
-                        #memory.warning { background-color: @flamingo; }
-                        #memory.critical { background-color: @red; }
+                        #memory.warning { background-color: @flamingo; color: @crust; }
+                        #memory.critical { background-color: @red; color: @crust; }
 
 
       '';
@@ -2997,8 +3063,9 @@ in rec {
     # '';
   };
 
-  # TODO: get to work
   # TODO: create dns alias
+  # TODO: make more personal
+  # use lighter colors: e.g. use catppuccin latte
   services.glance.enable = true;
   services.glance.settings = {
     server.port = 5678;
@@ -3030,23 +3097,26 @@ in rec {
                 type = "rss";
               }
               {
-                channels = ["theprimeagen" "cohhcarnage" "christitustech" "blurbs" "asmongold" "jembawls"];
+                channels = ["theprimeagen" "teej_dv" "peachoncan" "cohhcarnage"];
                 type = "twitch-channels";
               }
             ];
           }
           {
             size = "full";
-            widgets = [
+            widgets = let
+              subreddit = sub: {
+                subreddit = sub;
+                type = "reddit";
+              };
+            in [
               {type = "hacker-news";}
               {
                 channels = ["UCR-DXc1voovS8nhAvccRZhg" "UCv6J_jJa8GJqFwQNgNrMuww" "UCOk-gHyjcWZNj3Br4oxwh0A"];
                 type = "videos";
               }
-              {
-                subreddit = "selfhosted";
-                type = "reddit";
-              }
+              (subreddit "rust")
+              (subreddit "linux")
             ];
           }
           {
@@ -3062,12 +3132,13 @@ in rec {
                 in [
                   (ticker "S&P 500" "SPY")
                   (ticker "NVIDIA" "NVDA")
+                  (ticker "AMD" "AMD")
+                  (ticker "Intel" "INTC")
                   (ticker "Apple" "AAPL")
-                  (ticker "Bitcoin" "BTC-USD")
                   (ticker "Microsoft" "MSFT")
                   (ticker "Google" "GOOGL")
-                  (ticker "AMD" "AMD")
-                  (ticker "Reddit" "RDDT")
+                  (ticker "Bitcoin" "BTC-USD")
+                  # (ticker "Reddit" "RDDT")
                 ];
                 type = "markets";
               }
@@ -3078,4 +3149,27 @@ in rec {
       }
     ];
   };
+
+  # home.file."colors.test".text = builtins.toJSON palette;
+  # sky in hex = ${palette.catppuccin.latte.sky.hex}
+  # keys ${builtins.concatStringSep " | " (builtins.attrNames palette.latte)}
+  # typeOf ${builtins.typeOf palette.catppuccin.latte}
+  home.file."colors.test".text = with builtins; let
+    # T = typeOf palette.catppuccin.latte.sky.hex;
+    sky = palette.catppuccin.sky;
+  in ''
+
+    this is a home-manager test
+
+    color: sky
+
+    hex = ${typeOf sky.hex}
+    rgb = ${typeOf sky.rgb}
+    hsl = ${typeOf sky.hsl}
+
+    hex = ${sky.hex}
+    rgb = ${concatStringsSep " | " (attrNames sky.rgb)}
+    hsl = ${concatStringsSep " | " (attrNames sky.hsl)}
+
+  '';
 }

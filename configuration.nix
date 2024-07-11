@@ -7,11 +7,7 @@
   inputs,
   ...
 }
-:
-# let
-#   tuxedo = import (builtins.fetchTarball "https://github.com/blitz/tuxedo-nixos/archive/master.tar.gz");
-# in
-let
+: let
   username = "kpbaks";
 in rec {
   imports = [
@@ -40,7 +36,6 @@ in rec {
 
   nix.settings.trusted-users = [
     "root"
-    # "kpbaks"
     username
   ];
 
@@ -110,6 +105,7 @@ in rec {
     settings = {};
   };
 
+  # Make it possible to run downloaded appimages
   boot.binfmt.registrations.appimage = {
     wrapInterpreterInShell = false;
     interpreter = "${pkgs.appimage-run}/bin/appimage-run";
@@ -118,97 +114,33 @@ in rec {
     mask = ''\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff'';
     magicOrExtension = ''\x7fELF....AI\x02'';
   };
-  # hardware.nvidia = {
-  #   # Modesetting is required.
-  #   modesetting.enable = true;
 
-  #   # Nvidia power management. Experimental, and can cause sleep/suspend to fail.
-  #   powerManagement.enable = false;
-  #   # Fine-grained power management. Turns off GPU when not in use.
-  #   # Experimental and only works on modern Nvidia GPUs (Turing or newer).
-  #   powerManagement.finegrained = false;
-
-  #   # Use the NVidia open source kernel module (not to be confused with the
-  #   # independent third-party "nouveau" open source driver).
-  #   # Support is limited to the Turing and later architectures. Full list of
-  #   # supported GPUs is at:
-  #   # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus
-  #   # Only available from driver 515.43.04+
-  #   # Currently alpha-quality/buggy, so false is currently the recommended setting.
-  #   open = false;
-
-  #   # Enable the Nvidia settings menu,
-  #   # accessible via `nvidia-settings`.
-  #   nvidiaSettings = true;
-
-  #   # Optionally, you may need to select the appropriate driver version for your specific GPU.
-  #   package = config.boot.kernelPackages.nvidiaPackages.stable;
-  # };
-
-  specialisation = {
-    gaming.configuration = {
-      system.nixos.tags = ["gaming"];
-      # Nvidia Configuration
-      services.xserver.videoDrivers = ["nvidia"];
-      hardware.graphics.enable = true;
+  specialisation.gaming.configuration = {
+    system.nixos.tags = ["gaming"];
+    # Nvidia Configuration
+    services.xserver.videoDrivers = ["nvidia"];
+    hardware.graphics.enable = true;
+    hardware.nvidia.modesetting.enable = true;
+    hardware.nvidia.prime = {
+      sync.enable = true;
+      # Bus ID of the NVIDIA GPU. You can find it using lspci, either under 3D or VGA
+      nvidiaBusId = "PCI:01:00:0";
+      # Bus ID of the Intel GPU. You can find it using lspci, either under 3D or VGA
+      intelBusId = "PCI:00:02:0";
     };
 
-    # TODO: works but bevy breaks down when used as renderer
-    nvidia.configuration = {
-      system.nixos.tags = ["nvidia"];
-      # Nvidia Configuration
-      services.xserver.videoDrivers = ["nvidia"];
-      hardware.opengl.enable = true;
+    hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
+    # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
 
-      # Optionally, you may need to select the appropriate driver version for your specific GPU.
-      # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
-      # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
-
-      hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.mkDriver {
-        version = "555.52.04";
-        sha256_64bit = "sha256-nVOubb7zKulXhux9AruUTVBQwccFFuYGWrU1ZiakRAI=";
-        sha256_aarch64 = pkgs.lib.fakeSha256;
-        openSha256 = pkgs.lib.fakeSha256;
-        settingsSha256 = "sha256-PMh5efbSEq7iqEMBr2+VGQYkBG73TGUh6FuDHZhmwHk=";
-        persistencedSha256 = pkgs.lib.fakeSha256;
-      };
-      # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
-
-      # nvidia-drm.modeset=1 is required for some wayland compositors, e.g. sway
-      hardware.nvidia.modesetting.enable = true;
-
-      hardware.nvidia.prime = {
-        sync.enable = true;
-
-        # Bus ID of the NVIDIA GPU. You can find it using lspci, either under 3D or VGA
-        nvidiaBusId = "PCI:01:00:0";
-
-        # Bus ID of the Intel GPU. You can find it using lspci, either under 3D or VGA
-        intelBusId = "PCI:00:02:0";
-      };
-    };
-    # nvidia-nouveau.configuration = {
-    #   system.nixos.tags = ["nvidia-nouveau"];
-    #   # Nvidia Configuration
-    #   services.xserver.videoDrivers = ["nouveau"];
-    #   hardware.opengl.enable = true;
-
-    #   # Optionally, you may need to select the appropriate driver version for your specific GPU.
-    #   # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
-
-    #   # nvidia-drm.modeset=1 is required for some wayland compositors, e.g. sway
-    #   hardware.nvidia.modesetting.enable = true;
-
-    #   hardware.nvidia.prime = {
-    #     sync.enable = true;
-
-    #     # Bus ID of the NVIDIA GPU. You can find it using lspci, either under 3D or VGA
-    #     nvidiaBusId = "PCI:01:00:0";
-
-    #     # Bus ID of the Intel GPU. You can find it using lspci, either under 3D or VGA
-    #     intelBusId = "PCI:00:02:0";
-    #   };
+    # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.mkDriver {
+    #   version = "555.52.04";
+    #   sha256_64bit = "sha256-nVOubb7zKulXhux9AruUTVBQwccFFuYGWrU1ZiakRAI=";
+    #   sha256_aarch64 = pkgs.lib.fakeSha256;
+    #   openSha256 = pkgs.lib.fakeSha256;
+    #   settingsSha256 = "sha256-PMh5efbSEq7iqEMBr2+VGQYkBG73TGUh6FuDHZhmwHk=";
+    #   persistencedSha256 = pkgs.lib.fakeSha256;
     # };
+    # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
   };
 
   environment.variables.EDITOR = "hx";
@@ -556,4 +488,39 @@ in rec {
   #   targets.fish.enable = false;
   # };
   # stylix.targets.niri.enable = true;
+
+  # services.blocky = {
+  #   enable = true;
+  #   settings = {
+  #     ports.dns = 53; # Port for incoming DNS Queries.
+  #     upstreams.groups.default = [
+  #       "https://one.one.one.one/dns-query" # Using Cloudflare's DNS over HTTPS server for resolving queries.
+  #     ];
+  #     # For initially solving DoH/DoT Requests when no system Resolver is available.
+  #     bootstrapDns = {
+  #       upstream = "https://one.one.one.one/dns-query";
+  #       ips = ["1.1.1.1" "1.0.0.1"];
+  #     };
+  #     #Enable Blocking of certian domains.
+  #     blocking = {
+  #       blackLists = {
+  #         #Adblocking
+  #         ads = ["https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"];
+  #         #Another filter for blocking adult sites
+  #         adult = ["https://blocklistproject.github.io/Lists/porn.txt"];
+  #         #You can add additional categories
+  #       };
+  #       #Configure what block categories are used
+  #       clientGroupsBlock = {
+  #         default = ["ads" "adult"];
+  #         # kids-ipad = ["ads" "adult"];
+  #       };
+  #     };
+  #     caching = {
+  #       minTime = "5m";
+  #       maxTime = "30m";
+  #       prefetching = true;
+  #     };
+  #   };
+  # };
 }
