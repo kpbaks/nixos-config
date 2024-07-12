@@ -197,6 +197,39 @@
         printf '%s%s%s%s = %s%s%s\n' $bold $p $reset $rpad $v_color $v $reset
       end
     '';
+  # TODO: finish
+  scripts.brightness =
+    pkgs.writers.writeFishBin "brightness" {}
+    /*
+    fish
+    */
+    ''
+      set -l ddc_sleep_multiplier 0.025
+      set -l external_display_ids (${pkgs.ddcutil}/bin/ddcutil --sleep-multiplier=$ddc_sleep_multiplier detect | string match --regex --groups-only "^Display (\d+)")
+      set -l laptop_max_brightness (${pkgs.brightnessctl}/bin/brightnessctl max)
+      set -l laptop_current_brightness (${pkgs.brightnessctl}/bin/brightnessctl get)
+      set -l laptop_percentage_brightness (math "round(($laptop_current_brightness / $laptop_max_brightness) * 100)")
+
+      set -l argc (count $argv)
+
+      switch $argc
+        case 0
+          # list current brighthess percentage of all displays
+        case 1
+          if string match --regex --groups-only "^(\d+)%?" -- $argv[1] | read new_brightness_percentage
+            if not test $new_brighthess_percentage -ge 0 -a $new_brightness_percentage -le 100
+            end
+            for id in $external_display_ids
+              ${pkgs.ddcutil}/bin/ddcutil --display $id setvcp 10 $new_brightness_percentage &; disown
+            end
+            ${pkgs.brightnessctl}/bin/brightnessctl set "$new_brightness_percentage%"
+          else
+          end
+          if
+        case '*'
+      end
+
+    '';
   scripts.scripts = let
     inherit (builtins) attrNames concatStringsSep;
   in
@@ -306,7 +339,8 @@ in rec {
       gping
       nixd
       kdePackages.plasma-workspace # for krunner
-      fuzzel
+      kdePackages.kolourpaint
+      # fuzzel
       resvg
       miller
       csview
@@ -1515,8 +1549,34 @@ in rec {
     };
   };
 
-  services.dunst = {
+  services.swaync = {
     enable = true;
+    settings = {
+      positionX = "right";
+      positionY = "top";
+      layer = "overlay";
+      control-center-layer = "top";
+      layer-shell = true;
+      notification-inline-replies = true;
+      notification-icon-size = 64;
+      notification-body-image-height = 100;
+      notification-body-image-width = 200;
+      cssPriority = "application";
+      control-center-margin-top = 0;
+      control-center-margin-bottom = 0;
+      control-center-margin-right = 0;
+      control-center-margin-left = 0;
+      notification-2fa-action = true;
+    };
+    style =
+      /*
+      css
+      */
+      null;
+  };
+
+  services.dunst = {
+    enable = false;
     catppuccin.enable = true;
     settings = {
       global = {
@@ -2775,12 +2835,12 @@ in rec {
 
       spawn-at-startup = map (s: {command = pkgs.lib.strings.splitString " " s;}) [
         "swww-daemon"
-        "waybar"
+        # "waybar"
         "kitty"
         # "spotify"
-        "telegram-desktop"
+        # "telegram-desktop"
         "udiskie"
-        "dunst"
+        # "dunst"
         # "eww daemon"
         # "eww ~/.config/eww/bar open bar" # FIX: not always open, and i want on multiple monitors
         "wlsunset -t 4000 -T 6500 -S 06:30 -s 18:30"
@@ -2990,7 +3050,8 @@ in rec {
         "Mod+Tab".action = focus-workspace-previous;
         # "Mod+Return".action = spawn "anyrun";
         # "Mod+Return".action = fish "pidof anyrun; and pkill anyrun; or anyrun";
-        "Mod+Return".action = fish "pidof nwg-drawer; and pkill nwg-drawer; or nwg-drawer -ovl -fm dolphin";
+        # "Mod+Return".action = fish "pidof nwg-drawer; and pkill nwg-drawer; or nwg-drawer -ovl -fm dolphin";
+        "Mod+Return".action = fish "pidof fuzzel; and pkill fuzzel; or fuzzel";
 
         "Mod+Shift+P".action = power-off-monitors;
       };
@@ -3154,22 +3215,63 @@ in rec {
   # sky in hex = ${palette.catppuccin.latte.sky.hex}
   # keys ${builtins.concatStringSep " | " (builtins.attrNames palette.latte)}
   # typeOf ${builtins.typeOf palette.catppuccin.latte}
-  home.file."colors.test".text = with builtins; let
-    # T = typeOf palette.catppuccin.latte.sky.hex;
-    sky = palette.catppuccin.sky;
-  in ''
+  # home.file."colors.test".text = with builtins; let
+  #   # T = typeOf palette.catppuccin.latte.sky.hex;
+  #   sky = palette.catppuccin.sky;
+  # in ''
 
-    this is a home-manager test
+  #   this is a home-manager test
 
-    color: sky
+  #   color: sky
 
-    hex = ${typeOf sky.hex}
-    rgb = ${typeOf sky.rgb}
-    hsl = ${typeOf sky.hsl}
+  #   hex = ${typeOf sky.hex}
+  #   rgb = ${typeOf sky.rgb}
+  #   hsl = ${typeOf sky.hsl}
 
-    hex = ${sky.hex}
-    rgb = ${concatStringsSep " | " (attrNames sky.rgb)}
-    hsl = ${concatStringsSep " | " (attrNames sky.hsl)}
+  #   hex = ${sky.hex}
+  #   rgb = ${concatStringsSep " | " (attrNames sky.rgb)}
+  #   hsl = ${concatStringsSep " | " (attrNames sky.hsl)}
 
-  '';
+  # '';
+
+  # xdg.configFile."nushell/starship.nu".source = ./starship.nu;
+
+  programs.fuzzel = {
+    enable = true;
+    # catppuccin.enable = false;
+
+    settings = {
+      main = {
+        layer = "overlay";
+        terminal = "${pkgs.kitty}/bin/kitty";
+        font = "JetBrainsMono Nerd Font";
+        dpi-aware = "yes";
+        icons-enabled = true;
+        fuzzy = true;
+        show-actions = true;
+        anchor = "center";
+        lines = 12;
+        width = 40; # in characters
+        horizontal-pad = 60; # px
+        vertical-pad = 20; # px
+        inner-pad = 20; # px
+      };
+      border.width = 2; # px
+      border.radius = 10; # px
+
+      colors = let
+        hex2fuzzel-color = hex: "${builtins.substring 1 6 hex}ff";
+        catppuccin2fuzzel-color = name: hex2fuzzel-color palette.catppuccin.${name}.hex;
+      in
+        builtins.mapAttrs (_: color: catppuccin2fuzzel-color color) {
+          background = "surface0";
+          text = "text";
+          match = "mauve";
+          selection = "overlay0";
+          selection-text = "text";
+          selection-match = "pink";
+          border = "blue";
+        };
+    };
+  };
 }
