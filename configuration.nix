@@ -5,14 +5,14 @@
   config,
   pkgs,
   inputs,
+  username,
   ...
 }
-: let
-  username = "kpbaks";
-in rec {
+: rec {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
+    # ./tuxedo-laptop-second-nvme-drive.nix
   ];
 
   nix.settings = {
@@ -63,6 +63,20 @@ in rec {
   # system.autoUpgrade.enable = true;
   # system.autoUpgrade.allowReboot = true;
 
+  fileSystems."/mnt/games" = {
+    # fsType = "btrfs";
+    fsType = "ext4";
+    device = "/dev/nvme0n1p1";
+    # device = "/dev/disk/by-uuid/52D0-5E93";
+    # https://manpages.ubuntu.com/manpages/noble/en/man8/mount.8.html#filesystem-independent%20mount%20options
+    options = [
+      "users" # Allows any user to mount and unmount
+      "nofail" # Prevent system from failing if this drive doesn't mount
+      "exec" # Permit execution of binaries and other executable files.
+      "rw" # Mount the filesystem read-write.
+    ];
+  };
+
   # allow `perf` as user
   boot.kernel.sysctl."kernel.perf_event_paranoid" = -1;
   boot.kernel.sysctl."kernel.kptr_restrict" = pkgs.lib.mkForce 0;
@@ -91,6 +105,7 @@ in rec {
     tailor-gui.enable = true;
   };
   hardware.tuxedo-keyboard.enable = true;
+  # FIXME: 'evdi' not found
   boot.kernelModules = ["evdi" "tuxedo_keyboard"];
   boot.kernelParams = [
     "tuxedo_keyboard.mode=0"
@@ -122,8 +137,16 @@ in rec {
     services.xserver.videoDrivers = ["nvidia"];
     hardware.graphics.enable = true;
     hardware.nvidia.modesetting.enable = true;
-    hardware.nvidia.prime = {
-      sync.enable = true;
+    hardware.nvidia.prime = let
+      inherit (pkgs.lib) mkForce;
+    in {
+      sync.enable = mkForce false;
+      offload = rec {
+        enable = mkForce true;
+        enableOffloadCmd = enable;
+      };
+
+      # NOTE: ids found with `lspci | grep VGA`
       # Bus ID of the NVIDIA GPU. You can find it using lspci, either under 3D or VGA
       nvidiaBusId = "PCI:01:00:0";
       # Bus ID of the Intel GPU. You can find it using lspci, either under 3D or VGA
@@ -207,7 +230,7 @@ in rec {
   # services.blueman.enable = true;
 
   # Enable sound with pipewire.
-  sound.enable = true;
+  # sound.enable = true;
 
   hardware.pulseaudio.enable = false;
   hardware.pulseaudio.extraModules = [pkgs.pulseaudio-modules-bt];
@@ -237,7 +260,7 @@ in rec {
   users.users.kpbaks = {
     isNormalUser = true;
     description = "Kristoffer Sørensen";
-    extraGroups = ["networkmanager" "wheel" "docker" "podman"];
+    extraGroups = ["networkmanager" "wheel" "docker" "podman" "storage"];
     packages = []; # managed by home-manager, see ./home.nix
   };
   users.groups.input.members = [username];
@@ -252,6 +275,13 @@ in rec {
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
+    mangohud
+    protonup
+    btrfs-progs
+    lutris
+    heroic
+    bottles
+
     chase
     nh # nix helper
     nix-output-monitor # `nom`
@@ -261,14 +291,14 @@ in rec {
     atool # {,de}compress various compression formats
     helix # text editor
     alejandra # nix formatter
+    nixpkgs-fmt
     doas # sudo alternative
     cachix
     udev
     dig # lookup dns name resolving
-    dog # loopup dns name resolving, but in rust!
+    dogdns # loopup dns name resolving, but in rust!
     nmap
-    tmux
-
+    # tmux
     wl-clipboard
     sniffnet
     git
@@ -277,6 +307,76 @@ in rec {
     pciutils # `lscpi`
     # nvtopPackages.full
     ddcutil # control external displays, such as chaning their brightness
+    (pkgs.writers.writeFishBin
+      "nixos-diff"
+      {}
+      /*
+      fish
+      */
+      ''
+        set -l reset (set_color normal)
+        set -l red (set_color red)
+        set -l options v/verbose h/help
+        argparse $options -- $argv; or return 2
+
+        set -l generations (string match --regex --groups-only '(\d+)' /nix/var/nix/profiles/system-*-link | ${pkgs.coreutils}/bin/sort --numeric-sort)
+        if test 1 -eq (count $generations)
+          # Nothing to compare with only 1 generation
+          printf '%serror%s: only one profile exists, nothing to compare!\n' $red $reset >&2
+          return 1
+        end
+
+        set -l a
+        set -l b 0
+
+        set -l argc (count $argv)
+        switch $argc
+          case 0
+            # Diff latest profile with the second latest (or the largest one < latest, if that can even happen ...)
+            # NOTE: use `readlink` instead of `path resolve` as we only want to resolve the symlink once, and not recursively.
+            set -l active (${pkgs.coreutils}/bin/readlink /nix/var/nix/profiles/system)
+            set b (string match --regex --groups-only '(\d+)' -- $active)
+          case 1
+            # Diff `$argv[1]` with `$argv[1] - 1`
+            # Error if `$argv[1] == 1`
+            set b $argv[1]
+          case 2
+            # Diff `$argv[1]` with `$argv[2]`
+            # invariant: `$argv[1] < $argv[2]`
+            set a $argv[1]
+            set b $argv[2]
+          case '*'
+            # Error
+        end
+
+        if not contains -- $b $generations
+          printf '%serror%s: "%s" does not match any existing generation ids: [ %s ]\n' $red $reset $b (string join ' ' $generations) >&2
+          return 2
+        end
+
+        if test -z $a
+          set -l b_idx (contains --index -- $b $generations)
+          if test $b_idx -eq 1
+          printf '%serror%s: when only a single argument is given the upper "%s" cannot be the oldest generation id, pick any of: [ %s ]\n' $red $reset $b (string join ' ' $generations[2..]) >&2
+            return 2
+          end
+          set -l a_idx (math "$b_idx - 1")
+          set a $generations[$a_idx]
+        end
+
+        if not contains -- $a $generations
+          printf '%serror%s: "%s" does not match any existing generation ids: [ %s ]\n' $red $reset $a (string join ' ' $generations) >&2
+          return 2
+        end
+
+        set -l expr ${pkgs.nvd}/bin/nvd diff /nix/var/nix/profiles/system-{$a,$b}-link
+
+        echo "evaluating expression:"
+        echo $expr | ${pkgs.fish}/bin/fish_indent --ansi
+        echo
+
+        eval $expr
+      '')
   ];
 
   programs.hyprland = {
@@ -336,13 +436,16 @@ in rec {
 
   programs.gamescope.enable = true;
   hardware.steam-hardware.enable = true;
-  programs.steam = {
-    enable = true;
-    extraPackages = with pkgs; [
-      gamescope
-    ];
-    # remotePlay.openFirewall = false;
-  };
+  programs.steam.enable = true;
+  programs.steam.gamescopeSession.enable = true;
+  programs.gamemode.enable = true;
+  # programs.steam = {
+  #   enable = true;
+  #   extraPackages = with pkgs; [
+  #     gamescope
+  #   ];
+  #   # remotePlay.openFirewall = false;
+  # };
 
   # services.spotifyd.enable = true;
   # services.surrealdb.enable = true;
@@ -448,6 +551,8 @@ in rec {
 
   # needed for `darkman`
   services.geoclue2.enable = true;
+  # NOTE: temporary fix reported by: https://github.com/NixOS/nixpkgs/issues/327464
+  environment.etc."geoclue/conf.d/.valid".text = ''created the directory.'';
 
   # show dots when typing password for sudo
   security.sudo.extraConfig = ''

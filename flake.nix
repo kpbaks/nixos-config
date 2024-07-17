@@ -108,11 +108,12 @@
     formatter.${system} = pkgs.alejandra;
     nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
       inherit system;
-      specialArgs = {inherit inputs;};
+      specialArgs = {inherit inputs username;};
       modules = [
         ./configuration.nix
         # inputs.stylix.nixosModules.stylix
         inputs.niri.nixosModules.niri
+        # inputs.nixos-hardware.nixosModules.tuxedo-infinitybook-pro14-gen7
         # inputs.sops-nix.nixosModules.sops
       ];
     };
