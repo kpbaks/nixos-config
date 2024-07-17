@@ -21,7 +21,7 @@
   cache_dir = "/home/" + username + "/.cache";
   data_dir = "/home/" + username + "/.local/share";
   lib = pkgs.lib;
-  join = lib.strings.concatStringsSep;
+  # join = lib.strings.concatStringsSep;
   mapjoin = lib.strings.concatMapStringsSep;
   range = from: to: builtins.genList (i: from + i) (to - from);
   merge = list: builtins.foldl' (acc: it: acc // it) {} list;
@@ -297,7 +297,6 @@ in rec {
 
   home.username = username;
   home.homeDirectory = "/home/" + username;
-
   # TODO: sync with `configuration.nix`
   home.stateVersion = "24.05";
 
@@ -312,14 +311,8 @@ in rec {
   home.packages = with pkgs;
     (builtins.attrValues scripts)
     ++ [
-      # scripts.PYTHONSTARTUP
-      # scripts.bluetoothctl-startup
-      # scripts.spotify-cover-art
-      # scripts.show-session
-      # scripts.wb-reload
-      # scripts.wb-toggle-visibility
-      # scripts.wb-watch-config-and-reload
-      # scripts.scripts
+      soco-cli # cli tools to interact with sonos devices
+      delta
       helvum # GTK-based patchbay for pipewire
       watchexec
       # rerun # FIXME: does not compile
@@ -338,7 +331,7 @@ in rec {
       element-desktop
       gping
       nixd
-      kdePackages.plasma-workspace # for krunner
+      # kdePackages.plasma-workspace # for krunner
       kdePackages.kolourpaint
       # fuzzel
       resvg
@@ -346,12 +339,12 @@ in rec {
       csview
       # pympress
       mission-center
-      mkchromecast
+      # mkchromecast
       samply
       sad
       sd
       # ungoogled-chromium
-      vivaldi
+      # vivaldi
       asciigraph
       imagemagick
       odin
@@ -377,7 +370,7 @@ in rec {
       daktilo # turn your keyboard into a typewriter!
       # lemmyknow # identify anything
       the-way # termial snippet-manager
-      # appflowy # open source alternative to notion
+      appflowy # open source alternative to notion
       macchina # neofetch like program
       neovim-remote # TODO: create `darkman` script to toggle light/dark mode with `set background=dark`
       lurk # like `strace` but with colors
@@ -391,16 +384,12 @@ in rec {
       nushell
       clipse # tui clipbard manager
       # gnomeExtensions.pano # fancy clipboard manager
-      # starship # shell prompt generator
-      # rerun
       devenv
-      # dragon
       ffmpeg
       ffmpegthumbnailer
       parallel
       libwebp # why do 'r/wallpaper' upload all its images in `webp`
       # tabnine
-      # waybar
       # grit
       d2
       graphviz
@@ -414,6 +403,7 @@ in rec {
       # ianny
       wluma
       wlsunset # set screen gamma (aka. night light) based on time of day
+      pdf2svg
       poppler_utils # pdf utilities
       webcord # fork of discord, with newer electron version, to support screen sharing
       hyprshot # screenshot tool designed to integrate with hyprland
@@ -565,7 +555,7 @@ in rec {
     super = "Super";
     shift = "Shift";
     alt = "Alt";
-    mods = modifiers: join "|" modifiers;
+    mods = modifiers: builtins.concatStringsSep "|" modifiers;
   in {
     enable = true;
     catppuccin.enable = true;
@@ -736,7 +726,21 @@ in rec {
   programs.firefox = {
     enable = true;
     package = pkgs.firefox;
+    # TODO: declare extensions here
     # package = pkgs.firefox-devedition;
+  };
+
+  programs.chromium = {
+    enable = true;
+    # package = pkgs.chromium;
+    package = pkgs.ungoogled-chromium;
+    extensions = [
+      {id = "cjpalhdlnbpafiamejdnhcphjbkeiagm";} # ublock origin
+      {
+        id = "dcpihecpambacapedldabdbpakmachpb";
+        updateUrl = "https://raw.githubusercontent.com/iamadamdev/bypass-paywalls-chrome/master/updates.xml";
+      }
+    ];
   };
 
   # programs.fish = {
@@ -1140,6 +1144,7 @@ in rec {
       "--colors=match:style:bold"
 
       "--smart-case"
+      "--pcre2-unicode"
     ];
   };
 
@@ -1470,6 +1475,10 @@ in rec {
       "notebook.lineNumbers" = "on";
       "notebook.output.minimalErrorRendering" = false;
       "jupyter.askForKernelRestart" = false;
+
+      "rust-analyzer.check.command" = "clippy";
+      "[rust]"."editor.defaultFormatter" = "rust-lang.rust-analyzer";
+      "[rust]"."editor.formatOnSave" = true;
     };
     keybindings = let
       ctrl = key: "ctrl+" + key;
@@ -1555,7 +1564,7 @@ in rec {
       positionX = "right";
       positionY = "top";
       layer = "overlay";
-      control-center-layer = "top";
+      control-center-layer = "overlay";
       layer-shell = true;
       notification-inline-replies = true;
       notification-icon-size = 64;
@@ -2490,11 +2499,12 @@ in rec {
 
                         #bluetooth.on {
                           color: @teal;
+
                         }
 
                         #bluetooth.connected {
                           background-color: @teal;
-                          color: @text;
+                          color: @crust;
                         }
                         #bluetooth.disabled {
                           color: @surface2;
@@ -2840,6 +2850,7 @@ in rec {
         # "spotify"
         # "telegram-desktop"
         "udiskie"
+        "nm-applet"
         # "dunst"
         # "eww daemon"
         # "eww ~/.config/eww/bar open bar" # FIX: not always open, and i want on multiple monitors
@@ -3059,13 +3070,8 @@ in rec {
     # // focus-workspace-keybinds;
   };
 
-  # FIX
-  # home.file.".config/fastfetch/config.jsonc".source = ./config/fastfetch/config.jsonc;
-  # home.file.".config/fastfetch/config.jsonc".source = ./fastfetch.config.jsonc;
-  # home.file.".config/fastfetch/config.jsonc".source = ./foo;
-
   programs.anyrun = {
-    enable = true;
+    enable = false;
     config = {
       plugins = [
         # An array of all the plugins you want, which either can be paths to the .so files, or their packages
@@ -3274,4 +3280,6 @@ in rec {
         };
     };
   };
+
+  services.blanket.enable = true;
 }

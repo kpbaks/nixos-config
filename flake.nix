@@ -1,5 +1,6 @@
 {
   description = "@kpbaks' NixOS configuration";
+
   nixConfig = {
     extra-experimental-features = "nix-command flakes";
     extra-substituters = [
@@ -7,12 +8,14 @@
       # "https://insane.cachix.org"
       "https://cachix.cachix.org"
       "https://hyprland.cachix.org"
+      "https://helix.cachix.org"
     ];
     extra-trusted-public-keys = [
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       # "insane.cachix.org-1:cLCCoYQKkmEb/M88UIssfg2FiSDUL4PUjYj9tdo4P8o="
       "cachix.cachix.org-1:eWNHQldwUO7G2VkjpnjDbWwy4KQ/HNxht7H4SSoMckM="
       "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+      "helix.cachix.org-1:ejp9KQpR1FBI2onstMQ34yogDm4OgU2ru6lIwPvuCVs="
     ];
   };
 
@@ -37,6 +40,7 @@
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
 
+    # TODO use
     plasma-manager = {
       url = "github:pjones/plasma-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -46,14 +50,15 @@
     niri.url = "github:sodiboo/niri-flake";
     niri.inputs.nixpkgs.follows = "nixpkgs";
     hyprland.url = "github:hyprwm/Hyprland";
+    # TODO: what do i use this for?
     hyprgrass = {
       url = "github:horriblename/hyprgrass";
       inputs.hyprland.follows = "hyprland"; # IMPORTANT
     };
     # TODO: use
-    sops-nix.url = "github:Mic92/sops-nix";
+    # sops-nix.url = "github:Mic92/sops-nix";
     # TODO: use
-    nur.url = "github:nix-community/NUR";
+    # nur.url = "github:nix-community/NUR";
 
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     helix = {
@@ -90,7 +95,6 @@
     hostname = "nixos";
     username = "kpbaks";
     system = "x86_64-linux";
-    # system = builtins.currentSystem;
     overlays = [
       inputs.niri.overlays.niri
       # inputs.neovim-nightly-overlay.overlay
@@ -103,14 +107,13 @@
   in {
     formatter.${system} = pkgs.alejandra;
     nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
-      # nixosConfigurations.default = nixpkgs.lib.nixosSystem {
       inherit system;
       specialArgs = {inherit inputs;};
       modules = [
         ./configuration.nix
         # inputs.stylix.nixosModules.stylix
         inputs.niri.nixosModules.niri
-        inputs.sops-nix.nixosModules.sops
+        # inputs.sops-nix.nixosModules.sops
       ];
     };
 
@@ -130,12 +133,6 @@
               catppuccin.accent = "lavender";
             }
           )
-          # inputs.anyrun.homeManagerModules.default
-          # (
-          #   {...}: {
-          #     home.packages = [inputs.yazi.packages.${pkgs.system}.default];
-          #   }
-          # )
         ];
       };
     };

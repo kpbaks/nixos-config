@@ -63,11 +63,11 @@ in rec {
   # system.autoUpgrade.enable = true;
   # system.autoUpgrade.allowReboot = true;
 
-  # allow perf as user
+  # allow `perf` as user
   boot.kernel.sysctl."kernel.perf_event_paranoid" = -1;
   boot.kernel.sysctl."kernel.kptr_restrict" = pkgs.lib.mkForce 0;
 
-  # so perf can find kernel modules
+  # so `perf` can find kernel modules
   systemd.tmpfiles.rules = [
     "L /lib - - - - /run/current/system/lib"
   ];
@@ -115,6 +115,7 @@ in rec {
     magicOrExtension = ''\x7fELF....AI\x02'';
   };
 
+  # TODO: get steam to work
   specialisation.gaming.configuration = {
     system.nixos.tags = ["gaming"];
     # Nvidia Configuration
@@ -237,7 +238,7 @@ in rec {
     isNormalUser = true;
     description = "Kristoffer Sørensen";
     extraGroups = ["networkmanager" "wheel" "docker" "podman"];
-    packages = []; # managed by home-manager
+    packages = []; # managed by home-manager, see ./home.nix
   };
   users.groups.input.members = [username];
 
@@ -305,6 +306,7 @@ in rec {
   # services.netbird.enable = true;
 
   services.flatpak.enable = true;
+  # FIXME: get to work
   #   services.espanso.enable = false;
   services.mullvad-vpn.enable = true;
 
@@ -380,10 +382,15 @@ in rec {
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
+  # It is annoying to sometimes reboot/shutdown and having to wait 2 ENTIRE minutes, which is the default,
+  # for Systemd to wait patiently for a program to terminate.
   systemd.extraConfig = ''
     DefaultTimeoutStopSec=15s
   '';
 
+  # Prevent OOM when building with nix e.g. `nixos-rebuild switch`
+  # By setting the maximum allowed usage of memory at the same time to be lower than the installed
+  # currently: laptop with 16 GiB
   systemd.services.nix-daemon.serviceConfig = {
     MemoryHigh = "8G";
     MemoryMax = "10G";
@@ -489,38 +496,42 @@ in rec {
   # };
   # stylix.targets.niri.enable = true;
 
-  # services.blocky = {
-  #   enable = true;
-  #   settings = {
-  #     ports.dns = 53; # Port for incoming DNS Queries.
-  #     upstreams.groups.default = [
-  #       "https://one.one.one.one/dns-query" # Using Cloudflare's DNS over HTTPS server for resolving queries.
-  #     ];
-  #     # For initially solving DoH/DoT Requests when no system Resolver is available.
-  #     bootstrapDns = {
-  #       upstream = "https://one.one.one.one/dns-query";
-  #       ips = ["1.1.1.1" "1.0.0.1"];
-  #     };
-  #     #Enable Blocking of certian domains.
-  #     blocking = {
-  #       blackLists = {
-  #         #Adblocking
-  #         ads = ["https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"];
-  #         #Another filter for blocking adult sites
-  #         adult = ["https://blocklistproject.github.io/Lists/porn.txt"];
-  #         #You can add additional categories
-  #       };
-  #       #Configure what block categories are used
-  #       clientGroupsBlock = {
-  #         default = ["ads" "adult"];
-  #         # kids-ipad = ["ads" "adult"];
-  #       };
-  #     };
-  #     caching = {
-  #       minTime = "5m";
-  #       maxTime = "30m";
-  #       prefetching = true;
-  #     };
-  #   };
-  # };
+  services.blocky = {
+    enable = true;
+    settings = {
+      ports.dns = 53; # Port for incoming DNS Queries.
+      upstreams.groups.default = [
+        "https://one.one.one.one/dns-query" # Using Cloudflare's DNS over HTTPS server for resolving queries.
+      ];
+      # For initially solving DoH/DoT Requests when no system Resolver is available.
+      bootstrapDns = {
+        upstream = "https://one.one.one.one/dns-query";
+        ips = ["1.1.1.1" "1.0.0.1"];
+      };
+      #Enable Blocking of certian domains.
+      blocking = {
+        blackLists = {
+          #Adblocking
+          ads = ["https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"];
+          #Another filter for blocking adult sites
+          adult = ["https://blocklistproject.github.io/Lists/porn.txt"];
+          #You can add additional categories
+          # social-media = [""];
+        };
+        #Configure what block categories are used
+        clientGroupsBlock = {
+          default = ["ads" "adult"];
+          # kids-ipad = ["ads" "adult"];
+        };
+      };
+      caching = {
+        minTime = "5m";
+        maxTime = "30m";
+        prefetching = true;
+      };
+    };
+  };
+
+  # KDE partition manager
+  programs.partition-manager.enable = true;
 }
