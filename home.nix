@@ -50,7 +50,7 @@
     def get_stdlib_modules() -> Set[str]:
         """Get a set of standard library module names."""
         stdlib_path = next(p for p in sys.path if 'site-packages' not in p and 'dist-packages' not in p)
-        stdlib_modules = {name for _, name, _ in pkgutil.iter_modules([stdlib_path])}
+        stdlib_modules: Set[str] = {name for _, name, _ in pkgutil.iter_modules([stdlib_path]) if not name.startswith("_")}
         return stdlib_modules
 
 
@@ -300,17 +300,32 @@ in rec {
   # TODO: sync with `configuration.nix`
   home.stateVersion = "24.05";
 
-  home.sessionVariables = {
-    PAGER = "${pkgs.moar}/bin/moar";
-    MOAR = "-statusbar=bold -no-linenumbers -quit-if-one-screen";
-    # https://docs.python.org/3/using/cmdline.html#envvar-PYTHONSTARTUP
-    PYTHONSTARTUP = pkgs.lib.getExe scripts.PYTHONSTARTUP;
-  };
+  home.sessionVariables =
+    {
+      PAGER = "${pkgs.moar}/bin/moar";
+      MOAR = "-statusbar=bold -no-linenumbers -quit-if-one-screen";
+      # https://docs.python.org/3/using/cmdline.html#envvar-PYTHONSTARTUP
+      PYTHONSTARTUP = pkgs.lib.getExe scripts.PYTHONSTARTUP;
+      # GUM
+    }
+    // builtins.mapAttrs (_: color: palette.catppuccin.${color}.hex) {
+      GUM_CONFIRM_PROMPT_FOREGROUND = "sky";
+      GUM_CONFIRM_SELECTED_FOREGROUND = "teal";
+      GUM_CONFIRM_UNSELECTED_FOREGROUND = "crust";
+
+      GUM_CHOOSE_CURSOR_FOREGROUND = "sky";
+      GUM_CHOOSE_HEADER_FOREGROUND = "sky";
+      GUM_CHOOSE_ITEM_FOREGROUND = "sky";
+      GUM_CHOOSE_SELECTED_FOREGROUND = "sky";
+    };
 
   # TODO: document all pkgs
   home.packages = with pkgs;
     (builtins.attrValues scripts)
     ++ [
+      calibre
+      calibre-web
+      swayosd
       soco-cli # cli tools to interact with sonos devices
       delta
       helvum # GTK-based patchbay for pipewire
@@ -495,12 +510,20 @@ in rec {
       comma
       fish
 
-      python3
+      # python3
+      (python3.withPackages (python-pkgs:
+        with python-pkgs; [
+          bpython
+          tabulate
+          psutil
+          numpy
+        ]))
       ouch # {,de}compression tool
       # inlyne # markdown viewer
       # neovide # neovim gui
       # nil # nix lsp
       taplo # toml formatter/linter/lsp
+      web-ext # helper program to build browser extensions and debug instrument firefox
     ];
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
@@ -725,9 +748,80 @@ in rec {
 
   programs.firefox = {
     enable = true;
+    # TODO: wrap in `web-ext`
     package = pkgs.firefox;
     # TODO: declare extensions here
     # package = pkgs.firefox-devedition;
+    # FIXME: does not work
+    # enableGnomeExtensions = config.services.gnome-browser-connector.enable;
+    policies = {
+      DefaultDownloadDirectory = "${config.home.homeDirectory}/Downloads";
+    };
+
+    profiles.default = {
+      id = 0; # default
+      settings = {
+        "browser.startup.homepage" = "https://nixos.org";
+        "browser.search.region" = "DK";
+        "browser.search.isUS" = false;
+        "distribution.searchplugins.defaultLocale" = "en-DK";
+        "general.useragent.locale" = "en-DK";
+        "browser.bookmarks.showMobileBookmarks" = false;
+        "browser.newtabpage.pinned" = [
+          {
+            title = "NixOS";
+            url = "https://nixos.org";
+          }
+        ];
+      };
+      # extensions = with pkgs.nur.repos.rycee.firefox-addons; [
+      #   privacy-badger
+      # ];
+      search.privateDefault = "DuckDuckGo";
+      search.engines = {
+        "Nix Packages" = {
+          urls = [
+            {
+              template = "https://search.nixos.org/packages";
+              params = [
+                {
+                  name = "type";
+                  value = "packages";
+                }
+                {
+                  name = "query";
+                  value = "{searchTerms}";
+                }
+              ];
+            }
+          ];
+
+          icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
+          definedAliases = ["@np"];
+        };
+
+        "NixOS Wiki" = {
+          urls = [{template = "https://wiki.nixos.org/index.php?search={searchTerms}";}];
+          iconUpdateURL = "https://wiki.nixos.org/favicon.png";
+          updateInterval = 24 * 60 * 60 * 1000; # every day
+          definedAliases = ["@nw"];
+        };
+
+        "Bing".metaData.hidden = true;
+        "Google".metaData.alias = "@g"; # builtin engines only support specifying one additional alias
+      };
+
+      userChrome =
+        /*
+        css
+        */
+        '''';
+      userContent =
+        /*
+        css
+        */
+        '''';
+    };
   };
 
   programs.chromium = {
@@ -1379,6 +1473,9 @@ in rec {
     package = pkgs.vscodium;
     enableExtensionUpdateCheck = true;
     enableUpdateCheck = true;
+    # TODO: add more
+    # - Catppuccin.catppuccin-vsc-icons
+    # - Catppuccin.catppuccin-vsc
     extensions = with pkgs.vscode-extensions; [
       zxh404.vscode-proto3
       # tiehuis.zig
@@ -1479,6 +1576,8 @@ in rec {
       "rust-analyzer.check.command" = "clippy";
       "[rust]"."editor.defaultFormatter" = "rust-lang.rust-analyzer";
       "[rust]"."editor.formatOnSave" = true;
+      "workbench.preferredLightColorTheme" = "Catppuccin Latte";
+      # "workbench.colorTheme": "Default Dark Modern",
     };
     keybindings = let
       ctrl = key: "ctrl+" + key;
@@ -1558,7 +1657,10 @@ in rec {
     };
   };
 
-  services.swaync = {
+  # ref: https://pastebin.com/xycT4nrk
+  services.swaync = let
+    control-center-margin = 10;
+  in {
     enable = true;
     settings = {
       positionX = "right";
@@ -1571,17 +1673,386 @@ in rec {
       notification-body-image-height = 100;
       notification-body-image-width = 200;
       cssPriority = "application";
-      control-center-margin-top = 0;
-      control-center-margin-bottom = 0;
-      control-center-margin-right = 0;
-      control-center-margin-left = 0;
+      control-center-margin-top = control-center-margin;
+      control-center-margin-bottom = control-center-margin;
+      control-center-margin-right = control-center-margin;
+      control-center-margin-left = control-center-margin;
       notification-2fa-action = true;
+      timeout = 3;
+      timeout-low = 2;
+      timeout-critical = 0;
+      fit-to-screen = true;
+      # control-center-width = 500;
+      # control-center-height = 1025;
+      # notification-window-width = 440;
+      keyboard-shortcuts = true;
+      image-visibility = "when-available";
+      transition-time = 200;
+      hide-on-clear = true;
+      hide-on-action = true;
+      script-fail-notify = true;
+      widgets = [
+        "title"
+        "dnd"
+        "notifications"
+        "mpris"
+        "volume"
+        "buttons-grid"
+      ];
+      widget-config = {
+        dnd.text = "Do Not Disturb";
+        title = {
+          text = "Notification Center";
+          clear-all-button = true;
+          button-text = "󰆴 Clear All";
+        };
+        label = {
+          max-lines = 1;
+          text = "Notification Center";
+        };
+        mpris = {
+          image-size = 96;
+          image-radius = 7;
+        };
+        volume = {
+          label = "󰕾";
+          show-per-app = true;
+        };
+        buttons-grid.actions = let
+          systemctl = subcommand: "${pkgs.systemd}/bin/systemctl ${subcommand}";
+          todo = "${pkgs.libnotify}/bin/notify-send 'home-manager' 'not implemented this action yet'";
+        in [
+          {
+            label = "󰐥";
+            command = systemctl "poweroff";
+          }
+          {
+            label = "󰜉";
+            command = systemctl "reboot";
+          }
+          {
+            label = "󰌾";
+            command = todo;
+            # "command": "$HOME/.config/hypr/scripts/lock-session.sh"
+          }
+          {
+            label = "󰍃";
+            # command = "hyprctl dispatch exit";
+            command = todo;
+          }
+          {
+            label = "󰤄";
+            command = systemctl "suspend";
+          }
+          {
+            label = "󰕾";
+            # command = "swayosd-client --output-volume mute-toggle";
+            command = todo;
+          }
+          {
+            label = "󰍬";
+            # command = "swayosd-client --input-volume mute-toggle";
+            command = todo;
+          }
+          {
+            label = "󰖩";
+            # command = "$HOME/.local/bin/shved/rofi-menus/wifi-menu.sh";
+            command = todo;
+          }
+          {
+            label = "󰂯";
+            # command = "${pkgs.blueman}/bin/blueman-manager";
+            command = "${pkgs.overskride}/bin/overskride";
+          }
+          {
+            label = "";
+            command = "${pkgs.obs-studio}/bin/obs";
+          }
+        ];
+      };
+      #     "buttons-grid": {
+      #         "actions": [
+      #             {
+      #                 "label": "󰐥",
+      #                 "command": "systemctl poweroff"
+      #             },
+      #             {
+      #                 "label": "󰜉",
+      #                 "command": "systemctl reboot"
+      #             },
+      #             {
+      #                 "label": "󰌾",
+      #                 "command": "$HOME/.config/hypr/scripts/lock-session.sh"
+      #             },
+      #             {
+      #                 "label": "󰍃",
+      #                 "command": "hyprctl dispatch exit"
+      #             },
+      #             {
+      #                 "label": "󰤄",
+      #                 "command": "systemctl suspend"
+      #             },
+      #             {
+      #                 "label": "󰕾",
+      #                 "command": "swayosd-client --output-volume mute-toggle"
+      #             },
+      #             {
+      #                 "label": "󰍬",
+      #                 "command": "swayosd-client --input-volume mute-toggle"
+      #             },
+      #             {
+      #                 "label": "󰖩",
+      #                 "command": "$HOME/.local/bin/shved/rofi-menus/wifi-menu.sh"
+      #             },
+      #             {
+      #                 "label": "󰂯",
+      #                 "command": "blueman-manager"
+      #             },
+      #             {
+      #                 "label": "",
+      #                 "command": "obs"
+      #             }
+      #         ]
+      #     }
+      # }
     };
+    # TODO: improve layout
+    # https://github.com/catppuccin/swaync
+    # https://github.com/ErikReider/SwayNotificationCenter/discussions/183
+    # https://github.com/rose-pine/swaync
     style =
       /*
       css
       */
-      null;
+      ''
+        @define-color cc-bg #32302f;
+        @define-color noti-border-color #32302f;
+        @define-color noti-bg #3c3836;
+        @define-color noti-bg-darker #3c3836;
+        @define-color noti-bg-hover rgb(27, 27, 43);
+        @define-color noti-bg-focus rgba(27, 27, 27, 0.6);
+        @define-color text-color #f9f5d7;
+        @define-color text-color-disabled #bdae93;
+        @define-color bg-selected #fabd2f;
+
+        * {
+            font-family: JetBrainsMono NFP;
+            font-weight: bold;
+        	font-size: 14px
+        }
+
+        .control-center .notification-row:focus,
+        .control-center .notification-row:hover {
+            opacity: 1;
+            background: @noti-bg-darker
+        }
+
+        .notification-row {
+            outline: none;
+            margin: 20px;
+            padding: 0;
+        }
+
+        .notification {
+            background: transparent;
+            margin: 0px;
+        }
+
+        .notification-content {
+            background: @cc-bg;
+            padding: 7px;
+            border-radius: 0px;
+            border: 2px solid #85796f;
+            margin: 0;
+        }
+
+        .close-button {
+            background: #d79921;
+            color: @cc-bg;
+            text-shadow: none;
+            padding: 0;
+            border-radius: 0px;
+            margin-top: 5px;
+            margin-right: 5px;
+        }
+
+        .close-button:hover {
+            box-shadow: none;
+            background: #fabd2f;
+            transition: all .15s ease-in-out;
+            border: none
+        }
+
+        .notification-action {
+            color: #ebdbb2;
+            border: 2px solid #85796f;
+            border-top: none;
+            border-radius: 0px;
+            background: #32302F;
+        }
+
+        .notification-default-action:hover,
+        .notification-action:hover {
+            color: #ebdbb2;
+            background: #32302F;
+        }
+
+        .summary {
+        	padding-top: 7px;
+            font-size: 13px;
+            color: #ebdbb2;
+        }
+
+        .time {
+            font-size: 11px;
+            color: #d79921;
+            margin-right: 24px
+        }
+
+        .body {
+            font-size: 12px;
+            color: #ebdbb2;
+        }
+
+        .control-center {
+            background: @cc-bg;
+            border: 2px solid #85796f;
+            border-radius: 0px;
+        }
+
+        .control-center-list {
+            background: transparent
+        }
+
+        .control-center-list-placeholder {
+            opacity: .5
+        }
+
+        .floating-notifications {
+            background: transparent
+        }
+
+        .blank-window {
+            background: alpha(black, 0.1)
+        }
+
+        .widget-title {
+            color: #f9f5d7;
+            background: @noti-bg-darker;
+            padding: 5px 10px;
+            margin: 10px 10px 5px 10px;
+            font-size: 1.5rem;
+            border-radius: 5px;
+        }
+
+        .widget-title>button {
+            font-size: 1rem;
+            color: @text-color;
+            text-shadow: none;
+            background: @noti-bg;
+            box-shadow: none;
+            border-radius: 5px;
+        }
+
+        .widget-title>button:hover {
+            background: #d79921;
+            color: @cc-bg;
+        }
+
+        .widget-dnd {
+            background: @noti-bg-darker;
+            padding: 5px 10px;
+            margin: 5px 10px 10px 10px;
+            border-radius: 5px;
+            font-size: large;
+            color: #f2e5bc;
+        }
+
+        .widget-dnd>switch {
+            border-radius: 4px;
+            background: #665c54;
+        }
+
+        .widget-dnd>switch:checked {
+            background: #d79921;
+            border: 1px solid #d79921;
+        }
+
+        .widget-dnd>switch slider {
+            background: @cc-bg;
+            border-radius: 5px
+        }
+
+        .widget-dnd>switch:checked slider {
+            background: @cc-bg;
+            border-radius: 5px
+        }
+
+        .widget-label {
+            margin: 10px 10px 5px 10px;
+        }
+
+        .widget-label>label {
+            font-size: 1rem;
+            color: @text-color;
+        }
+
+        .widget-mpris {
+            color: @text-color;
+            background: @noti-bg-darker;
+            padding: 5px 10px 0px 0px;
+            margin: 5px 10px 5px 10px;
+            border-radius: 0px;
+        }
+
+        .widget-mpris > box > button {
+            border-radius: 5px;
+        }
+
+        .widget-mpris-player {
+            padding: 5px 10px;
+            margin: 10px
+        }
+
+        .widget-mpris-title {
+            font-weight: 700;
+            font-size: 1.25rem
+        }
+
+        .widget-mpris-subtitle {
+            font-size: 1.1rem
+        }
+
+        .widget-buttons-grid {
+            font-size: x-large;
+            padding: 5px;
+            margin: 5px 10px 10px 10px;
+            border-radius: 5px;
+            background: @noti-bg-darker;
+        }
+
+        .widget-buttons-grid>flowbox>flowboxchild>button {
+            margin: 3px;
+            background: @cc-bg;
+            border-radius: 5px;
+            color: @text-color
+        }
+
+        .widget-buttons-grid>flowbox>flowboxchild>button:hover {
+            background: #d79921;
+            color: @cc-bg;
+        }
+
+        .widget-menubar>box>.menu-button-bar>button {
+            border: none;
+            background: transparent
+        }
+
+        .topbar-buttons>button {
+            border: none;
+            background: transparent
+        }
+      '';
   };
 
   services.dunst = {
@@ -2066,6 +2537,7 @@ in rec {
         ];
         modules-center = [
           # "wlr/taskbar"
+          "systemd-failed-units"
           "tray"
           "clock"
           "privacy"
@@ -2082,6 +2554,7 @@ in rec {
           "temperature"
           "bluetooth"
           "network"
+          "custom/notification"
         ];
         battery = {
           format = "{capacity}% {icon} ";
@@ -2110,7 +2583,7 @@ in rec {
           };
         };
         systemd-failed-units = {
-          hide-on-ok = false;
+          hide-on-ok = true;
           format = "systemd ✗ {nr_failed}";
           format-ok = "✓";
           system = true;
@@ -2126,6 +2599,7 @@ in rec {
             mode-mon-col = 3;
             weeks-pos = "right";
             on-scroll = 1;
+            # TODO: change colors to catppuccin
             format = {
               months = "<span color='#ffead3'><b>{}</b></span>";
               days = "<span color='#ecc6d9'><b>{}</b></span>";
@@ -2175,18 +2649,20 @@ in rec {
           format-icons = ["" "" ""];
         };
 
+        # TODO: add upload/download metrics
         network = {
           # "interface"= "wlp2s0";
           format = "{ifname}";
           format-wifi = "{essid} ({signalStrength}%)  ";
           format-ethernet = "{ipaddr}/{cidr} 󰊗 ";
-          format-disconnected = ""; # An empty format will hide the module.
+          format-disconnected = ""; # An empty format will hide the module.
           tooltip-format = "{ifname} via {gwaddr} 󰊗 ";
           tooltip-format-wifi = "{essid} ({signalStrength}%)  ";
           tooltip-format-ethernet = "{ifname}  ";
           tooltip-format-disconnected = "Disconnected";
           max-length = 50;
-          on-click = "nmtui";
+          # on-click = "nmtui";
+          on-click = "${terminal} ${pkgs.networkmanager}/bin/nmtui";
         };
 
         mpris = {
@@ -2209,7 +2685,7 @@ in rec {
 
         power-profiles-daemon = {
           format = "{icon}   {profile}";
-          tooltip-format = "Power profile= {profile}\nDriver= {driver}";
+          tooltip-format = "Power profile = {profile}\nDriver = {driver}";
           tooltip = true;
           format-icons = {
             default = "";
@@ -2224,6 +2700,7 @@ in rec {
           tooltip = false;
           on-click = "${terminal} ${pkgs.lib.getExe pkgs.btop}";
           format = "{icon0}{icon1}{icon2}{icon3}{icon4}{icon5}{icon6}{icon7}";
+          # TODO: change colors to catppuccin
           format-icons = [
             "<span color='#69ff94'>▁</span>" # green
             "<span color='#2aa9ff'>▂</span>" # blue
@@ -2294,6 +2771,48 @@ in rec {
           interval = 30;
         };
 
+        "custom/notification" = {
+          tooltip = false;
+          format = "{} {icon}";
+          format-icons = {
+            notification = "<span foreground='red'><sup></sup></span>";
+            none = "";
+            dnd-notification = "<span foreground='red'><sup></sup></span>";
+            dnd-none = "";
+            inhibited-notification = "<span foreground='red'><sup></sup></span>";
+            inhibited-none = "";
+            dnd-inhibited-notification = "<span foreground='red'><sup></sup></span>";
+            dnd-inhibited-none = "";
+          };
+
+          return-type = "json";
+          escape = true;
+          exec = "${pkgs.swaynotificationcenter}/bin/swaync-client -swb";
+          on-click = "${pkgs.swaynotificationcenter}/bin/swaync-client -t -sw";
+          on-click-right = "${pkgs.swaynotificationcenter}/bin/swaync-client -d -sw";
+        };
+
+        #         "custom/notification": {
+        #   "tooltip": false,
+        #   "format": "{icon}",
+        #   "format-icons": {
+        #     "notification": "<span foreground='red'><sup></sup></span>",
+        #     "none": "",
+        #     "dnd-notification": "<span foreground='red'><sup></sup></span>",
+        #     "dnd-none": "",
+        #     "inhibited-notification": "<span foreground='red'><sup></sup></span>",
+        #     "inhibited-none": "",
+        #     "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
+        #     "dnd-inhibited-none": ""
+        #   },
+        #   "return-type": "json",
+        #   "exec-if": "which swaync-client",
+        #   "exec": "swaync-client -swb",
+        #   "on-click": "swaync-client -t -sw",
+        #   "on-click-right": "swaync-client -d -sw",
+        #   "escape": true
+        # },
+
         # "group/group-power" = {
         #   orientation = "inerit";
         #   drawer = {
@@ -2329,7 +2848,7 @@ in rec {
         #   format = "";
         #   tooltip = false;
         #   on-click = "shutdown now";
-        # };
+        # };Job	Group	CPU	State	Command
         "image#nixos-logo" = {
           path = home.homeDirectory + "/.config/waybar/nixos-logo.png";
           size = 32;
@@ -2344,344 +2863,360 @@ in rec {
       css
       */
       ''
-                        * {
-                            /* border: none; */
-                            border-radius: 5px;
-                            /* padding: 2px 0px; */
-                            font-family: Font Awesome, Roboto, Arial, sans-serif;
-                            font-size: 16px;
-                            color: @text;
-                            /* color: #ffffff; */
-                            /* min-height: 0; */
-                        }
+                                * {
+                                    /* border: none; */
+                                    border-radius: 5px;
+                                    /* padding: 2px 0px; */
+                                    font-family: Font Awesome, Roboto, Arial, sans-serif;
+                                    font-size: 16px;
+                                    color: @text;
+                                    /* color: #ffffff; */
+                                    /* min-height: 0; */
+                                }
 
-                        window#waybar {
-                            font-family: FontAwesome, monospace;
-                            background-color: transparent;
-                            border-bottom: 0px;
-                            color: #ebdbb2;
-                            transition-property: background-color;
-                            transition-duration: .5s;
-                        }
+                                window#waybar {
+                                    font-family: FontAwesome, monospace;
+                                    background-color: transparent;
+                                    border-bottom: 0px;
+                                    color: #ebdbb2;
+                                    transition-property: background-color;
+                                    transition-duration: .5s;
+                                }
 
-                        window#waybar.hidden {
-                            opacity: 0.2;
-                        }
+                                window#waybar.hidden {
+                                    opacity: 0.2;
+                                }
 
-                        window#waybar.empty #window {
-                            background-color: transparent;
-                        }
+                                window#waybar.empty #window {
+                                    background-color: transparent;
+                                }
 
-                        .modules-right {
-                            margin: 10px 10px 0 0;
-                        }
-                        .modules-center {
-                            margin: 10px 0 0 0;
-                        }
-                        .modules-left {
-                            margin: 10px 0 0 10px;
-                        }
+                                .modules-right {
+                                    margin: 10px 10px 0 0;
+                                }
+                                .modules-center {
+                                    margin: 10px 0 0 0;
+                                }
+                                .modules-left {
+                                    margin: 10px 0 0 10px;
+                                }
 
-                        button {
-                            border: none;
-                        }
+                                button {
+                                    border: none;
+                                }
 
-                        #tray menu {
-                            font-family: sans-serif;
-                        }
+                                #tray menu {
+                                    font-family: sans-serif;
+                                }
 
-                        tooltip {
-                          background: rgba(43, 48, 59, 0.5);
-                          border: 1px solid rgba(100, 114, 125, 0.5);
-                        }
-                        tooltip label {
-                          color: white;
-                        }
+                                tooltip {
+                                  background: rgba(43, 48, 59, 0.5);
+                                  border: 1px solid rgba(100, 114, 125, 0.5);
+                                }
+                                tooltip label {
+                                  color: white;
+                                }
 
-                        #workspaces button {
-                            padding: 0 5px;
-                            background: transparent;
-                            color: white;
-                            border-bottom: 3px solid transparent;
-                        }
+                                #workspaces button {
+                                    padding: 0 5px;
+                                    background: transparent;
+                                    color: white;
+                                    border-bottom: 3px solid transparent;
+                                }
 
-                        #workspaces button.focused {
-                            background: #64727D;
-                            border-bottom: 3px solid white;
-                        }
+                                #workspaces button.focused {
+                                    background: #64727D;
+                                    border-bottom: 3px solid white;
+                                }
 
-                        /* #mode, #clock, #battery #keyboard-state { */
-                            /* padding: 2px 6px; */
-                            /* border-radius: 25%; */
-                        /* } */
+                                /* #mode, #clock, #battery #keyboard-state { */
+                                    /* padding: 2px 6px; */
+                                    /* border-radius: 25%; */
+                                /* } */
 
-                        /* #clock, */
-                        /* #battery, */
-                        /* #cpu, */
-                        /* #memory, */
-                        /* #temperature, */
-                        /* #network, */
-                        /* #pulseaudio, */
-                        /* #custom-media, */
-                        /* #tray, */
-                        /* #mode, */
-                        /* #custom-power, */
-                        /* #custom-menu, */
-                        /* #idle_inhibitor { */
-                            /* padding: 0 10px; */
-                        /* } */
-
-
-                        #idle_inhibitor,
-                        #cava,
-                        #scratchpad,
-                        #mode,
-                        #window,
-                        #clock,
-                        #battery,
-                        #backlight,
-                        #wireplumber,
-                        #tray,
-                        #privacy,
-                        #temperature,
-                        #mpris,
-                        #bluetooth,
-                        #power-profiles-daemon,
-                        #pulseaudio,
-                        #pulseaudio-slider,
-                        #memory,
-                        #disk,
-                        #cpu,
-                        /* #custom-gpu-usage, */
-                        #network,
-                        #taskbar,
-                        #load {
-                            padding: 8px 10px;
-                            /* background-color: #282828; */
-                            background-color: alpha(@mantle, 0.75);
-                        /* #191C19 */
-                            color: @text;
-                        }
+                                /* #clock, */
+                                /* #battery, */
+                                /* #cpu, */
+                                /* #memory, */
+                                /* #temperature, */
+                                /* #network, */
+                                /* #pulseaudio, */
+                                /* #custom-media, */
+                                /* #tray, */
+                                /* #mode, */
+                                /* #custom-power, */
+                                /* #custom-menu, */
+                                /* #idle_inhibitor { */
+                                    /* padding: 0 10px; */
+                                /* } */
 
 
-                        #battery.charging, #battery.plugged {
-                            background-color: #98971a;
-                            color: #282828;
-                        }
-
-                        #mpris.playing {
-                            background-color: @green;
-                        }
-
-                        #mpris.paused {
-                            background-color: rgba(80, 80, 80, 0.5);
-                        }
-
-                        #mpris.stopped {
-                            background-color: @red;
-                        }
-
-                        #mpris.spotify {
-                            background-color: #20D465;
-                            color: black;
-                        }
-
-                        /* #mpris.youtube { */
-                        #mpris.firefox {
-                            /* background-color: #FB0B08; */
-                            background-color: @peach;
-                            color: black;
-                        }
-
-                        label:focus {
-                            background-color: #000000;
-                        }
-
-                        #bluetooth.on {
-                          color: @teal;
-
-                        }
-
-                        #bluetooth.connected {
-                          background-color: @teal;
-                          color: @crust;
-                        }
-                        #bluetooth.disabled {
-                          color: @surface2;
-                        }
-                        #bluetooth.off {
-                          color: @surface2;
-                        }
-
-        /*    bluetooth */
-        /*    bluetooth.disabled */
-        /*    bluetooth.off */
-        /*    bluetooth.on */
-        /*    bluetooth.connected */
-        /*    bluetooth.discoverable */
-        /*    bluetooth.discovering */
-        /*    bluetooth.pairable */
+                                #idle_inhibitor,
+                                #cava,
+                                #scratchpad,
+                                #mode,
+                                #window,
+                                #clock,
+                                #battery,
+                                #backlight,
+                                #wireplumber,
+                                #tray,
+                                #privacy,
+                                #temperature,
+                                #mpris,
+                                #bluetooth,
+                                #power-profiles-daemon,
+                                #pulseaudio,
+                                #pulseaudio-slider,
+                                #memory,
+                                #disk,
+                                #cpu,
+                                /* #custom-gpu-usage, */
+                                #network,
+                                #taskbar,
+                                #load,
+                                #custom-notification,
+                                #systemd-failed-units
+                                {
+                                    padding: 8px 10px;
+                                    /* background-color: #282828; */
+                                    background-color: alpha(@mantle, 0.75);
+                                /* #191C19 */
+                                    color: @text;
+                                }
 
 
+                                #battery.charging, #battery.plugged {
+                                    background-color: #98971a;
+                                    color: #282828;
+                                }
 
-                        #tray > .passive {
-                            -gtk-icon-effect: dim;
-                        }
+                                #mpris.playing {
+                                    background-color: @green;
+                                }
 
-                        #tray > .needs-attention {
-                            -gtk-icon-effect: highlight;
-                        }
+                                #mpris.paused {
+                                    background-color: rgba(80, 80, 80, 0.5);
+                                }
 
-                        #mode {
-                            background-color: #689d6a;
-                            color: #282828;
-                            /* box-shadow: inset 0 -3px #ffffff; */
-                        }
+                                #mpris.stopped {
+                                    background-color: @red;
+                                }
 
-                        /* #mode { */
-                            /* background: #64727D; */
-                            /* border-bottom: 3px solid white; */
-                        /* } */
+                                #mpris.spotify {
+                                    background-color: #20D465;
+                                    color: black;
+                                }
 
-                        /* #clock { */
-                            /* background-color: #64727D; */
-                        /* } */
+                                /* #mpris.youtube { */
+                                #mpris.firefox {
+                                    /* background-color: #FB0B08; */
+                                    background-color: @peach;
+                                    color: black;
+                                }
 
-                        /* #battery { */
-                            /* background-color: #ffffff; */
-                            /* color: black; */
-                        /* } */
+                                label:focus {
+                                    background-color: #000000;
+                                }
 
-                        /* #battery.charging { */
-                            /* color: white; */
-                            /* background-color: #26A65B; */
-                        /* } */
-
-                        /* @keyframes blink { */
-                            /* to { */
-                                /* background-color: #ffffff; */
-                                /* color: black; */
-                            /* } */
-                        /* } */
-
-                        #battery.warning:not(.charging) {
-                            background: #f53c3c;
-                            color: white;
-                            animation-name: blink;
-                            animation-duration: 0.5s;
-                            animation-timing-function: steps(12);
-                            animation-iteration-count: infinite;
-                            animation-direction: alternate;
-                        }
-
-                        /* #systemd-failed-units { */
-                          /* color: red; */
-                        /* } */
-
-                        /* #systemd-failed-units.ok { */
-                          /* color: green; */
-                        /* } */
-
-                        /* #keyboard-state { */
-
-                        /* } */
-
-                        /* #bluetooth.on { */
-                            /* color: green; */
-                        /* } */
-
-                        /* #bluetooth.off { */
-                            /* color: red; */
-                        /* } */
+                                #bluetooth.on {
+                                  color: @teal;
+                                }
 
 
-                        /* #bluetooth */
-                        /* #bluetooth.disabled */
-                        /* #bluetooth.off */
-                        /* #bluetooth.on */
-                        /* #bluetooth.connected */
-                        /* #bluetooth.discoverable */
-                        /* #bluetooth.discovering */
-                        /* #bluetooth.pairable */
-
-                        #network.disabled {
-                            color: @mauve;
-                        }
-
-                        #network.enabled {
-                            color: @green;
-                        }
+                                #bluetooth.connected {
+                                  background-color: @teal;
+                                  color: @crust;
+                                }
+                                #bluetooth.disabled {
+                                  color: @surface2;
+                                }
+                                #bluetooth.off {
+                                  color: @surface2;
+                                }
 
 
-                        /* #network */
-                        /* #network.disabled */
-                        /* #network.disconnected */
-                        /* #network.linked */
-                        /* #network.ethernet */
-                        /* #network.wifi */
-
-                #power-profiles-daemon {
-                    color: @crust;
-                }
-
-                #power-profiles-daemon.performance {
-                    background-color: @red;
-                }
-
-                #power-profiles-daemon.balanced {
-                    background-color: @peach;
-                }
-
-                #power-profiles-daemon.power-saver {
-                    background-color: @green;
-                }
-
-                #power-profiles-daemon.default {
-                    background-color: @sky;
-                }
+                /*    bluetooth */
+                /*    bluetooth.disabled */
+                /*    bluetooth.off */
+                /*    bluetooth.on */
+                /*    bluetooth.connected */
+                /*    bluetooth.discoverable */
+                /*    bluetooth.discovering */
+                /*    bluetooth.pairable */
 
 
 
-                        /* #pulseaudio */
-                        /* #pulseaudio.bluetooth */
-                        /* #pulseaudio.muted */
-                        /* #pulseaudio.source-muted */
+                                #tray > .passive {
+                                    -gtk-icon-effect: dim;
+                                }
 
-                        /* #pulseaudio-slider slider { */
-                            /* min-height: 0px; */
-                            /* min-width: 0px; */
-                            /* opacity: 0; */
-                            /* background-image: none; */
-                            /* border: none; */
-                            /* box-shadow: none; */
-                        /* } */
-                        /* #pulseaudio-slider trough { */
-                            /* min-height: 80px; */
-                            /* min-width: 10px; */
-                            /* border-radius: 5px; */
-                            /* background-color: black; */
-                        /* } */
-                        /* #pulseaudio-slider highlight { */
-                            /* min-width: 10px; */
-                            /* border-radius: 5px; */
-                            /* background-color: green; */
-                        /* } */
+                                #tray > .needs-attention {
+                                    -gtk-icon-effect: highlight;
+                                }
+
+                                #mode {
+                                    background-color: #689d6a;
+                                    color: #282828;
+                                    /* box-shadow: inset 0 -3px #ffffff; */
+                                }
+
+                                /* #mode { */
+                                    /* background: #64727D; */
+                                    /* border-bottom: 3px solid white; */
+                                /* } */
+
+                                /* #clock { */
+                                    /* background-color: #64727D; */
+                                /* } */
+
+                                /* #battery { */
+                                    /* background-color: #ffffff; */
+                                    /* color: black; */
+                                /* } */
+
+                                /* #battery.charging { */
+                                    /* color: white; */
+                                    /* background-color: #26A65B; */
+                                /* } */
+
+                                /* @keyframes blink { */
+                                    /* to { */
+                                        /* background-color: #ffffff; */
+                                        /* color: black; */
+                                    /* } */
+                                /* } */
+
+                                #battery.warning:not(.charging) {
+                                    background: #f53c3c;
+                                    color: white;
+                                    animation-name: blink;
+                                    animation-duration: 0.5s;
+                                    animation-timing-function: steps(12);
+                                    animation-iteration-count: infinite;
+                                    animation-direction: alternate;
+                                }
+
+                                /* #systemd-failed-units { */
+                                  /* color: red; */
+                                /* } */
+
+                                /* #systemd-failed-units.ok { */
+                                  /* color: green; */
+                                /* } */
+
+                                /* #keyboard-state { */
+
+                                /* } */
+
+                                /* #bluetooth.on { */
+                                    /* color: green; */
+                                /* } */
+
+                                /* #bluetooth.off { */
+                                    /* color: red; */
+                                /* } */
 
 
-                        /* #network */
-                        /* #network.disabled */
-                        /* #network.disconnected */
-                        /* #network.linked */
-                        /* #network.ethernet */
-                        /* #network.wifi */
+                                /* #bluetooth */
+                                /* #bluetooth.disabled */
+                                /* #bluetooth.off */
+                                /* #bluetooth.on */
+                                /* #bluetooth.connected */
+                                /* #bluetooth.discoverable */
+                                /* #bluetooth.discovering */
+                                /* #bluetooth.pairable */
 
-                        #temperature.critical {
-                            background-color: @red;
+                                #network.disabled {
+                                    color: @mauve;
+                                }
+
+                                #network.enabled {
+                                    color: @green;
+                                }
+
+                                #network.wifi, #network.ethernet, #network.linked {
+                                  color: @green;
+                                }
+
+                                #network.disabled, #network.disconnected {
+                                  background-color: @red;
+                                  color: @crust;
+                                }
+
+                                /* #network */
+                                /* #network.disabled */
+                                /* #network.disconnected */
+                                /* #network.linked */
+                                /* #network.ethernet */
+                                /* #network.wifi */
+
+                        #power-profiles-daemon {
                             color: @crust;
                         }
 
-                        #memory.warning { background-color: @flamingo; color: @crust; }
-                        #memory.critical { background-color: @red; color: @crust; }
+                        #power-profiles-daemon.performance {
+                            background-color: @red;
+                        }
+
+                        #power-profiles-daemon.balanced {
+                            background-color: @peach;
+                        }
+
+                        #power-profiles-daemon.power-saver {
+                            background-color: @green;
+                        }
+
+                        #power-profiles-daemon.default {
+                            background-color: @sky;
+                        }
+
+
+
+                                /* #pulseaudio */
+                                /* #pulseaudio.bluetooth */
+                                /* #pulseaudio.muted */
+                                /* #pulseaudio.source-muted */
+
+                                /* #pulseaudio-slider slider { */
+                                    /* min-height: 0px; */
+                                    /* min-width: 0px; */
+                                    /* opacity: 0; */
+                                    /* background-image: none; */
+                                    /* border: none; */
+                                    /* box-shadow: none; */
+                                /* } */
+                                /* #pulseaudio-slider trough { */
+                                    /* min-height: 80px; */
+                                    /* min-width: 10px; */
+                                    /* border-radius: 5px; */
+                                    /* background-color: black; */
+                                /* } */
+                                /* #pulseaudio-slider highlight { */
+                                    /* min-width: 10px; */
+                                    /* border-radius: 5px; */
+                                    /* background-color: green; */
+                                /* } */
+
+
+                                /* #network */
+                                /* #network.disabled */
+                                /* #network.disconnected */
+                                /* #network.linked */
+                                /* #network.ethernet */
+                                /* #network.wifi */
+
+                                #temperature.critical {
+                                    background-color: @red;
+                                    color: @crust;
+                                }
+
+                                #memory.warning { background-color: @flamingo; color: @crust; }
+                                #memory.critical { background-color: @red; color: @crust; }
+
+                                #custom-notification {
+          font-family: "NotoSansMono Nerd Font";
+        }
 
 
       '';
@@ -2903,6 +3438,7 @@ in rec {
         '';
 
       # https://github.com/sodiboo/niri-flake/blob/main/docs.md#programsnirisettingsbinds
+      # TODO: wrap in `swayosd-client`
       binds = with config.lib.niri.actions; let
         sh = spawn "sh" "-c";
         fish = spawn "fish" "--no-config" "-c";
@@ -3293,4 +3829,216 @@ in rec {
   };
 
   services.blanket.enable = true;
+  # https://github.com/dalance/procs
+  # FIXME: make default look like github readme
+  home.file.".config/procs/config.toml".source = let
+    toml = pkgs.formats.toml {};
+  in
+    toml.generate "procs-config" {
+      columns = [
+        {
+          align = "Left";
+          kind = "Pid";
+          nonnumeric_search = false;
+          numeric_search = true;
+          style = "BrightYellow|Yellow";
+        }
+        {
+          align = "Left";
+          kind = "User";
+          nonnumeric_search = true;
+          numeric_search = false;
+          style = "BrightGreen|Green";
+        }
+        {
+          align = "Left";
+          kind = "Separator";
+          nonnumeric_search = false;
+          numeric_search = false;
+          style = "White|BrightBlack";
+        }
+        {
+          align = "Left";
+          kind = "Tty";
+          nonnumeric_search = false;
+          numeric_search = false;
+          style = "BrightWhite|Black";
+        }
+        {
+          align = "Right";
+          kind = "UsageCpu";
+          nonnumeric_search = false;
+          numeric_search = false;
+          style = "ByPercentage";
+        }
+        {
+          align = "Right";
+          kind = "UsageMem";
+          nonnumeric_search = false;
+          numeric_search = false;
+          style = "ByPercentage";
+        }
+        {
+          align = "Left";
+          kind = "CpuTime";
+          nonnumeric_search = false;
+          numeric_search = false;
+          style = "BrightCyan|Cyan";
+        }
+        {
+          align = "Right";
+          kind = "MultiSlot";
+          nonnumeric_search = false;
+          numeric_search = false;
+          style = "ByUnit";
+        }
+        {
+          align = "Left";
+          kind = "Separator";
+          nonnumeric_search = false;
+          numeric_search = false;
+          style = "White|BrightBlack";
+        }
+        {
+          align = "Left";
+          kind = "Command";
+          nonnumeric_search = true;
+          numeric_search = false;
+          style = "BrightWhite|Black";
+        }
+      ];
+      display = {
+        abbr_sid = true;
+        ascending = "▲";
+        color_mode = "Auto";
+        cut_to_pager = false;
+        cut_to_pipe = false;
+        cut_to_terminal = true;
+        descending = "▼";
+        separator = "│";
+        show_children_in_tree = true;
+        show_footer = true;
+        show_header = true;
+        show_kthreads = true;
+        show_parent_in_tree = true;
+        show_self = false;
+        show_self_parents = false;
+        show_thread = true;
+        show_thread_in_tree = true;
+        theme = "Auto";
+        tree_symbols = ["│" "─" "┬" "├" "└"];
+      };
+      docker = {path = "unix:///var/run/docker.sock";};
+      pager = {
+        detect_width = false;
+        mode = "Auto";
+        use_builtin = false;
+        command = config.home.sessionVariables.PAGER;
+      };
+      search = {
+        case = "Smart";
+        logic = "And";
+        nonnumeric_search = "Partial";
+        numeric_search = "Exact";
+      };
+      sort = {
+        column = "cpu";
+        order = "Descending";
+        # order = "Ascending";
+      };
+      style = {
+        by_percentage = {
+          color_000 = "BrightBlue|Blue";
+          color_025 = "BrightGreen|Green";
+          color_050 = "BrightYellow|Yellow";
+          color_075 = "BrightRed|Red";
+          color_100 = "BrightRed|Red";
+        };
+        by_state = {
+          color_d = "BrightRed|Red";
+          color_k = "BrightYellow|Yellow";
+          color_p = "BrightYellow|Yellow";
+          color_r = "BrightGreen|Green";
+          color_s = "BrightBlue|Blue";
+          color_t = "BrightCyan|Cyan";
+          color_w = "BrightYellow|Yellow";
+          color_x = "BrightMagenta|Magenta";
+          color_z = "BrightMagenta|Magenta";
+        };
+        by_unit = {
+          color_g = "BrightYellow|Yellow";
+          color_k = "BrightBlue|Blue";
+          color_m = "BrightGreen|Green";
+          color_p = "BrightRed|Red";
+          color_t = "BrightRed|Red";
+          color_x = "BrightBlue|Blue";
+        };
+        header = "BrightWhite|Black";
+        tree = "BrightWhite|Black";
+        unit = "BrightWhite|Black";
+      };
+
+      # columns = [
+      #   {
+      #     kind = "Pid";
+      #     style = "BrightYellow|Yellow";
+      #     numeric_search = true;
+      #     nonnumeric_search = false;
+      #   }
+      #   {
+      #     kind = "Username";
+      #     style = "BrightGreen|Green";
+      #     numeric_search = false;
+      #     nonnumeric_search = true;
+      #     align = "Right";
+      #   }
+      # ];
+      # display = {
+      #   show_self = false;
+      #   show_thread = true;
+      #   color_mode = "Auto";
+      #   show_header = true;
+      #   show_footer = true;
+      # };
+    };
+
+  # [display]
+  # show_self = false
+  # show_thread = false
+  # show_thread_in_tree = true
+  # cut_to_terminal = true
+  # cut_to_pager = false
+  # cut_to_pipe = false
+  # color_mode = "Auto"
+
+  # xdg.configHome.
+  # xdg.configFile."procs/config.toml" =
+  #   pkgs.formats.toTOML {
+  #   };
+
+  programs.fd = {
+    enable = true;
+    ignores = [
+      ".git/"
+      "*.bak"
+    ];
+    hidden = true;
+    extraOptions = [
+      "--absolute-path"
+    ];
+  };
+
+  home.file.".config/dust/config.toml".source = let
+    toml = pkgs.formats.toml {};
+  in
+    toml.generate "dust-config" {
+      bars-on-right = true;
+      reverse = true;
+    };
+
+  services.swayosd = {
+    enable = true;
+    topMargin = 0.5; # center
+    display = monitors.laptop;
+  };
 }

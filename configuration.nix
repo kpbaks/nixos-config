@@ -63,19 +63,19 @@
   # system.autoUpgrade.enable = true;
   # system.autoUpgrade.allowReboot = true;
 
-  fileSystems."/mnt/games" = {
-    # fsType = "btrfs";
-    fsType = "ext4";
-    device = "/dev/nvme0n1p1";
-    # device = "/dev/disk/by-uuid/52D0-5E93";
-    # https://manpages.ubuntu.com/manpages/noble/en/man8/mount.8.html#filesystem-independent%20mount%20options
-    options = [
-      "users" # Allows any user to mount and unmount
-      "nofail" # Prevent system from failing if this drive doesn't mount
-      "exec" # Permit execution of binaries and other executable files.
-      "rw" # Mount the filesystem read-write.
-    ];
-  };
+  # fileSystems."/mnt/ssd1" = {
+  #   # fsType = "btrfs";
+  #   fsType = "ext4";
+  #   # device = "/dev/nvme0n1p1";
+  #   device = "/dev/disk/by-uuid/52D0-5E93";
+  #   # https://manpages.ubuntu.com/manpages/noble/en/man8/mount.8.html#filesystem-independent%20mount%20options
+  #   # options = [
+  #   #   "users" # Allows any user to mount and unmount
+  #   #   "nofail" # Prevent system from failing if this drive doesn't mount
+  #   #   "exec" # Permit execution of binaries and other executable files.
+  #   #   "rw" # Mount the filesystem read-write.
+  #   # ];
+  # };
 
   # allow `perf` as user
   boot.kernel.sysctl."kernel.perf_event_paranoid" = -1;
@@ -266,7 +266,7 @@
   users.groups.input.members = [username];
 
   fonts.packages = with pkgs; [
-    (nerdfonts.override {fonts = ["JetBrainsMono" "FiraCode" "Iosevka" "VictorMono"];})
+    (nerdfonts.override {fonts = ["JetBrainsMono" "FiraCode" "Iosevka" "VictorMono" "NotoSans"];})
     cantarell-fonts
     # line-awesome
     font-awesome
@@ -277,6 +277,7 @@
   environment.systemPackages = with pkgs; [
     mangohud
     protonup
+    protonup-qt
     btrfs-progs
     lutris
     heroic
@@ -307,6 +308,25 @@
     pciutils # `lscpi`
     # nvtopPackages.full
     ddcutil # control external displays, such as chaning their brightness
+    (pkgs.writers.writeFishBin "logout" {}
+      /*
+      fish
+      */
+      ''
+        set -l session_ids (${pkgs.systemd}/bin/loginctl list-sessions \
+        | ${pkgs.coreutils}/bin/tail +2 \
+        | ${pkgs.coreutils}/bin/head -1 \
+        | string match --regex '\d')
+
+        if test (count $session_ids) -gt 1
+          printf '%serror%s: more than one login session active. Not sure what to do, sorry.\n' (set_color red) (set_color normal) >&2
+          return 1
+        end
+
+        ${pkgs.gum}/bin/gum confirm "Logout?" --default=true --affirmative "Yes" --negative "No"
+        and ${pkgs.systemd}/bin/loginctl kill-session $session_ids[1]
+
+      '')
     (pkgs.writers.writeFishBin
       "nixos-diff"
       {}

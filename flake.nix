@@ -84,6 +84,10 @@
     # atdo.url = "github:kpbaks/atdo";
     # atdo.inputs.nixpkgs.follows = "nixpkgs";
     swww.url = "github:LGFae/swww";
+    umu = {
+      url = "git+https://github.com/Open-Wine-Components/umu-launcher/?dir=packaging\/nix&submodules=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -132,6 +136,11 @@
             {...}: {
               catppuccin.flavor = "macchiato";
               catppuccin.accent = "lavender";
+            }
+          )
+          (
+            {...}: {
+              home.packages = [inputs.umu.packages.${pkgs.system}.umu];
             }
           )
         ];
