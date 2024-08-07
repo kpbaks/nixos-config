@@ -3,6 +3,7 @@
   # osConfig,
   pkgs,
   inputs,
+  system,
   username,
   ...
 } @ args: let
@@ -115,6 +116,45 @@
       # else
       #   echo $cover
       # end
+    '';
+
+  scripts.change-audio-sink =
+    pkgs.writers.writeFishBin "change-audio-sink" {}
+    /*
+    fish
+    */
+    ''
+      set -l fzf_opts \
+        --cycle \
+        --ansi \
+        --border \
+        --header "select which audio sink to make the active one." \
+        --bind "enter:execute-silent(${pkgs.pulseaudio}/bin/pactl set-default-sink {1})" \
+        --preview "${pkgs.pulseaudio}/bin/pactl --format=json info {1} | ${pkgs.jaq}/bin/jaq --color=always"
+      set -l reset (set_color normal)
+      set -l blue (set_color blue)
+      set -l green (set_color green)
+      set -l red (set_color red)
+
+      set -l active -1
+      set -l i 1
+      pactl --format=json list sinks \
+      | jaq -r '.[] | [.index, .description, .state] | @csv' \
+      | while read --delimiter , index desc state
+        printf "%4d - %s%s%s - " $index $blue $desc $reset
+        set -l state (string sub --start=2 --end=-1 -- $state)
+        switch $state
+          case SUSPENDED
+            printf '%ssuspended%s' $red $reset
+          case RUNNING
+            printf '%srunning%s' $green $reset
+        end
+        printf '\n'
+        set i (math "$i + 1")
+      end \
+      | ${pkgs.fzf}/bin/fzf $fzf_opts
+            # bind enter to change sink, but not leave
+      # pactl set-default-sink <index>
     '';
 
   scripts.bluetoothctl-startup =
@@ -300,14 +340,33 @@ in rec {
   # TODO: sync with `configuration.nix`
   home.stateVersion = "24.05";
 
-  home.sessionVariables =
+  home.sessionVariables = let
+    reset = "'\e[0m'";
+  in
     {
       PAGER = "${pkgs.moar}/bin/moar";
-      MOAR = "-statusbar=bold -no-linenumbers -quit-if-one-screen";
+      MOAR = builtins.concatStringsSep " " [
+        "-statusbar=bold"
+        "-no-linenumbers"
+        "-quit-if-one-screen"
+        "-no-clear-on-exit"
+        "-wrap"
+        "-colors 16M" # truecolor
+      ];
+
+      # https://www.tiger-computing.co.uk/linux-tips-colourful-man-pages/
+      LESS_TERMCAP_mb = ""; # begin blinking
+      LESS_TERMCAP_md = ""; # begin bold
+      LESS_TERMCAP_me = reset; # end mode
+      LESS_TERMCAP_se = reset; # end standout-mode
+      LESS_TERMCAP_so = ""; # begin standout-mode
+      LESS_TERMCAP_ue = reset; # end underline
+      LESS_TERMCAP_us = ""; # begin underline
       # https://docs.python.org/3/using/cmdline.html#envvar-PYTHONSTARTUP
       PYTHONSTARTUP = pkgs.lib.getExe scripts.PYTHONSTARTUP;
       # GUM
     }
+    # TODO: do for rest of gum subcommands
     // builtins.mapAttrs (_: color: palette.catppuccin.${color}.hex) {
       GUM_CONFIRM_PROMPT_FOREGROUND = "sky";
       GUM_CONFIRM_SELECTED_FOREGROUND = "teal";
@@ -323,6 +382,14 @@ in rec {
   home.packages = with pkgs;
     (builtins.attrValues scripts)
     ++ [
+      teams-for-linux
+      libsForQt5.kdialog
+      yad
+      zenity
+      tabview
+      ollama
+      # ollama-cuda
+      # ollama-rocm
       calibre
       calibre-web
       swayosd
@@ -363,6 +430,7 @@ in rec {
       asciigraph
       imagemagick
       odin
+      c3c
       lychee
       tutanota-desktop
       localsend # open source alternative to Apple Airdrop
@@ -372,6 +440,7 @@ in rec {
       dogdns # rust alternative to dig
       # TODO: use home-manager module when ready
       zed-editor
+      # TODO: integrate with `cmake.fish`
       upx
       ripdrag # drag and drop files from the terminal
       caddy # Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS
@@ -410,6 +479,7 @@ in rec {
       graphviz
       aria
       wofi
+      rofi-emoji-wayland # `rofimoji`
       # rofi-wayland
       pavucontrol # audio sink gui
       overskride # bluetooth gui
@@ -420,7 +490,8 @@ in rec {
       wlsunset # set screen gamma (aka. night light) based on time of day
       pdf2svg
       poppler_utils # pdf utilities
-      webcord # fork of discord, with newer electron version, to support screen sharing
+      # webcord # fork of discord, with newer electron version, to support screen sharing
+      vesktop # Vesktop is a custom Discord App aiming to give you better performance and improve linux support
       hyprshot # screenshot tool designed to integrate with hyprland
       grim # wayland screenshot tool
       slurp # wayland tool to make a screen selection
@@ -453,8 +524,8 @@ in rec {
       just # command runner
       cmake # C/C++ build system generator
       ninja # small build system with a focus on speed
-      kate # text editor
-      julia # scientific programming language
+      # kate # text editor
+      # julia # scientific programming language
       duf # disk usage viewer
       du-dust # calculate directory sizes. `du` replacement
       eza # `ls` replacement
@@ -483,8 +554,8 @@ in rec {
       anki # flashcard app
       mpv # media player
       grc # "generic colorizer" improves the output of many commands by adding colors
-      # bitwarden # password manager
-      # bitwarden-cli # bitwarden cli
+      bitwarden # password manager
+      bitwarden-cli # bitwarden cli
       pass # password manager
       pre-commit # git hook manager
       glow # terminal markdown previewer
@@ -690,6 +761,32 @@ in rec {
   programs.bat = {
     enable = true;
     catppuccin.enable = true;
+    extraPackages = with pkgs.bat-extras; [batdiff batman batgrep batwatch];
+    syntaxes = {
+      gleam = {
+        src = pkgs.fetchFromGitHub {
+          owner = "molnarmark";
+          repo = "sublime-gleam";
+          rev = "2e761cdb1a87539d827987f997a20a35efd68aa9";
+          hash = "sha256-Zj2DKTcO1t9g18qsNKtpHKElbRSc9nBRE2QBzRn9+qs=";
+        };
+        file = "syntax/gleam.sublime-syntax";
+      };
+    };
+
+    config = {
+      map-syntax = [
+        "*.jenkinsfile:Groovy"
+        "*.props:Java Properties"
+        "*.jupyterlab-settings:json5"
+        "*.zon:zig"
+        "flake.lock:json"
+        "*.cu:cpp"
+        "conanfile.txt:ini"
+        "justfile:make"
+        "Justfile:make"
+      ];
+    };
   };
 
   programs.bottom = {
@@ -1054,6 +1151,8 @@ in rec {
   #   passwordCommand = pkgs.writeScript "email-password" "echo ...";
   #   himalaya.enable = true;
   #   thunderbird.enable = true;
+
+  #   aerc.enable = config.programs.aerc.enable;
   # };
 
   programs.himalaya = {
@@ -1466,17 +1565,18 @@ in rec {
   # };
 
   # TODO: convert settings to this
-  programs.vscode = {
+  programs.vscode = let
+    inherit (pkgs) vscode-with-extensions;
+    extensions = inputs.nix-vscode-extensions.extensions.${system};
+  in {
     enable = true;
     # package = pkgs.vscode;
     # package = pkgs.vscode.fhs;
     package = pkgs.vscodium;
     enableExtensionUpdateCheck = true;
     enableUpdateCheck = true;
-    # TODO: add more
-    # - Catppuccin.catppuccin-vsc-icons
-    # - Catppuccin.catppuccin-vsc
-    extensions = with pkgs.vscode-extensions; [
+    # extensions = with pkgs.vscode-extensions; [
+    extensions = with extensions.vscode-marketplace; [
       zxh404.vscode-proto3
       # tiehuis.zig
       gleam.gleam
@@ -1484,13 +1584,18 @@ in rec {
       nvarner.typst-lsp
       usernamehw.errorlens
       tamasfe.even-better-toml
-      # ms-vscode.cpptools
+      ms-vscode.cpptools
       llvm-vs-code-extensions.vscode-clangd
       ms-python.python
-      # ms-vsliveshare.vsliveshare
+      ms-vsliveshare.vsliveshare
       ms-toolsai.jupyter
       yzhang.markdown-all-in-one
       rust-lang.rust-analyzer
+      supermaven.supermaven
+      catppuccin.catppuccin-vsc-icons
+      catppuccin.catppuccin-vsc
+      # https://github.com/nix-community/vscode-nix-ide
+      jnoortheen.nix-ide
       # github.copilot
       # github.copilot-chat
       # tabnine.tabnine-vscode
@@ -1562,6 +1667,9 @@ in rec {
       };
 
       "[nix]"."editor.tabSize" = 2;
+      "nix.enableLanguageServer" = true;
+      "nix.serverPath" = "${pkgs.nixd}/bin/nixd";
+      "nix.formatterPath" = "${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt";
       "tabnine.experimentalAutoImports" = true;
       "tabnine.debounceMilliseconds" = 1000;
       "jupyter.executionAnalysis.enabled" = true;
@@ -1662,7 +1770,7 @@ in rec {
     control-center-margin = 10;
   in {
     enable = true;
-    settings = {
+    settings = rec {
       positionX = "right";
       positionY = "top";
       layer = "overlay";
@@ -1678,8 +1786,8 @@ in rec {
       control-center-margin-right = control-center-margin;
       control-center-margin-left = control-center-margin;
       notification-2fa-action = true;
-      timeout = 3;
-      timeout-low = 2;
+      timeout = timeout-low + 1;
+      timeout-low = 5;
       timeout-critical = 0;
       fit-to-screen = true;
       # control-center-width = 500;
@@ -1746,13 +1854,11 @@ in rec {
           }
           {
             label = "󰕾";
-            # command = "swayosd-client --output-volume mute-toggle";
-            command = todo;
+            command = "${pkgs.swayosd}/bin/swayosd-client --output-volume mute-toggle";
           }
           {
             label = "󰍬";
-            # command = "swayosd-client --input-volume mute-toggle";
-            command = todo;
+            command = "${pkgs.swayosd}/bin/swayosd-client --input-volume mute-toggle";
           }
           {
             label = "󰖩";
@@ -2511,10 +2617,61 @@ in rec {
     enable = true;
     catppuccin.enable = true;
     catppuccin.mode = "prependImport";
+    # FIXME: does not start with `niri`
     systemd.enable = true;
     settings = let
       height = 48;
     in {
+      leftbar = {
+        layer = "top";
+        position = "left";
+
+        spacing = 4; # px
+        inherit height;
+        output = builtins.attrValues monitors;
+        modules-left = [
+          # "cava"
+        ];
+        modules-center = [
+          "wlr/taskbar"
+        ];
+        modules-right = [
+          "image#nixos-logo"
+        ];
+
+        "image#nixos-logo" = {
+          path = home.homeDirectory + "/.config/waybar/nixos-logo.png";
+          size = 32;
+          # interval = 60 * 60 * 24;
+          on-click = "${pkgs.xdg-utils}/bin/xdg-open 'https://nixos.org/'";
+          tooltip = true;
+        };
+
+        cava = {
+          # //        "cava_config": "$XDG_CONFIG_HOME/cava/cava.conf",
+          # cava_config = config.home.homeDirectory + ".config/cava/config";
+          framerate = 30;
+          autosens = 1;
+          # sensitivity = 100;
+          bars = 14;
+          lower_cutoff_freq = 50;
+          higher_cutoff_freq = 10000;
+          hide_on_silence = true;
+          method = "pulse";
+          source = "auto";
+          stereo = true;
+          reverse = false;
+          bar_delimiter = 0;
+          monstercat = true;
+          waves = false;
+          noise_reduction = 0.77;
+          input_delay = 2;
+          format-icons = ["▁" "▂" "▃" "▄" "▅" "▆" "▇" "█"];
+          actions = {
+            on-click-right = "mode";
+          };
+        };
+      };
       mainbar = {
         layer = "top";
         position = "top";
@@ -2526,13 +2683,14 @@ in rec {
         modules-left = [
           # "systemd-failed-units"
           # "keyboard-state"
-          "image#nixos-logo"
+          # "image#nixos-logo"
           "backlight"
           "pulseaudio"
           # "wireplumber"
           # "pulseaudio/slider"
           "mpris"
           "image/spotify-cover-art"
+          # "cava"
           # "cava" # FIXME: get to work
         ];
         modules-center = [
@@ -2572,6 +2730,32 @@ in rec {
           on-click = pkgs.lib.getExe scripts.bluetoothctl-startup;
           # on-click = "${pkgs.bluez}/bin/bluetoothctl "
         };
+
+        cava = {
+          # //        "cava_config": "$XDG_CONFIG_HOME/cava/cava.conf",
+          # cava_config = config.home.homeDirectory + ".config/cava/config";
+          framerate = 30;
+          autosens = 1;
+          # sensitivity = 100;
+          bars = 14;
+          lower_cutoff_freq = 50;
+          higher_cutoff_freq = 10000;
+          hide_on_silence = true;
+          method = "pulse";
+          source = "auto";
+          stereo = true;
+          reverse = false;
+          bar_delimiter = 0;
+          monstercat = true;
+          waves = false;
+          noise_reduction = 0.77;
+          input_delay = 2;
+          format-icons = ["▁" "▂" "▃" "▄" "▅" "▆" "▇" "█"];
+          actions = {
+            on-click-right = "mode";
+          };
+        };
+
         memory = {
           interval = 30;
           format = "{used:0.1f}GiB / {total:0.1f}GiB  ";
@@ -2582,6 +2766,7 @@ in rec {
             critical = 95; # percent
           };
         };
+        # TODO: add `on-click` that either opens `systemctl-tui` or a script that filters out the failed units to show
         systemd-failed-units = {
           hide-on-ok = true;
           format = "systemd ✗ {nr_failed}";
@@ -2757,6 +2942,7 @@ in rec {
         backlight = {
           device = "intel_backlight";
           format = "{percent}% {icon}";
+          # FIXME: 30% looks weird
           format-icons = ["" "" "" "" "" "" "" "" "" "" "" "" "" ""];
         };
 
@@ -3291,6 +3477,7 @@ in rec {
     scan on
   '';
 
+  # TODO: create keybind to quickly open `flake.nix` in a kitty window
   programs.niri = {
     enable = true;
     settings = {
@@ -3299,7 +3486,7 @@ in rec {
         # options = "grp:win_space_toggle,compose:ralt,ctrl:nocaps";
         options = "compose:ralt,ctrl:nocaps";
       };
-      input.focus-follows-mouse = true;
+      # input.focus-follows-mouse = true;
       input.touchpad.dwt = true;
       input.warp-mouse-to-focus = true;
       prefer-no-csd = true;
@@ -3315,8 +3502,8 @@ in rec {
 
       layout = {
         gaps = 10; # px
-        # center-focused-column = "on-overflow";
-        center-focused-column = "never";
+        center-focused-column = "on-overflow";
+        # center-focused-column = "never";
         # center-focused-column = "always";
         preset-column-widths = [
           {proportion = 1.0 / 3.0;}
@@ -3324,7 +3511,8 @@ in rec {
           {proportion = 2.0 / 3.0;}
         ];
         # default-column-width = {proportion = 1.0 / 3.0;};
-        default-column-width = {proportion = 1.0 / 2.0;};
+        # default-column-width = {proportion = 1.0 / 2.0;};
+        default-column-width = {proportion = 1.0;};
         focus-ring = {
           enable = true;
           width = 4;
@@ -3381,10 +3569,11 @@ in rec {
       spawn-at-startup = map (s: {command = pkgs.lib.strings.splitString " " s;}) [
         "swww-daemon"
         # "waybar"
-        "kitty"
+        # "kitty"
         # "spotify"
         # "telegram-desktop"
         "udiskie"
+        # TODO: does not show-up
         "nm-applet"
         # "dunst"
         # "eww daemon"
@@ -3394,6 +3583,7 @@ in rec {
         "copyq"
       ];
 
+      # TODO: experiment with this
       # https://github.com/sodiboo/nix-config/blob/3d25eaf71cc27a0159fd3449c9d20ac4a8a873b5/niri.mod.nix#L196C11-L232C14
       animations.shaders.window-resize =
         /*
@@ -3447,37 +3637,52 @@ in rec {
         brightnessctl = spawn "brightnessctl";
         wpctl = spawn "wpctl"; # wireplumber
         bluetoothctl = spawn "bluetoothctl";
+        swayosd-client = spawn "swayosd-client";
         run-flatpak = spawn "flatpak" "run";
         run-in-terminal = spawn "kitty";
         run-in-sh-within-kitty = spawn "kitty" "sh" "-c";
+        run-in-fish-within-kitty = spawn "kitty" "${pkgs.fish}/bin/fish" "--no-config" "-c";
         # focus-workspace-keybinds = builtins.listToAttrs (map:
         #   (n: {
         #     name = "Mod+${toString n}";
         #     value = {action = "focus-workspace ${toString n}";};
         #   }) (range 1 10));
       in {
-        "XF86AudioRaiseVolume".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+";
-        "XF86AudioLowerVolume".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-";
-        "XF86AudioMute" = {
-          action = wpctl "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle";
-          allow-when-locked = true;
-        };
-        "XF86AudioMicMute" = {
-          action = wpctl "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle";
-          allow-when-locked = true;
-        };
+        # "XF86AudioRaiseVolume".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+";
+        # "XF86AudioLowerVolume".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-";
+        "XF86AudioRaiseVolume".action = swayosd-client "--output-volume" "raise";
+        "XF86AudioLowerVolume".action = swayosd-client "--output-volume" "lower";
+        "XF86AudioMute".action = swayosd-client "--output-volume" "mute-toggle";
+        "XF86AudioMicMute".action = swayosd-client "--input-volume" "mute-toggle";
 
-        "Mod+TouchpadScrollDown".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02+";
-        "Mod+TouchpadScrollUp".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02-";
+        # command = "${pkgs.swayosd}/bin/swayosd-client --output-volume mute-toggle";
+        # command = "${pkgs.swayosd}/bin/swayosd-client --input-volume mute-toggle";
+        # "XF86AudioMute" = {
+        #   action = wpctl "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle";
+        #   allow-when-locked = true;
+        # };
+        # "XF86AudioMicMute" = {
+        #   action = wpctl "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle";
+        #   allow-when-locked = true;
+        # };
+
+        # "Mod+TouchpadScrollDown".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02+";
+        # "Mod+TouchpadScrollUp".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02-";
+        "Mod+TouchpadScrollDown".action = swayosd-client "--output-volume" "+2";
+        "Mod+TouchpadScrollUp".action = swayosd-client "--output-volume" "-2";
 
         "XF86AudioPlay".action = playerctl "play-pause";
         "XF86AudioNext".action = playerctl "next";
         "XF86AudioPrev".action = playerctl "previous";
         "XF86AudioStop".action = playerctl "stop";
-        "XF86MonBrightnessUp".action = brightnessctl "set" "10%+";
-        "XF86MonBrightnessDown".action = brightnessctl "set" "10%-";
-        "Mod+Shift+TouchpadScrollDown".action = brightnessctl "set" "5%+";
-        "Mod+Shift+TouchpadScrollUp".action = brightnessctl "set" "5%-";
+        "XF86MonBrightnessUp".action = swayosd-client "--brightness" "raise";
+        "XF86MonBrightnessDown".action = swayosd-client "--brightness" "lower";
+        "Mod+Shift+TouchpadScrollDown".action = swayosd-client "--brightness" "";
+        "Mod+Shift+TouchpadScrollUp".action = swayosd-client "--brightness" "5%-";
+        # "XF86MonBrightnessUp".action = brightnessctl "set" "10%+";
+        # "XF86MonBrightnessDown".action = brightnessctl "set" "10%-";
+        # "Mod+Shift+TouchpadScrollDown".action = brightnessctl "set" "5%+";
+        # "Mod+Shift+TouchpadScrollUp".action = brightnessctl "set" "5%-";
 
         "Mod+1".action = focus-workspace 1;
         "Mod+2".action = focus-workspace 2;
@@ -3494,9 +3699,11 @@ in rec {
         # "Mod+?".action = show-hotkey-overlay;
         "Mod+T".action = spawn "kitty";
         "Mod+F".action = spawn "firefox";
+        "Mod+Shift+F".action = spawn "firefox" "--private-window";
         "Mod+G".action = spawn "telegram-desktop";
         "Mod+S".action = spawn "spotify";
-        "Mod+D".action = spawn "webcord";
+        # "Mod+D".action = spawn "webcord";
+        "Mod+D".action = spawn "vesktop";
         # "Mod+E".action = run-in-kitty "yazi";
         "Mod+E".action = run-in-sh-within-kitty "cd ~/Downloads; yazi";
         # "Mod+E".action = spawn "dolphin";
@@ -3560,7 +3767,7 @@ in rec {
 
         "Mod+Shift+Slash".action = show-hotkey-overlay;
         "Mod+Q".action = close-window;
-        "Mod+V".action = spawn "copyq" "menu";
+        "Mod+V".action = spawn "${pkgs.copyq}/bin/copyq" "menu";
         "Mod+M".action = maximize-column;
 
         # // There are also commands that consume or expel a single window to the side.
@@ -3573,8 +3780,14 @@ in rec {
         "Mod+R".action = switch-preset-column-width;
         "Mod+Shift+R".action = reset-window-height;
 
-        "Mod+Comma".action = consume-window-into-column;
-        "Mod+Period".action = expel-window-from-column;
+        # "Mod+Comma".action = consume-window-into-column;
+        # "Mod+Period".action = expel-window-from-column;
+
+        # "Mod+Comma".action = run-in-fish-within-kitty "${pkgs.helix}/bin/hx ~/dotfiles/{flake,configuration,home}.nix";
+        # TODO: improve by checking if an editor process instance is already running, before spawning another
+        "Mod+Comma".action = run-in-fish-within-kitty "hx ~/dotfiles/{flake,configuration,home}.nix";
+        "Mod+Period".action = spawn "${pkgs.swaynotificationcenter}/bin/swaync-client" "--toggle-panel";
+        # TODO: color picker keybind
 
         # // Actions to switch layouts.
         #    // Note: if you uncomment these, make sure you do NOT have
@@ -3942,7 +4155,7 @@ in rec {
         numeric_search = "Exact";
       };
       sort = {
-        column = "cpu";
+        column = 5; # cpu
         order = "Descending";
         # order = "Ascending";
       };
@@ -4036,9 +4249,64 @@ in rec {
       reverse = true;
     };
 
+  # TODO: use
+
+  # home.file.""
+  xdg.configFile."swayosd/style.css".text =
+    /*
+    css
+    */
+    ''
+
+    '';
   services.swayosd = {
     enable = true;
     topMargin = 0.5; # center
     display = monitors.laptop;
+    # stylePath = xdg.configFile."swayosd/style.css".path;
+  };
+
+  # TODO: save user settings for jupyter lab
+  # TODO: figure out how to install extensions on nixos
+  # ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/notification.jupyterlab-settings
+
+  # TODO: use https://github.com/jupyter-lsp/jupyterlab-lsp
+  # TODO: use https://github.com/catppuccin/jupyterlab
+
+  # home.file.".jupyter/lab/user-settings/@jupyterlab/apputils-extension/notification.jupyterlab-settings".text = "";
+  # home.file."~/.jupyter/lab/user-settings/@jupyterlab/completer-extension/inline-completer.jupyterlab-settings".text =
+  #   builtins.toJSON
+  #   {
+  #     providers = {
+  #       "@jupyterlab/inline-completer:history" = {
+  #         debouncerDelay = 0;
+  #         enabled = true;
+  #         maxSuggestions = 100;
+  #         timeout = 5000;
+  #       };
+  #     };
+  #     showShortcuts = true;
+  #     showWidget = "always";
+  #     streamingAnimation = "uncover";
+  #   };
+
+  # xdg.configFile."foo".text = ''fooo'';
+  # builtins.toJSON;
+
+  # home.file.".config/jupyter/...".text =
+  #   /*
+  #   json
+  #   */
+  #   ''
+
+  #   '';
+
+  # services.copyq = {
+  #   enable = true;
+  #   systemdTarget = "graphical-session.target";
+  # };
+
+  programs.aerc = {
+    enable = true;
   };
 }

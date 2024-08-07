@@ -266,7 +266,15 @@
   users.groups.input.members = [username];
 
   fonts.packages = with pkgs; [
-    (nerdfonts.override {fonts = ["JetBrainsMono" "FiraCode" "Iosevka" "VictorMono" "NotoSans"];})
+    (nerdfonts.override {
+      fonts = [
+        "JetBrainsMono"
+        "FiraCode"
+        "Iosevka"
+        "VictorMono"
+        # "NotoSans"
+      ];
+    })
     cantarell-fonts
     # line-awesome
     font-awesome
