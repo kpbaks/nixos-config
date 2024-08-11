@@ -77,6 +77,7 @@
   scripts.wb-reload = pkgs.writers.writeBashBin "wb-reload" ''
     if ! ${pkgs.procps}/bin/pkill -USR2 waybar; then
       ${pkgs.libnotify}/bin/notify-send --transient "waybar" "waybar is not running"
+      ${pkgs.waybar}/bin/waybar 2>/dev/null >&2 &; disown
     fi
   '';
 
@@ -118,43 +119,73 @@
       # end
     '';
 
-  scripts.change-audio-sink =
-    pkgs.writers.writeFishBin "change-audio-sink" {}
+  scripts.audio-sink =
+    pkgs.writers.writeFishBin "audio-sink" {}
     /*
     fish
     */
     ''
-      set -l fzf_opts \
-        --cycle \
-        --ansi \
-        --border \
-        --header "select which audio sink to make the active one." \
-        --bind "enter:execute-silent(${pkgs.pulseaudio}/bin/pactl set-default-sink {1})" \
-        --preview "${pkgs.pulseaudio}/bin/pactl --format=json info {1} | ${pkgs.jaq}/bin/jaq --color=always"
+      set -l subcommand change # default
+      if test (count $argv) -gt 0
+        set subcommand $argv[1]
+      end
+
       set -l reset (set_color normal)
       set -l blue (set_color blue)
       set -l green (set_color green)
       set -l red (set_color red)
 
-      set -l active -1
-      set -l i 1
-      pactl --format=json list sinks \
-      | jaq -r '.[] | [.index, .description, .state] | @csv' \
-      | while read --delimiter , index desc state
-        printf "%4d - %s%s%s - " $index $blue $desc $reset
-        set -l state (string sub --start=2 --end=-1 -- $state)
-        switch $state
-          case SUSPENDED
-            printf '%ssuspended%s' $red $reset
-          case RUNNING
-            printf '%srunning%s' $green $reset
-        end
-        printf '\n'
-        set i (math "$i + 1")
-      end \
-      | ${pkgs.fzf}/bin/fzf $fzf_opts
-            # bind enter to change sink, but not leave
-      # pactl set-default-sink <index>
+      switch $subcommand
+        case list
+          ${pkgs.pulseaudio}/bin/pactl --format=json list sinks \
+          | ${pkgs.jaq}/bin/jaq -r '.[] | [.index, .description, .state] | @csv' \
+          | while read --delimiter , index desc state
+            printf "%4d - %s%s%s - " $index $blue $desc $reset
+            set -l state (string sub --start=2 --end=-1 -- $state)
+            switch $state
+              case SUSPENDED
+                printf '%ssuspended%s' $red $reset
+              case RUNNING
+                printf '%srunning%s' $green $reset
+            end
+            printf '\n'
+            # set i (math "$i + 1")
+          end
+        case change
+          set -l fzf_opts \
+            --cycle \
+            --ansi \
+            --border \
+            --height=~50% \
+            --header "select which audio sink to make the active one." \
+            --bind "enter:execute-silent(${pkgs.pulseaudio}/bin/pactl set-default-sink {1})+reload(sleep 0.5; $(status filename) list)" \
+            --bind j:down \
+            --bind k:up \
+            --border-label "Change Audio Sink" \
+            --preview "${pkgs.pulseaudio}/bin/pactl --format=json info {1} | ${pkgs.jaq}/bin/jaq --color=always"
+          eval (status filename) list | ${pkgs.fzf}/bin/fzf $fzf_opts
+        case '*'
+          return 2
+      end
+      # set -l active -1
+      # set -l i 1
+      # pactl --format=json list sinks \
+      # | jaq -r '.[] | [.index, .description, .state] | @csv' \
+      # | while read --delimiter , index desc state
+      #   printf "%4d - %s%s%s - " $index $blue $desc $reset
+      #   set -l state (string sub --start=2 --end=-1 -- $state)
+      #   switch $state
+      #     case SUSPENDED
+      #       printf '%ssuspended%s' $red $reset
+      #     case RUNNING
+      #       printf '%srunning%s' $green $reset
+      #   end
+      #   printf '\n'
+      #   set i (math "$i + 1")
+      # end \
+      # | ${pkgs.fzf}/bin/fzf $fzf_opts
+      #       # bind enter to change sink, but not leave
+      # # pactl set-default-sink <index>
     '';
 
   scripts.bluetoothctl-startup =
@@ -285,6 +316,43 @@
         printf '%s%s%s\n' $blue $s $reset
       end
     '';
+
+  # TODO: finish
+  scripts.dr-radio =
+    pkgs.writers.writeFishBin "dr-radio" {}
+    /*
+    fish
+    */
+    ''
+      mpv
+      fzf
+
+    '';
+
+  # https://github.com/niksingh710/nsearch/blob/master/nsearch
+  # TODO: finish
+  scripts.nixpkgs =
+    pkgs.writers.writeFishBin "nixpkgs-search" {}
+    /*
+    fish
+    */
+    ''
+      set -l cache_dir ""
+      set -l db $cache_dir/nixpkgs.json
+      function update
+        ${pkgs.gum}/bin/gum spin --
+        nix search nixpkgs --json "" 2>/dev/null 1>$db
+
+
+        set -l fzf_opts \
+          --ansi \
+          --border \
+
+        fzf
+
+        jaq
+      end
+    '';
 in rec {
   # TODO: consider using https://github.com/chessai/nix-std
   imports = [
@@ -354,6 +422,11 @@ in rec {
         "-colors 16M" # truecolor
       ];
 
+      # TODO: improve colors, to not use default red
+      # https://www.gnu.org/software/grep/manual/html_node/Environment-Variables.html
+      GREP_COLORS = "ms=01;31:mc=01;31:sl=:cx=:fn=35:ln=32:bn=32:se=36";
+
+      # TODO: finish these
       # https://www.tiger-computing.co.uk/linux-tips-colourful-man-pages/
       LESS_TERMCAP_mb = ""; # begin blinking
       LESS_TERMCAP_md = ""; # begin bold
@@ -387,6 +460,7 @@ in rec {
       yad
       zenity
       tabview
+      rustscan # portscanner like `nmap`
       ollama
       # ollama-cuda
       # ollama-rocm
@@ -846,9 +920,9 @@ in rec {
   programs.firefox = {
     enable = true;
     # TODO: wrap in `web-ext`
-    package = pkgs.firefox;
+    # package = pkgs.firefox;
     # TODO: declare extensions here
-    # package = pkgs.firefox-devedition;
+    package = pkgs.firefox-devedition;
     # FIXME: does not work
     # enableGnomeExtensions = config.services.gnome-browser-connector.enable;
     policies = {
@@ -961,7 +1035,32 @@ in rec {
   programs.fzf = {
     enable = true;
     enableFishIntegration = false;
+    defaultCommand = "${pkgs.fd}/bin/fd --type f";
+    defaultOptions = [
+      "--height=~50%"
+      "--border"
+      "--ansi"
+      "--cycle"
+      "--default=reverse-list"
+      "--scroll-off=5"
+      "--filepath-word"
+      # "--jump-labels="
+      "--bind space:jump"
+      # "--pointer='|>'"
+      "--pointer='=>'"
+      "--marker='✔'"
+      # TODO: use catppuccin colors
+      # TODO: change cursor icon
+    ];
   };
+  # TODO: integrate with border.fish
+  # EXIT STATUS
+  #        0      Normal exit
+  #        1      No match
+  #        2      Error
+  #        126    Permission denied error from become action
+  #        127    Invalid shell command for become action
+  #        130    Interrupted with CTRL-C or ESC
 
   programs.gh = {
     enable = true;
@@ -2613,6 +2712,8 @@ in rec {
   # home.file.".config/waybar/nix-logo.png".source = ./nix-logo.png;
   # xdg.configFile."waybar-nixos-logo.png".source = ./nixos-logo.png;
 
+  # TODO: use https://github.com/raffaem/waybar-mediaplayer
+  # https://github.com/raffaem/waybar-screenrecorder
   programs.waybar = {
     enable = true;
     catppuccin.enable = true;
@@ -2645,6 +2746,16 @@ in rec {
           # interval = 60 * 60 * 24;
           on-click = "${pkgs.xdg-utils}/bin/xdg-open 'https://nixos.org/'";
           tooltip = true;
+        };
+
+        "wlr/taskbar" = {
+          all-outputs = true;
+          # "format"= "{icon} {title} {short_state}";
+          format = "{icon}";
+          tooltip-format = "{title} | {app_id}";
+          on-click = "activate";
+          on-click-middle = "close";
+          on-click-right = "fullscreen";
         };
 
         cava = {
@@ -3511,8 +3622,8 @@ in rec {
           {proportion = 2.0 / 3.0;}
         ];
         # default-column-width = {proportion = 1.0 / 3.0;};
-        # default-column-width = {proportion = 1.0 / 2.0;};
-        default-column-width = {proportion = 1.0;};
+        default-column-width = {proportion = 1.0 / 2.0;};
+        # default-column-width = {proportion = 1.0;};
         focus-ring = {
           enable = true;
           width = 4;
@@ -3544,6 +3655,7 @@ in rec {
           opacity = 0.95;
         }
         {
+          # TODO: add more rules
           # FIXME: does not match private browsing in firefox
           matches = [
             {
@@ -3568,7 +3680,7 @@ in rec {
 
       spawn-at-startup = map (s: {command = pkgs.lib.strings.splitString " " s;}) [
         "swww-daemon"
-        # "waybar"
+        "waybar &"
         # "kitty"
         # "spotify"
         # "telegram-desktop"
@@ -3639,9 +3751,13 @@ in rec {
         bluetoothctl = spawn "bluetoothctl";
         swayosd-client = spawn "swayosd-client";
         run-flatpak = spawn "flatpak" "run";
-        run-in-terminal = spawn "kitty";
-        run-in-sh-within-kitty = spawn "kitty" "sh" "-c";
-        run-in-fish-within-kitty = spawn "kitty" "${pkgs.fish}/bin/fish" "--no-config" "-c";
+        # run-in-terminal = spawn "kitty";
+        run-in-terminal = spawn "${pkgs.alacritty}/bin/alacritty";
+        run-with-sh-within-terminal = run-in-terminal "sh" "-c";
+        # run-with-fish-within-terminal = run-in-terminal "sh" "-c";
+        run-with-fish-within-terminal = spawn "kitty" "${pkgs.fish}/bin/fish" "--no-config" "-c";
+        # run-in-sh-within-kitty = spawn "kitty" "sh" "-c";
+        # run-in-fish-within-kitty = spawn "kitty" "${pkgs.fish}/bin/fish" "--no-config" "-c";
         # focus-workspace-keybinds = builtins.listToAttrs (map:
         #   (n: {
         #     name = "Mod+${toString n}";
@@ -3677,6 +3793,9 @@ in rec {
         "XF86AudioStop".action = playerctl "stop";
         "XF86MonBrightnessUp".action = swayosd-client "--brightness" "raise";
         "XF86MonBrightnessDown".action = swayosd-client "--brightness" "lower";
+        # TODO: make variant for external displays
+        # "Shift+XF86MonBrightnessUp".action = "ddcutil";
+        # "Shift+XF86MonBrightnessDown".action = "ddcutil";
         "Mod+Shift+TouchpadScrollDown".action = swayosd-client "--brightness" "";
         "Mod+Shift+TouchpadScrollUp".action = swayosd-client "--brightness" "5%-";
         # "XF86MonBrightnessUp".action = brightnessctl "set" "10%+";
@@ -3697,7 +3816,7 @@ in rec {
         # inherit (focus-workspace-keybinds) ${builtins.attrNames focus-workspace-keybinds};
 
         # "Mod+?".action = show-hotkey-overlay;
-        "Mod+T".action = spawn "kitty";
+        "Mod+T".action = spawn "alacritty";
         "Mod+F".action = spawn "firefox";
         "Mod+Shift+F".action = spawn "firefox" "--private-window";
         "Mod+G".action = spawn "telegram-desktop";
@@ -3705,7 +3824,7 @@ in rec {
         # "Mod+D".action = spawn "webcord";
         "Mod+D".action = spawn "vesktop";
         # "Mod+E".action = run-in-kitty "yazi";
-        "Mod+E".action = run-in-sh-within-kitty "cd ~/Downloads; yazi";
+        "Mod+E".action = run-with-sh-within-terminal "cd ~/Downloads; yazi";
         # "Mod+E".action = spawn "dolphin";
         # "Mod+B".action = spawn "overskride";
         "Mod+B".action = run-in-terminal (pkgs.lib.getExe scripts.bluetoothctl-startup);
@@ -3785,7 +3904,7 @@ in rec {
 
         # "Mod+Comma".action = run-in-fish-within-kitty "${pkgs.helix}/bin/hx ~/dotfiles/{flake,configuration,home}.nix";
         # TODO: improve by checking if an editor process instance is already running, before spawning another
-        "Mod+Comma".action = run-in-fish-within-kitty "hx ~/dotfiles/{flake,configuration,home}.nix";
+        "Mod+Comma".action = run-with-fish-within-terminal "hx ~/dotfiles/{flake,configuration,home}.nix";
         "Mod+Period".action = spawn "${pkgs.swaynotificationcenter}/bin/swaync-client" "--toggle-panel";
         # TODO: color picker keybind
 
@@ -4309,4 +4428,27 @@ in rec {
   programs.aerc = {
     enable = true;
   };
+
+  # TODO: check if this is the right place to generate the global project file
+  # https://github.com/dotnet/vscode-csharp/issues/5149#issuecomment-1086893318
+  home.file.".omnisharp.json".text =
+    builtins.toJSON
+    {
+      roslynExtensionsOptions = {
+        inlayHintsOptions = {
+          enableForParameters = true;
+          enableForTypes = true;
+          forImplicitObjectCreation = true;
+          forImplicitVariableTypes = true;
+          forIndexerParameters = true;
+          forLambdaParameterTypes = true;
+          forLiteralParameters = true;
+          forObjectCreationParameters = true;
+          forOtherParameters = true;
+          suppressForParametersThatDifferOnlyBySuffix = false;
+          suppressForParametersThatMatchArgumentName = false;
+          suppressForParametersThatMatchMethodIntent = false;
+        };
+      };
+    };
 }
