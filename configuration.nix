@@ -167,8 +167,12 @@
     # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
   };
 
-  environment.variables.EDITOR = "hx";
-  environment.variables.NIXPKGS_ALLOW_UNFREE = "1";
+  environment.variables = {
+    DIRENV_LOG_FORMAT = ""; # silence `direnv` msgs
+    # EDITOR = "hx";
+    EDITOR = pkgs.lib.getExe pkgs.helix;
+    NIXPKGS_ALLOW_UNFREE = "1";
+  };
 
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -413,6 +417,8 @@
   };
 
   programs.niri.enable = true;
+  programs.niri.package = pkgs.niri;
+  # programs.niri.package = pkgs.niri-unstable;
 
   # programs.river.enable = true;
 
@@ -629,6 +635,7 @@
   # };
   # stylix.targets.niri.enable = true;
 
+  # FIXME: make work
   services.blocky = {
     enable = true;
     settings = {

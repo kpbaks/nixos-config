@@ -331,7 +331,7 @@
 
   # https://github.com/niksingh710/nsearch/blob/master/nsearch
   # TODO: finish
-  scripts.nixpkgs =
+  scripts.nixpkgs-search =
     pkgs.writers.writeFishBin "nixpkgs-search" {}
     /*
     fish
@@ -452,9 +452,17 @@ in rec {
     };
 
   # TODO: document all pkgs
+  # TODO: checkout https://github.com/azzamsa/zman
+  # TODO: checkout https://github.com/6543/batmon/
   home.packages = with pkgs;
     (builtins.attrValues scripts)
     ++ [
+      wtype # xdotool for wayland
+      jetbrains-toolbox
+      jetbrains.rider
+      # jetbrains.rust-rover
+      # jetbrains.clion
+      # jetbrains.pycharm-community-bin
       teams-for-linux
       libsForQt5.kdialog
       yad
@@ -465,10 +473,10 @@ in rec {
       # ollama-cuda
       # ollama-rocm
       calibre
-      calibre-web
+      # calibre-web
       swayosd
       soco-cli # cli tools to interact with sonos devices
-      delta
+      # delta # FIXME: does not compile tor 15 aug 15:31:05 CEST 2024
       helvum # GTK-based patchbay for pipewire
       watchexec
       # rerun # FIXME: does not compile
@@ -669,6 +677,7 @@ in rec {
       # nil # nix lsp
       taplo # toml formatter/linter/lsp
       web-ext # helper program to build browser extensions and debug instrument firefox
+      # firefox-devedition
     ];
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
@@ -798,6 +807,10 @@ in rec {
         decorations = "None";
         dynamic_padding = true;
         opacity = 0.9;
+        padding = {
+          x = 10;
+          y = 10;
+        };
         # startup_mode = "Fullscreen";
       };
     };
@@ -849,6 +862,7 @@ in rec {
     };
 
     config = {
+      # TODO: check if bat supports pr for this
       map-syntax = [
         "*.jenkinsfile:Groovy"
         "*.props:Java Properties"
@@ -859,6 +873,7 @@ in rec {
         "conanfile.txt:ini"
         "justfile:make"
         "Justfile:make"
+        "*.msproj:xml"
       ];
     };
   };
@@ -920,9 +935,9 @@ in rec {
   programs.firefox = {
     enable = true;
     # TODO: wrap in `web-ext`
-    # package = pkgs.firefox;
+    package = pkgs.firefox;
+    # package = pkgs.firefox-devedition;
     # TODO: declare extensions here
-    package = pkgs.firefox-devedition;
     # FIXME: does not work
     # enableGnomeExtensions = config.services.gnome-browser-connector.enable;
     policies = {
@@ -1165,80 +1180,356 @@ in rec {
       [
         marksman
         taplo
+        typos
       ]
       ++ [
         inputs.simple-completion-language-server.defaultPackage.${pkgs.system}
       ];
-    # settings = {
-    #   theme = "gruvbox_dark_hard";
-    #   editor = {
-    #     auto-completion = true;
-    #     auto-format = true;
-    #     auto-info = true;
-    #     auto-pairs = true;
-    #     bufferline = "always";
-    #     color-modes = true;
-    #     completion-replace = true;
-    #     completion-trigger-len = 1;
-    #     cursor-shape = {
-    #       insert = "bar";
-    #       normal = "block";
-    #       select = "underline";
-    #     };
-    #     cursorcolumn = false;
-    #     cursorline = true;
-    #     file-picker = {hidden = false;};
-    #     gutters = ["diff" "diagnostics" "line-numbers" "spacer"];
-    #     idle-timeout = 400;
-    #     indent-guides = {
-    #       character = "╎";
-    #       render = true;
-    #       skip-levels = 1;
-    #     };
-    #     line-number = "relative";
-    #     lsp = {
-    #       auto-signature-help = true;
-    #       display-inlay-hints = true;
-    #       display-messages = true;
-    #       display-signature-help-docs = true;
-    #       enable = true;
-    #       snippets = true;
-    #     };
-    #     mouse = true;
-    #     search = {
-    #       smart-case = false;
-    #       wrap-around = true;
-    #     };
-    #     smart-tab = {
-    #       enable = true;
-    #       supersede-menu = false;
-    #     };
-    #     soft-wrap = {enable = false;};
-    #     statusline = {
-    #       center = ["file-name" "file-modification-indicator" "diagnostics"];
-    #       left = ["mode" "spinner" "version-control" "separator"];
-    #       right = ["separator" "selections" "position" "file-encoding" "file-line-ending" "file-type"];
-    #       separator = "│";
-    #     };
-    #
-    #     true-color = true;
-    #     undercurl = true;
-    #     whitespace = {
-    #       characters = {
-    #         nbsp = "⍽";
-    #         newline = "⏎";
-    #         space = "·";
-    #         tab = "→";
-    #         tabpad = "·";
-    #       };
-    #       render = {
-    #         newline = "none";
-    #         space = "none";
-    #         tab = "none";
-    #       };
-    #     };
-    #   };
-    # };
+
+    ignores = [
+      ".build/"
+      "build/"
+      "target/"
+      ".direnv/"
+    ];
+
+    settings = {
+      theme = "catppuccin_mocha";
+      editor = {
+        cursorline = true;
+        line-number = "relative";
+        lsp.display-messages = true;
+        lsp.auto-signature-help = true;
+        lsp.display-inlay-hints = true;
+        lsp.snippets = true;
+        lsp.display-signature-help-docs = true;
+        completion-trigger-len = 1;
+        idle-timeout = 50; # ms
+        auto-info = true;
+        auto-format = true;
+        undercurl = true;
+        mouse = true;
+        preview-completion-insert = true;
+        color-modes = true;
+        gutters = ["diff" "diagnostics" "line-numbers" "spacer"];
+        true-color = true;
+        bufferline = "always";
+        end-of-line-diagnostics = "hint";
+        inline-diagnostics.cursor-line = "warning"; # show warnings and errors on the cursorline inline
+        cursor-shape = {
+          insert = "bar";
+          normal = "block";
+          select = "underline";
+        };
+        file-picker = {
+          hidden = false;
+          git-ignore = true;
+        };
+        soft-wrap.enable = true;
+        smart-tab = {
+          enable = true;
+          supersede-menu = true;
+        };
+        indent-guides = {
+          render = true;
+          character = "╎";
+          skip-levels = 1;
+        };
+        statusline = {
+          separator = "│";
+          left = [
+            "mode"
+            "spinner"
+            "version-control"
+            # "selections"
+            "separator"
+          ];
+          center = [
+            "file-name"
+            "file-modification-indicator"
+            "diagnostics"
+            # "file-type"
+          ];
+          right = [
+            "register"
+            "separator"
+            "workspace-diagnostics"
+            "selections"
+            "position"
+            "file-encoding"
+            "file-line-ending"
+            "file-type"
+          ];
+
+          mode.normal = "NORMAL";
+          mode.insert = "INSERT";
+          mode.select = "SELECT";
+        };
+        search = {
+          smart-case = false;
+          wrap-around = true;
+        };
+      };
+      keys.insert = {
+        C-space = "signature_help";
+      };
+      keys.normal = {
+        ret = ["open_below" "normal_mode"];
+        D = ["select_mode" "goto_line_end" "delete_selection"];
+        H = ["goto_line_start" "goto_first_nonwhitespace"];
+        Y = [
+          "save_selection"
+          "select_mode"
+          "goto_line_end"
+          "yank"
+          "jump_backward"
+        ]; # Similar to Y in nvim
+        w = [
+          "move_prev_word_start"
+          # "select_textobject_inner",
+          # "w",
+          "move_next_word_start"
+        ];
+        W = [
+          "move_prev_long_word_start"
+          # "select_textobject_inner",
+          # "w",
+          "move_next_long_word_start"
+        ];
+
+        "*" = [
+          "move_char_right"
+          "move_prev_word_start"
+          "move_next_word_end"
+          "search_selection"
+          "make_search_word_bounded"
+          "search_next"
+        ];
+        "#" = [
+          "move_char_right"
+          "move_prev_word_start"
+          "move_next_word_end"
+          "search_selection"
+          "make_search_word_bounded"
+          "search_prev"
+        ];
+        A-down = [
+          "extend_to_line_bounds"
+          "yank"
+          "delete_selection"
+          "move_line_down"
+          "paste_before"
+        ];
+        A-j = [
+          "extend_to_line_bounds"
+          "yank"
+          "delete_selection"
+          "move_line_down"
+          "paste_before"
+        ];
+        A-up = [
+          "extend_to_line_bounds"
+          "yank"
+          "delete_selection"
+          "move_line_up"
+          "paste_before"
+        ];
+        A-k = [
+          "extend_to_line_bounds"
+          "yank"
+          "delete_selection"
+          "move_line_up"
+          "paste_before"
+        ];
+
+        space.space = "last_picker";
+        space.w = ":w";
+        C-s = ":w";
+        space.q = ":buffer-close";
+        space.Q = ":buffer-close-others";
+        C-q = ":q";
+        space.p = "paste_clipboard_before"; # I like <space>P more as the default
+        space.n = ":set-option line-number absolue";
+        space.N = ":set-option line-number relative";
+        space.t.i = ":toggle-option lsp.display-inlay-hints";
+        space.t.w = ":toggle-option soft-wrap.enable";
+        space.l = {
+          r = ":lsp-restart";
+          s = ":lsp-stop";
+          w = ":lsp-workspace-command";
+        };
+        backspace = ":buffer-previous";
+        a = ["append_mode" "collapse_selection"]; # Similar to "a" in neovim
+        esc = [
+          "collapse_selection"
+          "keep_primary_selection"
+        ]; # use esc to remove selection, AND to collapse multiple cursors into one
+        X = "extend_line_above";
+        C-left = "jump_view_left";
+        C-right = "jump_view_right";
+        C-up = "jump_view_up";
+        C-down = "jump_view_down";
+        C-h = "jump_view_left";
+        C-l = "jump_view_right";
+        C-k = "jump_view_up";
+        C-j = "jump_view_down";
+        # just like in a browser
+        C-pageup = "goto_previous_buffer";
+        C-pagedown = "goto_next_buffer";
+        g = {
+          a = "code_action"; # `ga` -> show possible code actions
+          q = ":reflow";
+          Y = [
+            "extend_line_below"
+            "yank"
+            "toggle_comments"
+            "paste_after"
+            "goto_line_start"
+          ];
+          H = ["select_mode" "goto_line_start"];
+          L = ["select_mode" "goto_line_end"];
+          S = ["select_mode" "goto_first_nonwhitespace"];
+
+          left = "jump_view_left";
+          right = "jump_view_right";
+          up = "jump_view_up";
+          down = "jump_view_down";
+
+          # "~" = "switch_case"
+          u = "switch_to_lowercase";
+          U = "switch_to_uppercase";
+        };
+        "[".b = ":buffer-previous";
+        "]".b = ":buffer-next";
+      };
+      keys.select = {
+        A-x = "extend_to_line_bounds";
+        X = ["extend_line_up" "extend_to_line_bounds"];
+        g = {
+          u = "switch_to_lowercase";
+          U = "switch_to_uppercase";
+        };
+      };
+    };
+
+    languages = {
+      language-server.clangd = {
+        command = "${pkgs.clang-tools}/bin/clangd";
+        args = [
+          "--completion-style"
+          "detailed"
+          "--pretty"
+          "--all-scopes-completion"
+          "--clang-tidy"
+        ];
+      };
+      language-server.quick-lint-js = {
+        command = "quick-lint-js";
+        args = ["--lsp-server"];
+      };
+      language-server.typos = {
+        command = "${pkgs.typos-lsp}/bin/typos-lsp";
+        environment.RUST_LOG = "error";
+        config.diagnosticSeverity = "Warning";
+      };
+
+      language-server.nixd = {
+        command = "${pkgs.nixd}/bin/nixd";
+        args = ["--inlay-hints" "--semantic-tokens"];
+      };
+
+      language-server.nu-lsp = {
+        command = "${pkgs.nushell}/bin/nu";
+        args = ["--lsp"];
+        language-id = "nu";
+      };
+      language-server.pyright = {
+        command = "${pkgs.pyright}/bin/pyright";
+      };
+      language-server.ruff-lsp = {
+        command = "${pkgs.ruff-lsp}/bin/ruff-lsp";
+        language-id = "python";
+      };
+
+      language = let
+        indent = {
+          tab-width = 4;
+          unit = "\t";
+        };
+      in [
+        {
+          name = "markdown";
+          # TODO: marksman
+          lsp-servers = ["typos"];
+        }
+        {
+          name = "bash";
+          formatter.command = "${pkgs.shfmt}/bin/shfmt";
+          auto-format = true;
+          inherit indent;
+        }
+        {
+          name = "cpp";
+          auto-format = false;
+          language-servers = ["clangd"];
+          inherit indent;
+        }
+        {
+          name = "fish";
+          auto-format = true;
+          formatter.command = "${pkgs.fish}/bin/fish_indent";
+          file-types = ["fish"];
+        }
+        {
+          name = "json";
+          auto-format = true;
+          formatter = {
+            command = "${pkgs.jaq}/bin/jaq";
+            args = ["."];
+          };
+        }
+        {
+          name = "nickel";
+          auto-format = true;
+          formatter = {
+            command = "${pkgs.nickel}/bin/nickel";
+            args = ["format"];
+          };
+        }
+        {
+          name = "nix";
+          auto-format = true;
+          formatter = {
+            command = "${pkgs.nixfmt-rfc-style}/bin/nixfmt";
+          };
+          language-servers = ["nixd"];
+          inherit indent;
+        }
+        {
+          name = "nu";
+          auto-format = true;
+          language-servers = ["pyright" "ruff-lsp"];
+        }
+        {
+          name = "toml";
+          auto-format = true;
+          formatter = {
+            command = "${pkgs.taplo}/bin/taplo";
+            args = ["format" "-"];
+          };
+          language-servers = ["taplo"];
+        }
+        {
+          name = "yaml";
+          file-types = ["yml" "yaml" ".clang-format"];
+        }
+        {
+          name = "kitty-conf";
+          source.git = "https://github.com/clo4/tree-sitter-kitty-conf";
+          source.rev = "main";
+        }
+      ];
+    };
   };
 
   # # TODO: get to work
@@ -1482,7 +1773,8 @@ in rec {
     # $\{env_var.AGAIN_DYNAMIC_ENABLED}
     settings = {
       format = ''$shell$jobs$shlvl$character'';
-      right_format = ''$direnv$directory$git_branch$git_commit$git_state$git_metrics$git_status$package$time'';
+      # right_format = ''$direnv$directory$git_branch$git_commit$git_state$git_metrics$git_status$package$time'';
+      right_format = ''$direnv$directory$git_branch$git_commit$git_state$git_metrics$git_status$package'';
       add_newline = false;
       git_metrics.disabled = true;
       directory.fish_style_pwd_dir_length = 2;
@@ -1506,6 +1798,11 @@ in rec {
         disabled = false;
         style = "cyan";
         format = "[$time]($style)";
+      };
+      jobs = {
+        symbol = "jobs ";
+        number_threshold = 1;
+        symbol_threshold = 1;
       };
       shlvl = {
         disabled = true;
@@ -1676,28 +1973,34 @@ in rec {
     enableUpdateCheck = true;
     # extensions = with pkgs.vscode-extensions; [
     extensions = with extensions.vscode-marketplace; [
-      zxh404.vscode-proto3
-      # tiehuis.zig
-      gleam.gleam
-      tomoki1207.pdf
-      nvarner.typst-lsp
-      usernamehw.errorlens
-      tamasfe.even-better-toml
-      ms-vscode.cpptools
-      llvm-vs-code-extensions.vscode-clangd
-      ms-python.python
-      ms-vsliveshare.vsliveshare
-      ms-toolsai.jupyter
-      yzhang.markdown-all-in-one
-      rust-lang.rust-analyzer
-      supermaven.supermaven
-      catppuccin.catppuccin-vsc-icons
-      catppuccin.catppuccin-vsc
-      # https://github.com/nix-community/vscode-nix-ide
-      jnoortheen.nix-ide
       # github.copilot
       # github.copilot-chat
-      # tabnine.tabnine-vscode
+      # https://github.com/nix-community/vscode-nix-ide
+      # llvm-vs-code-extensions.vscode-clangd
+      # tiehuis.zig
+      avaloniateam.vscode-avalonia
+      decodetalkers.neocmake-lsp-vscode
+      catppuccin.catppuccin-vsc
+      catppuccin.catppuccin-vsc-icons
+      cheshirekow.cmake-format
+      github.classroom
+      gleam.gleam
+      jnoortheen.nix-ide
+      mguellsegarra.highlight-on-copy
+      ms-python.python
+      ms-toolsai.jupyter
+      ms-vscode.cpptools
+      ms-vsliveshare.vsliveshare
+      nvarner.typst-lsp
+      rust-lang.rust-analyzer
+      supermaven.supermaven
+      tamasfe.even-better-toml
+      tomoki1207.pdf
+      twxs.cmake
+      usernamehw.errorlens
+      yzhang.markdown-all-in-one
+      zxh404.vscode-proto3
+      tabnine.tabnine-vscode
     ];
     userSettings = let
       # TODO: get to work
@@ -2737,16 +3040,16 @@ in rec {
           "wlr/taskbar"
         ];
         modules-right = [
-          "image#nixos-logo"
+          # "image#nixos-logo"
         ];
 
-        "image#nixos-logo" = {
-          path = home.homeDirectory + "/.config/waybar/nixos-logo.png";
-          size = 32;
-          # interval = 60 * 60 * 24;
-          on-click = "${pkgs.xdg-utils}/bin/xdg-open 'https://nixos.org/'";
-          tooltip = true;
-        };
+        # "image#nixos-logo" = {
+        #   path = home.homeDirectory + "/.config/waybar/nixos-logo.png";
+        #   size = 32;
+        #   # interval = 60 * 60 * 24;
+        #   on-click = "${pkgs.xdg-utils}/bin/xdg-open 'https://nixos.org/'";
+        #   tooltip = true;
+        # };
 
         "wlr/taskbar" = {
           all-outputs = true;
@@ -3655,6 +3958,21 @@ in rec {
           opacity = 0.95;
         }
         {
+          open-maximized = true;
+        }
+        {
+          matches = [
+            {app-id = "Alacritty";}
+            {app-id = "Kitty";}
+          ];
+          open-maximized = false;
+        }
+        {
+          matches = [{app-id = "Bitwarden";}];
+          block-out-from = "screencast";
+          # block-out-from = "screen-capture";
+        }
+        {
           # TODO: add more rules
           # FIXME: does not match private browsing in firefox
           matches = [
@@ -3752,7 +4070,8 @@ in rec {
         swayosd-client = spawn "swayosd-client";
         run-flatpak = spawn "flatpak" "run";
         # run-in-terminal = spawn "kitty";
-        run-in-terminal = spawn "${pkgs.alacritty}/bin/alacritty";
+        # run-in-terminal = spawn "${pkgs.alacritty}/bin/alacritty";
+        run-in-terminal = spawn "${pkgs.kitty}/bin/kitty";
         run-with-sh-within-terminal = run-in-terminal "sh" "-c";
         # run-with-fish-within-terminal = run-in-terminal "sh" "-c";
         run-with-fish-within-terminal = spawn "kitty" "${pkgs.fish}/bin/fish" "--no-config" "-c";
@@ -3770,6 +4089,15 @@ in rec {
         "XF86AudioLowerVolume".action = swayosd-client "--output-volume" "lower";
         "XF86AudioMute".action = swayosd-client "--output-volume" "mute-toggle";
         "XF86AudioMicMute".action = swayosd-client "--input-volume" "mute-toggle";
+
+        # TODO: bind to an action that toggles light/dark theme
+        # hint: it is the f12 key with a shaded moon on it
+        # "XF86Sleep".action = "";
+
+        # TODO: use, this is the "fly funktion knap"
+        # "XF86RFKill".action = "";
+
+        # TODO: bind a key to the alternative to f3
 
         # command = "${pkgs.swayosd}/bin/swayosd-client --output-volume mute-toggle";
         # command = "${pkgs.swayosd}/bin/swayosd-client --input-volume mute-toggle";
@@ -4369,8 +4697,7 @@ in rec {
     };
 
   # TODO: use
-
-  # home.file.""
+  # https://github.com/ErikReider/SwayOSD/blob/11271760052c4a4a4057f2d287944d74e8fbdb58/data/style/style.scss
   xdg.configFile."swayosd/style.css".text =
     /*
     css
@@ -4431,7 +4758,7 @@ in rec {
 
   # TODO: check if this is the right place to generate the global project file
   # https://github.com/dotnet/vscode-csharp/issues/5149#issuecomment-1086893318
-  home.file.".omnisharp.json".text =
+  home.file.".omnisharp/omnisharp.json".text =
     builtins.toJSON
     {
       roslynExtensionsOptions = {
@@ -4451,4 +4778,47 @@ in rec {
         };
       };
     };
+
+  # TODO: finish
+  # TODO: come up with a better name
+  # https://haseebmajid.dev/posts/2023-10-08-how-to-create-systemd-services-in-nix-home-manager/
+  systemd.user.services.rfkill-notify-when-devices-state-changes = {
+    unit.description = "display notification whenever the on/off state of either wifi or bluetooth changes";
+    install.wantedby = ["default.target"];
+    service.execstart =
+      pkgs.writers.writefishbin "rfkill-notify-when-devices-state-changes" {}
+      /*
+      fish
+      */
+      ''
+
+        ${pkgs.util-linux}/bin/rfkill event | while read date time _idx id _type type _op op _soft soft _hard hard
+
+        switch $soft
+          case 0 # unblocked
+          case 1 # blocked
+        end
+
+        end
+      '';
+  };
+
+  systemd.user.services.open-https-urls-copied-to-clipboard = {
+    Unit.description = "Open https urls copied to clipboard in $BROWSER";
+    Install.WantedBy = ["default.target"];
+    Service.ExecStart =
+      pkgs.writers.writeFishBin "__open-https-urls-copied-to-clipboard" {}
+      /*
+      fish
+      */
+      ''
+        # wl-paste
+        ${pkgs.wl-wl-clipboard}/bin/wl-paste --watch echo "" | while read _ignore
+          set -l content (${pkgs.wl-wl-clipboard}/bin/wl-paste)
+          if string match --regex "^\s*https?://\S+" -- $content
+            ${pkgs.firefox}/bin/firefox (string trim -- "$content")
+          end
+        end
+      '';
+  };
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#! nix-shell -i fish -p gum git difftastic
+#! nix-shell -i fish -p gum git difftastic libnotify
 
 set -l reset (set_color normal)
 set -l bold (set_color --bold)
@@ -33,8 +33,6 @@ if set --query _flag_help
 
     return 0
 end >&2
-
-
 
 # 1. check if ./home.nix has any changes since its latest commit
 # - if it does not, then print a message and quit.
@@ -70,17 +68,33 @@ if set --query _flag_dry_run
     exit 0
 end
 
+# home-manager switch $hm_switch_opts --flake . | while read line
+
+# end
+
 
 # if gum spin --title "building derivation..." -- home-manager switch $hm_switch_opts --file ./home.nix
+set -l icon nix-snowflake
+set -l urgency critical
+set -l notify_send_opts --icon=$icon --urgency=$urgency
+notify-send $notify_send_opts --print-id home-manager | read notification_id
+
 if eval $expr
+    # TODO: can we ask niri to focus the terminal emulator running
     set -l generation (home-manager generations | head -1 | string match --groups-only --regex 'id (\d+)')
     set -l message "feat(home): derived generation $generation"
-    gum confirm "stage ./home.nix and commit with message: '$message'?" --default=true
+    set -l prompt "stage ./home.nix and commit with message: '$message'?"
+    notify-send $notify_send_opts home-manager $prompt
+    gum confirm $prompt --default=true
     and git add ./home.nix
     # TODO: just use `git commit` and enter commit msg in editor, but have it default to $message
     and git commit --edit --message $message
     and git log -1 HEAD
-    and gum confirm "push to remote: $remote?" --default=true
+    and begin
+        set -l prompt "push to remote: $remote?"
+        notify-send $notify_send_opts home-manager $prompt
+        gum confirm $prompt --default=true
+    end
     and git push
 end
 
