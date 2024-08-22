@@ -7,8 +7,8 @@
   inputs,
   username,
   ...
-}
-: rec {
+}:
+rec {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -16,22 +16,29 @@
   ];
 
   nix.settings = {
-    experimental-features = ["nix-command" "flakes"];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
     builders-use-substitutes = true;
     substituters = [
       "https://cache.nixos.org"
       "https://nix-community.cachix.org"
+      "https://cosmic.cachix.org/"
     ];
     extra-substituters = [
       "https://anyrun.cachix.org"
+      "https://yazi.cachix.org"
     ];
     trusted-public-keys = [
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE="
     ];
     extra-trusted-public-keys = [
       "anyrun.cachix.org-1:pqBobmOjI7nKlsUMV25u9QHa9btJK65/C8vnO3p346s="
+      "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
     ];
-    trusted-substituters = ["https://cache.nixos.org"];
+    trusted-substituters = [ "https://cache.nixos.org" ];
   };
 
   nix.settings.trusted-users = [
@@ -47,7 +54,7 @@
   nix.settings.auto-optimise-store = true; # automatically detects files in the store that have identical contents, and replaces them with hard links to a single copy
 
   nix.optimise.automatic = true;
-  nix.optimise.dates = ["22:30"];
+  nix.optimise.dates = [ "22:30" ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
@@ -82,15 +89,13 @@
   boot.kernel.sysctl."kernel.kptr_restrict" = pkgs.lib.mkForce 0;
 
   # so `perf` can find kernel modules
-  systemd.tmpfiles.rules = [
-    "L /lib - - - - /run/current/system/lib"
-  ];
+  systemd.tmpfiles.rules = [ "L /lib - - - - /run/current/system/lib" ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.enableContainers = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.supportedFilesystems = ["ntfs"]; # Be able to mount USB drives with NTFS fs
+  boot.supportedFilesystems = [ "ntfs" ]; # Be able to mount USB drives with NTFS fs
 
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
@@ -106,7 +111,10 @@
   };
   hardware.tuxedo-keyboard.enable = true;
   # FIXME: 'evdi' not found
-  boot.kernelModules = ["evdi" "tuxedo_keyboard"];
+  boot.kernelModules = [
+    "evdi"
+    "tuxedo_keyboard"
+  ];
   boot.kernelParams = [
     "tuxedo_keyboard.mode=0"
     "tuxedo_keyboard.brightness=255"
@@ -117,7 +125,7 @@
     enable = true;
     powerOnBoot = true;
     package = pkgs.bluez;
-    settings = {};
+    settings = { };
   };
 
   # Make it possible to run downloaded appimages
@@ -132,26 +140,28 @@
 
   # TODO: get steam to work
   specialisation.gaming.configuration = {
-    system.nixos.tags = ["gaming"];
+    system.nixos.tags = [ "gaming" ];
     # Nvidia Configuration
-    services.xserver.videoDrivers = ["nvidia"];
+    services.xserver.videoDrivers = [ "nvidia" ];
     hardware.graphics.enable = true;
     hardware.nvidia.modesetting.enable = true;
-    hardware.nvidia.prime = let
-      inherit (pkgs.lib) mkForce;
-    in {
-      sync.enable = mkForce false;
-      offload = rec {
-        enable = mkForce true;
-        enableOffloadCmd = enable;
-      };
+    hardware.nvidia.prime =
+      let
+        inherit (pkgs.lib) mkForce;
+      in
+      {
+        sync.enable = mkForce false;
+        offload = rec {
+          enable = mkForce true;
+          enableOffloadCmd = enable;
+        };
 
-      # NOTE: ids found with `lspci | grep VGA`
-      # Bus ID of the NVIDIA GPU. You can find it using lspci, either under 3D or VGA
-      nvidiaBusId = "PCI:01:00:0";
-      # Bus ID of the Intel GPU. You can find it using lspci, either under 3D or VGA
-      intelBusId = "PCI:00:02:0";
-    };
+        # NOTE: ids found with `lspci | grep VGA`
+        # Bus ID of the NVIDIA GPU. You can find it using lspci, either under 3D or VGA
+        nvidiaBusId = "PCI:01:00:0";
+        # Bus ID of the Intel GPU. You can find it using lspci, either under 3D or VGA
+        intelBusId = "PCI:00:02:0";
+      };
 
     hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
     # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
@@ -200,7 +210,16 @@
   # Enable the X11 windowing system.
   services.xserver.enable = true;
   # Enable the KDE Plasma Desktop Environment.
-  services.displayManager.sddm.enable = true;
+  services.displayManager.sddm = {
+    enable = true;
+    wayland.enable = true;
+    settings = {
+      Autologin = {
+        Session = "niri";
+        User = username;
+      };
+    };
+  };
   # services.desktopManager.plasma6.enable = true;
   # services.xserver.desktopManager.plasma5.enable = true;
   # services.xserver.desktopManager.gnome.enable = true;
@@ -215,7 +234,7 @@
 
   # services.xserver.videoDrivers = ["displaylink" "modesetting" "nvidia"];
   # services.xserver.videoDrivers = ["displaylink" "modesetting"];
-  services.xserver.videoDrivers = ["modesetting"];
+  services.xserver.videoDrivers = [ "modesetting" ];
   # services.xserver.displayManager.sessionCommands = ''
   #   ${pkgs.lib.getBin pkgs.xorg.xrandr}/bin/xrandr --setprovideroutputsource 2 0
   # '';
@@ -235,12 +254,13 @@
 
   # Enable sound with pipewire.
   # sound.enable = true;
-
   hardware.pulseaudio.enable = false;
-  hardware.pulseaudio.extraModules = [pkgs.pulseaudio-modules-bt];
+  nixpkgs.config.pulseaudio = true;
+  hardware.pulseaudio.extraModules = [ pkgs.pulseaudio-modules-bt ];
   hardware.pulseaudio.package = pkgs.puleaudioFull;
 
   security.rtkit.enable = true;
+  security.polkit.enable = true;
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -264,10 +284,16 @@
   users.users.kpbaks = {
     isNormalUser = true;
     description = "Kristoffer Sørensen";
-    extraGroups = ["networkmanager" "wheel" "docker" "podman" "storage"];
-    packages = []; # managed by home-manager, see ./home.nix
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "docker"
+      "podman"
+      "storage"
+    ];
+    packages = [ ]; # managed by home-manager, see ./home.nix
   };
-  users.groups.input.members = [username];
+  users.groups.input.members = [ username ];
 
   fonts.packages = with pkgs; [
     (nerdfonts.override {
@@ -287,43 +313,50 @@
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
+    # Gaming
     mangohud
     protonup
     protonup-qt
-    btrfs-progs
-    lutris
-    heroic
-    bottles
-
-    chase
-    nh # nix helper
-    nix-output-monitor # `nom`
-    nvd # nix version diff
-    systemctl-tui
+    # lutris
+    # heroic
+    # bottles
     wget
     atool # {,de}compress various compression formats
     helix # text editor
-    alejandra # nix formatter
-    nixpkgs-fmt
-    doas # sudo alternative
-    cachix
+    git
+    gh
+    # Linux
+    btrfs-progs # Tools to interact with btrfs file system partitions
     udev
+    systemctl-tui
+    systeroid # A more powerful alternative to sysctl(8) with a terminal user interface 🐧
+    kmon # tui to view state of loaded kernel modules
+    lshw # list hardware
+    pciutils # `lscpi`
+    lsof # "List open file descriptors"
+    # nvtopPackages.full
+    ddcutil # control external displays, such as chaning their brightness
+    findutils # find, locate
+    moreutils # `sponge` etc.
+
+    # Nix(os) tools
+    nixfmt-rfc-style
+    # alejandra # nix formatter
+    # nixpkgs-fmt
+    nh # nix helper
+    nix-output-monitor # `nom`
+    nvd # nix version diff
+    # doas # sudo alternative
+    cachix
+
+    # Networking inspection tools
     dig # lookup dns name resolving
     dogdns # loopup dns name resolving, but in rust!
     nmap
-    # tmux
-    wl-clipboard
     sniffnet
-    git
-    gh
-    lshw # list hardware
-    pciutils # `lscpi`
-    # nvtopPackages.full
-    ddcutil # control external displays, such as chaning their brightness
-    (pkgs.writers.writeFishBin "logout" {}
-      /*
-      fish
-      */
+
+    (pkgs.writers.writeFishBin "logout" { }
+      # fish
       ''
         set -l session_ids (${pkgs.systemd}/bin/loginctl list-sessions \
         | ${pkgs.coreutils}/bin/tail +2 \
@@ -338,13 +371,10 @@
         ${pkgs.gum}/bin/gum confirm "Logout?" --default=true --affirmative "Yes" --negative "No"
         and ${pkgs.systemd}/bin/loginctl kill-session $session_ids[1]
 
-      '')
-    (pkgs.writers.writeFishBin
-      "nixos-diff"
-      {}
-      /*
-      fish
-      */
+      ''
+    )
+    (pkgs.writers.writeFishBin "nixos-diff" { }
+      # fish
       ''
         set -l reset (set_color normal)
         set -l red (set_color red)
@@ -408,11 +438,12 @@
         echo
 
         eval $expr
-      '')
+      ''
+    )
   ];
 
   programs.hyprland = {
-    enable = true;
+    enable = false;
     xwayland.enable = true;
   };
 
@@ -452,20 +483,20 @@
 
   programs.firejail = {
     enable = true;
-    wrappedBinaries = {
-      librewolf = {
-        executable = "${pkgs.librewolf}/bin/librewolf";
-        profile = "${pkgs.firejail}/etc/firejail/librewolf.profile";
-        extraArgs = [
-          # Required for U2F USB stick
-          "--ignore=private-dev"
-          # Enforce dark mode
-          "--env=GTK_THEME=Adwaita:dark"
-          # Enable system notifications
-          "--dbus-user.talk=org.freedesktop.Notifications"
-        ];
-      };
-    };
+    # wrappedBinaries = {
+    #   librewolf = {
+    #     executable = "${pkgs.librewolf}/bin/librewolf";
+    #     profile = "${pkgs.firejail}/etc/firejail/librewolf.profile";
+    #     extraArgs = [
+    #       # Required for U2F USB stick
+    #       "--ignore=private-dev"
+    #       # Enforce dark mode
+    #       "--env=GTK_THEME=Adwaita:dark"
+    #       # Enable system notifications
+    #       "--dbus-user.talk=org.freedesktop.Notifications"
+    #     ];
+    #   };
+    # };
   };
 
   programs.gamescope.enable = true;
@@ -646,21 +677,27 @@
       # For initially solving DoH/DoT Requests when no system Resolver is available.
       bootstrapDns = {
         upstream = "https://one.one.one.one/dns-query";
-        ips = ["1.1.1.1" "1.0.0.1"];
+        ips = [
+          "1.1.1.1"
+          "1.0.0.1"
+        ];
       };
       #Enable Blocking of certian domains.
       blocking = {
         blackLists = {
           #Adblocking
-          ads = ["https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"];
+          ads = [ "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" ];
           #Another filter for blocking adult sites
-          adult = ["https://blocklistproject.github.io/Lists/porn.txt"];
+          adult = [ "https://blocklistproject.github.io/Lists/porn.txt" ];
           #You can add additional categories
           # social-media = [""];
         };
         #Configure what block categories are used
         clientGroupsBlock = {
-          default = ["ads" "adult"];
+          default = [
+            "ads"
+            "adult"
+          ];
           # kids-ipad = ["ads" "adult"];
         };
       };
@@ -674,4 +711,27 @@
 
   # KDE partition manager
   programs.partition-manager.enable = true;
+
+  # programs.regreet.enable = config.services.greetd.enable;
+  programs.regreet.enable = false;
+  # https://github.com/rharish101/ReGreet
+  services.greetd = {
+    enable = !config.services.displayManager.sddm.enable;
+    settings = {
+      # default_session.command = ''${pkgs.greetd.regreet}/bin/regreet'';
+      # default_session.command = ''
+      #   ${pkgs.greetd.tuigreet}/bin/tuigreet \
+      #     --time \
+      #     --remember \
+      #     --asterisks \
+      #     --user-menu \
+      #     --cmd niri-session
+      # '';
+    };
+  };
+
+  # niri-session
+  environment.etc."greetd/environments".text = '''';
+
+  # services.fwupd.enable = true;
 }

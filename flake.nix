@@ -9,6 +9,8 @@
       "https://cachix.cachix.org"
       "https://hyprland.cachix.org"
       "https://helix.cachix.org"
+      "https://yazi.cachix.org"
+      "https://cosmic.cachix.org/"
     ];
     extra-trusted-public-keys = [
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
@@ -16,6 +18,8 @@
       "cachix.cachix.org-1:eWNHQldwUO7G2VkjpnjDbWwy4KQ/HNxht7H4SSoMckM="
       "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
       "helix.cachix.org-1:ejp9KQpR1FBI2onstMQ34yogDm4OgU2ru6lIwPvuCVs="
+      "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
+      "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE="
     ];
   };
 
@@ -34,8 +38,10 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    home-manager.url = "github:nix-community/home-manager/master";
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    home-manager = {
+      url = "github:nix-community/home-manager/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
@@ -46,10 +52,20 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
+    niri = {
+      url = "github:sodiboo/niri-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixos-cosmic = {
+      url = "github:lilyinstarlight/nixos-cosmic";
+      inputs.nixpkgs.follows = "nixpkgs";
+      # inputs.home-manager.follows = "home-manager";
+    };
 
-    niri.url = "github:sodiboo/niri-flake";
-    niri.inputs.nixpkgs.follows = "nixpkgs";
-    hyprland.url = "github:hyprwm/Hyprland";
+    hyprland = {
+      url = "github:hyprwm/Hyprland";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # TODO: what do i use this for?
     hyprgrass = {
       url = "github:horriblename/hyprgrass";
@@ -66,24 +82,35 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    simple-completion-language-server.url = "github:estin/simple-completion-language-server";
-    # TODO: use
-    yazi.url = "github:sxyazi/yazi";
+    simple-completion-language-server = {
+      url = "github:estin/simple-completion-language-server";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    yazi = {
+      url = "github:sxyazi/yazi";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     catppuccin.url = "github:catppuccin/nix";
     # TODO: use
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     # TODO: use
-    stylix.url = "github:danth/stylix";
+    stylix = {
+      url = "github:danth/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # TODO: use
-    anyrun.url = "github:Kirottu/anyrun";
-    anyrun.inputs.nixpkgs.follows = "nixpkgs";
-    anyrun-nixos-options.url = "github:n3oney/anyrun-nixos-options";
+    # anyrun.url = "github:Kirottu/anyrun";
+    # anyrun.inputs.nixpkgs.follows = "nixpkgs";
+    # anyrun-nixos-options.url = "github:n3oney/anyrun-nixos-options";
 
     # TODO: use
     ags.url = "github:Aylur/ags";
     # atdo.url = "github:kpbaks/atdo";
     # atdo.inputs.nixpkgs.follows = "nixpkgs";
-    swww.url = "github:LGFae/swww";
+    swww = {
+      url = "github:LGFae/swww";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     umu = {
       url = "git+https://github.com/Open-Wine-Components/umu-launcher/?dir=packaging\/nix&submodules=1";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -91,63 +118,79 @@
 
     # TODO: checkout
     # https://github.com/fufexan/nix-gaming
+
+    nixos-cli = {
+      url = "github:water-sucks/nixos";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-    home-manager,
-    ...
-  } @ inputs: let
-    hostname = "nixos";
-    username = "kpbaks";
-    system = "x86_64-linux";
-    overlays = [
-      inputs.niri.overlays.niri
-      # inputs.neovim-nightly-overlay.overlay
-    ];
-    pkgs = import nixpkgs {
-      inherit system overlays;
-      config.allowUnfree = true;
-    };
-    # pkgs = nixpkgs.legacyPackages.${system};
-  in {
-    formatter.${system} = pkgs.alejandra;
-    nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
-      inherit system;
-      specialArgs = {inherit inputs username;};
-      modules = [
-        ./configuration.nix
-        # inputs.stylix.nixosModules.stylix
-        inputs.niri.nixosModules.niri
-        # inputs.nixos-hardware.nixosModules.tuxedo-infinitybook-pro14-gen7
-        # inputs.sops-nix.nixosModules.sops
+  outputs =
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      ...
+    }@inputs:
+    let
+      hostname = "nixos";
+      username = "kpbaks";
+      system = "x86_64-linux";
+      overlays = [
+        inputs.niri.overlays.niri
+        # inputs.neovim-nightly-overlay.overlay
       ];
-    };
-
-    homeConfigurations = {
-      "${username}@${hostname}" = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
-        extraSpecialArgs = {inherit inputs username system;};
+      pkgs = import nixpkgs {
+        inherit system overlays;
+        config.allowUnfree = true;
+      };
+    in
+    # pkgs = nixpkgs.legacyPackages.${system};
+    {
+      formatter.${system} = pkgs.nixfmt-rfc-style;
+      nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = {
+          inherit inputs username;
+        };
         modules = [
-          ./home.nix
-          inputs.niri.homeModules.niri
-          inputs.anyrun.homeManagerModules.default
-          inputs.catppuccin.homeManagerModules.catppuccin
-          inputs.plasma-manager.homeManagerModules.plasma-manager
-          (
-            {...}: {
-              catppuccin.flavor = "macchiato";
-              catppuccin.accent = "lavender";
-            }
-          )
-          (
-            {...}: {
-              home.packages = [inputs.umu.packages.${pkgs.system}.umu];
-            }
-          )
+          ./configuration.nix
+          # inputs.stylix.nixosModules.stylix
+          inputs.niri.nixosModules.niri
+          # inputs.nixos-cosmic.nixosModules.default
+          inputs.nixos-cli.nixosModules.nixos-cli
+          # inputs.nixos-hardware.nixosModules.tuxedo-infinitybook-pro14-gen7
+          # inputs.sops-nix.nixosModules.sops
         ];
       };
+
+      homeConfigurations = {
+        "${username}@${hostname}" = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          extraSpecialArgs = {
+            inherit inputs username system;
+          };
+          modules = [
+            ./home.nix
+            inputs.niri.homeModules.niri
+            # inputs.anyrun.homeManagerModules.default
+            inputs.catppuccin.homeManagerModules.catppuccin
+            inputs.plasma-manager.homeManagerModules.plasma-manager
+            (
+              { ... }:
+              {
+                catppuccin.flavor = "macchiato";
+                catppuccin.accent = "lavender";
+              }
+            )
+            (
+              { ... }:
+              {
+                home.packages = [ inputs.umu.packages.${pkgs.system}.umu ];
+              }
+            )
+          ];
+        };
+      };
     };
-  };
 }
