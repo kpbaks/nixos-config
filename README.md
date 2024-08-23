@@ -2,9 +2,11 @@
 
 This repository contain all the code and settings I use to setup my NixOS environment.
 
-![nixos-config-screenshot](https://github.com/user-attachments/assets/fab0f235-ff3f-4987-a338-2b2a7c4b430f)
+<!-- ![nixos-config-screenshot](https://github.com/user-attachments/assets/fab0f235-ff3f-4987-a338-2b2a7c4b430f) -->
+![nixos-config-screenshot](https://github.com/user-attachments/assets/91162080-afc9-47a6-9bab-c23cdf1c4fe0)
 
 <!-- https://nixos.wiki/wiki/Flakes -->
+
 
 ## INFO
 
