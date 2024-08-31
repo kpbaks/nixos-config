@@ -123,6 +123,11 @@
       url = "github:water-sucks/nixos";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    spicetify-nix = {
+      url = "github:Gerg-L/spicetify-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -155,12 +160,21 @@
         };
         modules = [
           ./configuration.nix
-          # inputs.stylix.nixosModules.stylix
+          inputs.stylix.nixosModules.stylix # provide theming for system level programs such as bootloaders, splash screens, and display managers
           inputs.niri.nixosModules.niri
-          # inputs.nixos-cosmic.nixosModules.default
           inputs.nixos-cli.nixosModules.nixos-cli
+
+          # inputs.nixos-cosmic.nixosModules.default
           # inputs.nixos-hardware.nixosModules.tuxedo-infinitybook-pro14-gen7
           # inputs.sops-nix.nixosModules.sops
+          (
+            { ... }:
+            {
+              # stylix.enable = true;
+
+              # stylix.targets.console.enable = true; # Linux kernel console
+            }
+          )
         ];
       };
 
@@ -172,21 +186,67 @@
           };
           modules = [
             ./home.nix
+            # ./kde-plasma.nix
             inputs.niri.homeModules.niri
             # inputs.anyrun.homeManagerModules.default
-            inputs.catppuccin.homeManagerModules.catppuccin
-            inputs.plasma-manager.homeManagerModules.plasma-manager
+            # inputs.plasma-manager.homeManagerModules.plasma-manager
             (
               { ... }:
               {
+                imports = [
+                  inputs.catppuccin.homeManagerModules.catppuccin
+                ];
+                catppuccin.enable = true; # Enable for all available programs you're using!
                 catppuccin.flavor = "macchiato";
                 catppuccin.accent = "lavender";
               }
             )
             (
+              { pkgs, ... }:
+              {
+                imports = [
+                  inputs.spicetify-nix.homeManagerModules.default
+                ];
+                programs.spicetify =
+                  let
+                    spicetify-pkgs = inputs.spicetify-nix.legacyPackages.${pkgs.system};
+                  in
+                  {
+                    enable = true;
+                    enabledExtensions = with spicetify-pkgs.extensions; [
+                      adblock
+                      hidePodcasts
+                      shuffle # shuffle+ (special characters are sanitized out of extension names)
+                      autoVolume
+                      betterGenres
+                      powerBar
+                    ];
+                    enabledCustomApps = with spicetify-pkgs.apps; [
+                      reddit
+                      newReleases
+                    ];
+                    theme = spicetify-pkgs.themes.fluent;
+                    # theme = spicetify-pkgs.themes.catppuccin;
+                    # colorScheme = "macchiato";
+                  };
+              }
+            )
+            (
               { ... }:
               {
-                home.packages = [ inputs.umu.packages.${pkgs.system}.umu ];
+                imports = [
+                  inputs.stylix.homeManagerModules.stylix
+                ];
+                stylix.enable = false;
+                stylix.polarity = "dark";
+                stylix.image = pkgs.fetchurl {
+                  # url = "https://github.com/NixOS/nixos-artwork/blob/master/wallpapers/nixos-wallpaper-catppuccin-macchiato.png";
+                  url = "https://github.com/NixOS/nixos-artwork/blob/master/wallpapers/nixos-wallpaper-catppuccin-macchiato.png?raw=true";
+                  sha256 = "SkXrLbHvBOItJ7+8vW+6iXV+2g0f8bUJf9KcCXYOZF0=";
+
+                  # url = "https://www.pixelstalk.net/wp-content/uploads/2016/05/Epic-Anime-Awesome-Wallpapers.jpg";
+                  # sha256 = "enQo3wqhgf0FEPHj2coOCvo7DuZv+x5rL/WIo4qPI50=";
+                };
               }
             )
           ];

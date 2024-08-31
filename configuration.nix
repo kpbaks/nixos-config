@@ -13,9 +13,12 @@ rec {
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     # ./tuxedo-laptop-second-nvme-drive.nix
+
   ];
 
   nix.settings = {
+    use-xdg-base-directories = true;
+
     experimental-features = [
       "nix-command"
       "flakes"
@@ -45,6 +48,8 @@ rec {
     "root"
     username
   ];
+
+  nix.settings.warn-dirty = false;
 
   nix.checkConfig = true;
   nix.checkAllErrors = true;
@@ -145,6 +150,7 @@ rec {
     services.xserver.videoDrivers = [ "nvidia" ];
     hardware.graphics.enable = true;
     hardware.nvidia.modesetting.enable = true;
+    hardware.nvidia.open = true;
     hardware.nvidia.prime =
       let
         inherit (pkgs.lib) mkForce;
@@ -182,6 +188,7 @@ rec {
     # EDITOR = "hx";
     EDITOR = pkgs.lib.getExe pkgs.helix;
     NIXPKGS_ALLOW_UNFREE = "1";
+    LIBVA_DRIVER_NAME = "iHD";
   };
 
   networking.hostName = "nixos"; # Define your hostname.
@@ -239,9 +246,19 @@ rec {
   #   ${pkgs.lib.getBin pkgs.xorg.xrandr}/bin/xrandr --setprovideroutputsource 2 0
   # '';
 
+  nixpkgs.config.packageOverrides = pkgs: {
+    # Needed for `wl-screenrec`
+    intel-vaapi-driver = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
+  };
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
+    extraPackages = with pkgs; [
+      # Needed for `wl-screenrec`
+      intel-media-driver # For Broadwell (2014) or newer processors. LIBVA_DRIVER_NAME=iHD
+      vpl-gpu-rt
+      # intel-vaapi-driver # For older processors. LIBVA_DRIVER_NAME=i965
+    ];
   };
 
   # Configure console keymap
@@ -313,7 +330,17 @@ rec {
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
+    # inputs.nixos-cli.packages.${system}.default
+    libinput
+    qemu
+    quickemu
+    v4l-utils
+    edid-decode
+    keyd
+    libva-utils # `vainfo`
+    mozwire
     # Gaming
+    kitty
     mangohud
     protonup
     protonup-qt
@@ -474,6 +501,8 @@ rec {
   # FIXME: get to work
   #   services.espanso.enable = false;
   services.mullvad-vpn.enable = true;
+  services.mozillavpn.enable = true;
+  services.wg-netmanager.enable = true;
 
   # security.pam.services.gdm.enableGnomeKeyring = false;
   security.pam.services.gdm.enableGnomeKeyring = false;
@@ -522,8 +551,25 @@ rec {
   #   excalidraw.enable = true;
   # };
 
+  services.thermald.enable = true;
+  services.auto-cpufreq.enable = true;
+  services.auto-cpufreq.settings = {
+    battery = {
+      governor = "powersave";
+      turbo = "never";
+    };
+    charger = {
+      governor = "performance";
+      turbo = "auto";
+    };
+  };
+
+  services.power-profiles-daemon.enable = false;
+
+  # services.tlp.enable = true;
+
   # services.thermald.enable = true;
-  # TODO: check out services.auto-cpufreq
+  # # TODO: check out services.auto-cpufreq
   # services.tlp = {
   #   enable = true;
   #   settings = {
@@ -734,4 +780,30 @@ rec {
   environment.etc."greetd/environments".text = '''';
 
   # services.fwupd.enable = true;
+  # https://github.com/Shinyzenith/nix-dotfiles/blob/master/host/default.nix
+  #   system = {
+  #   stateVersion = "23.05";
+  #   activationScripts.diff = {
+  #     supportsDryActivation = true;
+  #     text = ''
+  #       ${pkgs.nvd}/bin/nvd --nix-bin-dir=${pkgs.nix}/bin diff /run/current-system "$systemConfig"
+  #     '';
+  #   };
+  # };
+
+  programs.kdeconnect.enable = true;
+
+  services.keyd = {
+    enable = true;
+    keyboards = {
+      default = {
+        ids = [ "*" ];
+        settings = {
+          main = {
+            capslock = "overload(control, esc)";
+          };
+        };
+      };
+    };
+  };
 }

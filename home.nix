@@ -8,6 +8,7 @@
   ...
 }@args:
 let
+  bluetooth-blue = "#0082FC";
   name = "Kristoffer Sørensen";
   full-name = "Kristoffer Plagborg Bak Sørensen";
   gmail = "kristoffer.pbs@gmail.com";
@@ -110,15 +111,54 @@ let
         set -l system_failed_units (${pkgs.systemd}/bin/systemctl list-units --failed --output=json | ${pkgs.jaq}/bin/jaq -r $jq_expr)
         set -l failed_units $system_failed_units $user_failed_units
 
+        set -l subcommand tui
+        if test (count $argv) -gt 0
+          set subcommand $argv[1]
+        end
+
+        set -l icon yast-bootloader # Most appropriate one I could find (lør 17 aug 20:48:35 CEST 2024)
+
         if test (count $failed_units) -eq 0
-          set -l icon yast-bootloader # Most appropriate one I could find (lør 17 aug 20:48:35 CEST 2024)
-          ${pkgs.libnotify}/bin/notify-send --icon $icon systemd "No failed units ☺️"
-        else
-          set -l expr ${pkgs.systemctl-tui}/bin/systemctl-tui --limit-units $failed_units
-          set -q KITTY_PID; or set --prepend expr ${terminal}
-          eval $expr
+          set -l msg "No failed units ☺️"
+          if not isatty stdout
+          # TODO: only notify-send if not running in terminal
+            ${pkgs.libnotify}/bin/notify-send --icon $icon systemd $msg
+            else
+              echo $msg >&2
+            end
+          
+          return
+        end
+
+        function run
+          if isatty stderr
+            echo $argv | ${pkgs.fish}/bin/fish_indent --ansi >&2
+          end
+          eval $argv
+        end
+
+        switch $subcommand
+          case restart
+            if test (count $user_failed_units) -gt 0
+              run ${pkgs.systemd}/bin/systemctl --user restart $user_failed_units
+              if not isatty stdout
+                ${pkgs.libnotify}/bin/notify-send --icon $icon systemd "Restarted the following <b>user</b> units:\n$(printf \"- %s\n\" $user_failed_units)"
+              end
+            end
+            if test (count $system_failed_units) -gt 0
+              run ${pkgs.systemd}/bin/systemctl restart $system_failed_units
+              if not isatty stdout
+                ${pkgs.libnotify}/bin/notify-send --icon $icon systemd "Restarted the following <b>system</b> units:\n$(printf \"- %s\n\" $system_failed_units)"
+              end
+            end
+          case tui
+            set -l expr ${pkgs.systemctl-tui}/bin/systemctl-tui --limit-units $failed_units
+            set -q KITTY_PID; or set --prepend expr ${terminal}
+            eval $expr
+          case '*'
         end
       '';
+
   # TODO: present more nicely maybe with the `tabulate` package
   scripts.PYTHONSTARTUP =
     pkgs.writers.writePython3Bin "PYTHONSTARTUP.py"
@@ -500,12 +540,15 @@ rec {
   # TODO: consider using https://github.com/chessai/nix-std
   imports = [
     # inputs.ags.homeManagerModules.default
+    # ./home/default.nix
+    # ./home
   ];
 
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.permittedInsecurePackages = [
-    "electron-28.3.3" # needed for `logseq` 05-07-2024
-    "electron-27.3.11"
+    "electron-29.4.6"
+    # "electron-28.3.3" # needed for `logseq` 05-07-2024
+    # "electron-27.3.11"
   ];
 
   # programs.ags = {
@@ -557,6 +600,7 @@ rec {
       reset = "'\e[0m'";
     in
     {
+      WALKER_CONFIG_TYPE = "toml";
       PAGER = "${pkgs.moar}/bin/moar";
       MOAR = builtins.concatStringsSep " " [
         "-statusbar=bold"
@@ -603,6 +647,19 @@ rec {
     with pkgs;
     (builtins.attrValues scripts)
     ++ [
+      # ruby_3_3
+      swappy
+      grim
+      tesseract
+      walker
+      legit
+      birdtray
+      pstree
+      dprint
+      spotify-tray
+      spotify-cli-linux
+      brotab
+      nb
       wl-clipboard
       # wl-clipboard-rs
       wttrbar # Dependency of `waybar`
@@ -618,8 +675,8 @@ rec {
       # jetbrains.rust-rover
       # jetbrains.clion
       # jetbrains.pycharm-community-bin
-      teams-for-linux
-      libsForQt5.kdialog
+      # teams-for-linux
+      # libsForQt5.kdialog
       # yad
       # zenity
       trippy # provides `trip` binary
@@ -740,7 +797,7 @@ rec {
       thunderbird # email client
       # discord
       telegram-desktop # messaging client
-      spotify # music player
+      # spotify # music player
       # zotero # citation/bibliography manager
       copyq # clipboard manager
       libnotify # for `notify-send`
@@ -829,6 +886,7 @@ rec {
           tabulate
           psutil
           numpy
+          python-lsp-server
         ]
       ))
       ouch # {,de}compression tool
@@ -850,15 +908,15 @@ rec {
   programs.home-manager.enable = true;
 
   # https://github.com/hyprwm/hyprpicker/issues/51#issuecomment-2016368757
-  home.pointerCursor = {
-    gtk.enable = true;
-    package = pkgs.adwaita-icon-theme;
-    name = "Adwaita";
-    size = 16;
-  };
+  # home.pointerCursor = {
+  #   gtk.enable = true;
+  #   package = pkgs.adwaita-icon-theme;
+  #   name = "Adwaita";
+  #   size = 16;
+  # };
 
-  gtk.theme.name = "Adwaita";
-  gtk.theme.package = pkgs.gnome.gnome-themes-extra;
+  # gtk.theme.name = "Adwaita";
+  # gtk.theme.package = pkgs.gnome.gnome-themes-extra;
 
   # sourced every time the `julia` is started
   home.file.".julia/config/startup.jl".text =
@@ -881,9 +939,12 @@ rec {
       end
     '';
 
-  manual.html.enable = true;
-  manual.json.enable = true;
-  manual.manpages.enable = true;
+  manual = {
+    # Disable installation of various manual formats to save space
+    manpages.enable = false;
+    html.enable = false;
+    json.enable = false;
+  };
 
   news.display = "notify";
 
@@ -893,7 +954,21 @@ rec {
     options = null;
   };
 
-  programs.atuin.enable = false;
+  programs.atuin = {
+    enable = true;
+    enableFishIntegration = true;
+    flags = [
+      "--disable-up-arrow"
+      # "--disable-ctrl-r"
+    ];
+    settings = {
+      auto_sync = true;
+      sync_frequency = "5m";
+      sync_address = "https://api.atuin.sh";
+      search_mode = "prefix";
+    };
+
+  };
 
   # https://alacritty.org/config-alacritty.html
   programs.alacritty =
@@ -906,7 +981,7 @@ rec {
     in
     {
       enable = true;
-      catppuccin.enable = true;
+      # catppuccin.enable = false;
       settings = {
         bell = {
           duration = 200;
@@ -923,10 +998,10 @@ rec {
           builtin_box_drawing = true;
           normal = {
             # family = "JetBrains Mono NFM";
-            family = "Iosevka Nerd Font Mono";
+            # family = "Iosevka Nerd Font Mono";
             style = "Regular";
           };
-          size = 16;
+          # size = 16;
         };
         mouse = {
           hide_when_typing = true;
@@ -991,7 +1066,7 @@ rec {
           blur = false;
           decorations = "None";
           dynamic_padding = true;
-          opacity = 0.9;
+          # opacity = 0.9;
           padding = {
             x = 10;
             y = 10;
@@ -1032,7 +1107,7 @@ rec {
 
   programs.bat = {
     enable = true;
-    catppuccin.enable = true;
+    # catppuccin.enable = false;
     extraPackages = with pkgs.bat-extras; [
       # batdiff
       batman
@@ -1079,12 +1154,12 @@ rec {
 
   programs.btop = {
     enable = true;
-    catppuccin.enable = true;
+    # catppuccin.enable = false;
   };
 
   programs.cava = {
     enable = true;
-    catppuccin.enable = true;
+    # catppuccin.enable = false;
     catppuccin.transparent = true;
     settings = {
       general.framerate = 60;
@@ -1137,6 +1212,7 @@ rec {
     profiles.default = {
       id = 0; # default
       settings = {
+        "accessibility.browsewithcaret" = true; # toggled with f7
         "browser.startup.homepage" = "https://nixos.org";
         "browser.search.region" = "DK";
         "browser.search.isUS" = false;
@@ -1214,7 +1290,7 @@ rec {
   # };
 
   programs.foot = {
-    enable = true;
+    enable = false;
     server.enable = true;
     settings = {
       main = {
@@ -1236,7 +1312,8 @@ rec {
   programs.fzf = {
     enable = true;
     enableFishIntegration = false;
-    defaultCommand = "${pkgs.fd}/bin/fd --type f";
+    defaultCommand = "${pkgs.fd}/bin/fd --type file";
+    # FIXME: this does not match the generated $FZF_DEFAULT_OPTS
     defaultOptions = [
       "--height=~50%"
       "--border"
@@ -1296,7 +1373,7 @@ rec {
     userEmail = email;
     extraConfig = {
       init.defaultBranch = "main";
-      push.autosetupremote = true;
+      push.autoSetupRemote = true;
       # pull.ff = "only";
       pull.rebase = false;
       merge.conflictstyle = "zdiff3";
@@ -1326,11 +1403,11 @@ rec {
   programs.git-cliff.enable = true;
   programs.gitui = {
     enable = true;
-    catppuccin.enable = true;
+    # catppuccin.enable = false;
   };
   programs.lazygit = {
     enable = true;
-    catppuccin.enable = true;
+    # catppuccin.enable = false;
     # git:
     #   paging:
     #     externalDiffCommand: difft --color=always --display=inline --syntax-highlight=off
@@ -1363,6 +1440,7 @@ rec {
   # TODO: convert
   programs.helix = {
     enable = true;
+    catppuccin.enable = false;
     # package = pkgs.helix;
     package = inputs.helix.packages.${pkgs.system}.default;
     defaultEditor = true;
@@ -1372,6 +1450,10 @@ rec {
         marksman
         taplo
         typos
+        # vscode-langservers-extracted
+        dprint
+        python3Packages.python-lsp-server
+        python3Packages.python-lsp-ruff
       ]
       ++ [ inputs.simple-completion-language-server.defaultPackage.${pkgs.system} ];
 
@@ -1681,6 +1763,10 @@ rec {
         command = "${pkgs.ruff-lsp}/bin/ruff-lsp";
         language-id = "python";
       };
+      language-server.dprint = {
+        command = "${pkgs.dprint}/bin/dprint";
+        args = [ "lsp" ];
+      };
 
       language =
         let
@@ -1709,6 +1795,14 @@ rec {
             auto-format = false;
             language-servers = [ "clangd" ];
             inherit indent;
+          }
+          {
+            name = "css";
+            formatter = {
+              command = "${pkgs.dprint}/bin/dprint";
+              args = [ "fmt" ];
+            };
+            language-servers = [ "dprint" ];
           }
           {
             name = "fish";
@@ -1847,12 +1941,12 @@ rec {
   # home.file.".config/kitty/catppuccin-macchiato.conf".source = ./extra/kitty/catppuccin-macchiato.conf;
   programs.kitty = {
     enable = true;
-    catppuccin.enable = true;
+    # catppuccin.enable = false;
     environment = {
       # LS_COLORS = "1";
     };
-    # font.name = "JetBrainsMono Nerd Font Mono";
-    font.name = "Iosevka Nerd Font Mono";
+    font.name = "JetBrainsMono Nerd Font Mono";
+    # font.name = "Iosevka Nerd Font Mono";
     font.size = 18;
     keybindings = {
       "ctrl+c" = "copy_or_interrupt";
@@ -1911,12 +2005,74 @@ rec {
       # window_logo_alpha = "0.5";
       # window_logo_scale = 0;
       paste_actions = "no-op";
+
+      watcher = "${config.xdg.configHome}/kitty/watcher.py";
     };
     shellIntegration.mode = "no-cursor";
     shellIntegration.enableFishIntegration = true;
     shellIntegration.enableBashIntegration = true;
   };
 
+  # https://sw.kovidgoyal.net/kitty/launch/#watching-launched-windows
+  # TODO: `on_cmd_startstop` create a handler than check if kitty is not in focus, and the last command run took more than 5 seconds,
+  # and then create a notification to inform user that the task has completed, with a button to focus the terminal
+  # This can be done with `kitten` and `notify-send`
+  # man 26 aug 11:52:04 CEST 2024
+  xdg.configFile."kitty/watcher.py".text =
+    # python
+    ''
+      from typing import Any, Dict
+
+      from kitty.boss import Boss
+      from kitty.window import Window
+      import subprocess
+      from dataclasses import dataclass
+      from enum import Enum
+
+      class Urgency(Enum):
+          Low = 1
+          Normal = 2
+          Critical = 3
+
+      def notify_send(title: str, msg: str, urgency: Urgency = Urgency.Normal, transient: bool = False) -> None:
+          subprocess.run("${pkgs.libnotify}/bin/notify-send")
+
+      def on_resize(boss: Boss, window: Window, data: Dict[str, Any]) -> None:
+          # Here data will contain old_geometry and new_geometry
+          # Note that resize is also called the first time a window is created
+          # which can be detected as old_geometry will have all zero values, in
+          # particular, old_geometry.xnum and old_geometry.ynum will be zero.
+          # boss.call_remote_control(window, ('send-text', f'--match=id:{window.id}', 'hello world'))
+          pass
+
+      def on_focus_change(boss: Boss, window: Window, data: Dict[str, Any])-> None:
+          # Here data will contain focused
+          pass
+
+      def on_close(boss: Boss, window: Window, data: Dict[str, Any])-> None:
+          # called when window is closed, typically when the program running in
+          # it exits
+          pass
+
+      def on_set_user_var(boss: Boss, window: Window, data: Dict[str, Any]) -> None:
+          # called when a "user variable" is set or deleted on a window. Here
+          # data will contain key and value
+          pass
+
+      def on_title_change(boss: Boss, window: Window, data: Dict[str, Any]) -> None:
+          # called when the window title is changed on a window. Here
+          # data will contain title and from_child. from_child will be True
+          # when a title change was requested via escape code from the program
+          # running in the terminal
+          pass
+
+      def on_cmd_startstop(boss: Boss, window: Window, data: Dict[str, Any]) -> None:
+          # called when the shell starts/stops executing a command. Here
+          # data will contain is_start, cmdline and time.
+          pass
+    '';
+
+  # TODO: create pr to `home-manager` to have a dedicated option for this
   # https://sw.kovidgoyal.net/kitty/open_actions/
   xdg.configFile."kitty/open-actions.conf".text = ''
     # Open any image in the full kitty window by clicking on it
@@ -1933,6 +2089,23 @@ rec {
     # Open ssh URLs with ssh command
     protocol ssh
     action launch --type=os-window ssh -- $URL
+
+    # Open man URLs with man command
+    protocol man
+    action launch --type=window man -- $URL
+
+    # Open a compose mail window in thunderbird to any mail address clicked on
+    protocol mailto
+    action launch thunderbird -compose "to=\'$${FILE_PATH}\'"
+
+    # TODO: figure out something useful to do here
+    # protocol tel
+    # action launch ...
+
+    protocol file
+    mime inode/file
+    action launch --type=os-window --cwd -- hx $FILE_PATH
+
 
     # Open directories
     # TODO: use yazi
@@ -2023,7 +2196,8 @@ rec {
         "web:*.{html,css,js}*"
         # Search hidden files/directories by default
         "--hidden"
-        "--hyperlink-format=default"
+        # "--hyperlink-format=default"
+        "--hyperlink-format=kitty"
         # Set the colors.
         "--colors=line:fg:${hex2ripgrep-color palette.catppuccin.teal.hex}"
         "--colors=column:fg:${hex2ripgrep-color palette.catppuccin.maroon.hex}"
@@ -2040,23 +2214,23 @@ rec {
 
   programs.rio = {
     enable = true;
-    catppuccin.enable = true;
+    catppuccin.enable = false;
     settings = {
       editor = "hx";
-      blinking-cursor = false;
-      hide-cursor-when-typing = false;
-      confirm-before-quit = true;
-      use-fork = true; # faster on linux
-      window.decorations = "Disabled";
-      fonts.family = "Iosevka Nerd Font Mono";
-      fonts.size = 16;
+      # blinking-cursor = false;
+      # hide-cursor-when-typing = false;
+      # confirm-before-quit = true;
+      # use-fork = true; # faster on linux
+      # window.decorations = "Disabled";
+      # fonts.family = "Iosevka Nerd Font Mono";
+      # fonts.size = 16;
 
-      keyboard.use-kitty-keyboard-protocol = false;
-      scroll.multiplier = 5.0;
-      scroll.divider = 1.0;
+      # keyboard.use-kitty-keyboard-protocol = false;
+      # scroll.multiplier = 5.0;
+      # scroll.divider = 1.0;
 
-      adaptive-theme.light = "belafonte-day";
-      adaptive-theme.dark = "belafonte-night";
+      # adaptive-theme.light = "belafonte-day";
+      # adaptive-theme.dark = "belafonte-night";
     };
   };
 
@@ -2074,7 +2248,7 @@ rec {
 
   programs.starship = {
     enable = true;
-    catppuccin.enable = true;
+    # catppuccin.enable = false;
     enableTransience = true;
     # $\{env_var.AGAIN_ENABLED}
     # $\{env_var.AGAIN_DYNAMIC_ENABLED}
@@ -2161,10 +2335,11 @@ rec {
         auto_update = true;
         auto_update_interval_hours = 24;
       };
+      # TODO: make pr to tealdeer to support a dim flag, similar to `set_color --dim` in fish
       style = {
         command_name = {
           bold = true;
-          foreground = "yellow";
+          foreground = "blue";
           italic = false;
           underline = false;
         };
@@ -2172,6 +2347,7 @@ rec {
           bold = true;
           italic = true;
           underline = false;
+          foreground = "white";
         };
         example_code = {
           bold = false;
@@ -2203,7 +2379,7 @@ rec {
     enable = true;
     # https://yazi-rs.github.io/docs/quick-start#shell-wrapper
     enableFishIntegration = true;
-    catppuccin.enable = true;
+    # catppuccin.enable = false;
     package = inputs.yazi.packages.${pkgs.system}.default;
     settings = {
       manager = {
@@ -2325,7 +2501,7 @@ rec {
         mguellsegarra.highlight-on-copy
         ms-python.python
         ms-toolsai.jupyter
-        ms-vscode.cpptools
+        # ms-vscode.cpptools
         # ms-vsliveshare.vsliveshare
         nvarner.typst-lsp
         rust-lang.rust-analyzer
@@ -2354,12 +2530,12 @@ rec {
           "editor.tabSize" = 4;
           "editor.fontSize" = 14;
           "editor.cursorStyle" = "line";
-          "editor.fontFamily" = mapjoin ", " (font: "'${font}'") [
-            "Iosevka Nerd Font Mono"
-            "JetBrainsMono Nerd Font Mono"
-            "Droid Sans Mono"
-            "monospace"
-          ];
+          # "editor.fontFamily" = mapjoin ", " (font: "'${font}'") [
+          #   "Iosevka Nerd Font Mono"
+          #   "JetBrainsMono Nerd Font Mono"
+          #   "Droid Sans Mono"
+          #   "monospace"
+          # ];
 
           "editor.fontLigatures" = true;
 
@@ -2391,7 +2567,7 @@ rec {
           "workbench.commandPalette.preserveInput" = false;
           "workbench.list.smoothScrolling" = true;
 
-          "workbench.colorTheme" = "Default Dark Modern";
+          # "workbench.colorTheme" = "Default Dark Modern";
 
           "workbench.sideBar.location" = "left";
           "workbench.tips.enabled" = true;
@@ -2463,7 +2639,7 @@ rec {
 
   programs.zellij = {
     enable = true;
-    catppuccin.enable = true;
+    # catppuccin.enable = false;
   };
 
   programs.zoxide = {
@@ -2908,7 +3084,7 @@ rec {
 
   services.dunst = {
     enable = false;
-    catppuccin.enable = true;
+    # catppuccin.enable = false;
     settings = {
       global = {
         width = "(200,300)";
@@ -2938,10 +3114,6 @@ rec {
   services.kdeconnect = {
     enable = true;
     indicator = true;
-  };
-
-  services.spotifyd = {
-    enable = false;
   };
 
   services.espanso =
@@ -3393,7 +3565,7 @@ rec {
   # https://github.com/raffaem/waybar-screenrecorder
   programs.waybar = {
     enable = true;
-    catppuccin.enable = true;
+    # catppuccin.enable = false;
     catppuccin.mode = "prependImport";
     # FIXME: does not start with `niri`
     systemd.enable = true;
@@ -3415,19 +3587,18 @@ rec {
           # TODO: see if there is a way to only use external monitors when there are multiple and, still be able to use the laptop when no extra is connected.
           output = builtins.attrValues monitors;
           modules-left = [
+            "mpris"
             # "cava"
           ];
-          modules-center = [
-            "tray"
-            "wlr/taskbar"
-            "mpris"
-          ];
+          modules-center = [ "wlr/taskbar" ];
           modules-right = [
+            "tray"
             # "image#nixos-logo"
           ];
 
           "wlr/taskbar" = {
             all-outputs = true;
+            icon-size = 24;
             # "format"= "{icon} {title} {short_state}";
             format = "{icon}";
             tooltip-format = "{title} | {app_id}";
@@ -3455,8 +3626,8 @@ rec {
           };
 
           tray = {
-            icon-size = 16;
-            spacing = 10;
+            icon-size = 24;
+            spacing = 16;
           };
         };
         # leftbar = {
@@ -3578,6 +3749,25 @@ rec {
             exec = "${pkgs.wttrbar}/bin/wttrbar";
             return-type = "json";
           };
+
+          # TODO: use and customize
+          # https://gist.github.com/MyrikLD/4467d4dae3f0911cd5094b8440cbf418
+          # "custom/external-monitor-brightness" = {
+          #   format = "{icon} {percentage}%";
+          #   format-icons = [
+          #     "\uDB80\uDCDE"
+          #     "\uDB80\uDCDF"
+          #     "\uDB80\uDCE0"
+          #   ];
+          #   return-type = "json";
+          #   exec = "ddcutil --bus 7 getvcp 10 | grep -oP 'current.*?=\\s*\\K[0-9]+' | { read x; echo '{\"percentage\"='${x}'}'; }";
+          #   on-scroll-up = "ddcutil --noverify --bus 7 setvcp 10 + 10";
+          #   on-scroll-down = "ddcutil --noverify --bus 7 setvcp 10 - 10";
+          #   on-click = "ddcutil --noverify --bus 7 setvcp 10 0";
+          #   on-click-right = "ddcutil --noverify --bus 7 setvcp 10 100";
+          #   interval = 1;
+          #   tooltip = false;
+          # };
 
           "backlight/slider" = {
             min = 0;
@@ -3988,6 +4178,9 @@ rec {
         };
       };
     style =
+      let
+        bluetooth-blue = "#0082FC";
+      in
       # css
       ''
         * {
@@ -4001,6 +4194,7 @@ rec {
 
         box.module button:hover {
             box-shadow: inset 0 -3px #ffffff;
+            border: 2px solid red;
         }
 
         window#waybar {
@@ -4016,7 +4210,8 @@ rec {
         }                        
 
         window#waybar.top {
-            background: transparent;
+            /* background: transparent; */
+            border: 2px solid @surface0;
             /* box-shadow: inset 0 -3px; */
         }
 
@@ -4205,7 +4400,8 @@ rec {
         }
 
         #bluetooth.on {
-          color: @teal;
+          color: ${bluetooth-blue};
+          /* color: @teal; */
         }
 
 
@@ -4452,6 +4648,56 @@ rec {
             border-radius: 5px;
             background-color: @yellow;
         }
+
+
+        #tray > widget:hover {
+            color: red;
+            background-color: @surface2;
+            border-radius: 2pt;
+        }
+
+        window#waybar.empty {
+            background-color: transparent;
+        }
+
+        #tray menu {
+            background-color: red;
+        }
+
+        #taskbar button {
+            padding: 4px 10px;
+            margin: 0px 3px;
+            background-color: alpha(@surface1, 0.5);
+        }
+
+        #taskbar button.active {
+            background-color: alpha(@surface2, 1.0);
+            border: 1px solid gray;
+        }
+
+        #taskbar button.fullscreen {
+            background-color: alpha(@yellow, 0.8);
+            border: 1px solid @yellow;
+        }
+
+        #taskbar button.maximized {
+            background-color: alpha(@red, 0.8);
+            border: 1px solid @red;
+        }
+
+        #taskbar button.minimized {
+            background-color: alpha(@sky, 0.8);
+            border: 1px solid @sky;
+        }
+
+        #taskbar button > widget:hover {
+            background: green;
+        }
+
+        #cava {
+            /* padding: 10px 100px; */
+            color: @sky;
+        }
       '';
   };
 
@@ -4494,9 +4740,11 @@ rec {
       "" = "navigate next";
       # D = "toggle_page_mode";
       "[fullscreen] " = "zoom in";
+      ge = "G";
     };
     extraConfig = ''
       set selection-clipboard clipboard
+      set recolor true
       map D set "first-page-column 1:1"
       map <C-d> set "first-page-column 1:2"
       map ge bottom
@@ -4534,6 +4782,12 @@ rec {
   # xdg.configFile."systemd/user/niri.service.wants";
   programs.niri = {
     enable = true;
+    # config = ''
+    #   window-rule {
+    #       match app-id=r#"^org\.wezfurlong\.wezterm$"#
+    #       default-column-width {}
+    #   }
+    # '';
     settings = {
       input.keyboard.xkb = {
         layout = "us,dk";
@@ -4559,13 +4813,13 @@ rec {
       };
       prefer-no-csd = true;
       environment = {
-        QT_QPA_PLATFORM = "wayland";
         DISPLAY = null;
+        MOZ_ENABLE_WAYLAND = "1";
         NIXOS_OZONE_WL = "1";
+        QT_QPA_PLATFORM = "wayland";
+        QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
         XDG_CURRENT_DESKTOP = "niri";
         XDG_SESSION_TYPE = "wayland";
-        MOZ_ENABLE_WAYLAND = "1";
-        QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
       };
 
       layout = {
@@ -4578,9 +4832,9 @@ rec {
           in
           {
             left = 4;
-            right = strut;
-            top = 0;
-            bottom = vertical;
+            right = 4;
+            top = 8;
+            bottom = 8;
           };
         center-focused-column = "on-overflow";
         # center-focused-column = "never";
@@ -4595,7 +4849,7 @@ rec {
         # default-column-width = {proportion = 1.0;};
         focus-ring = {
           enable = true;
-          width = 4;
+          width = 2;
           active.gradient = {
             from = "#80c8ff";
             to = "#d3549a";
@@ -4625,12 +4879,12 @@ rec {
             };
           clip-to-geometry = true;
         }
-        {
-          # dim unfocused windows
-          matches = [ { is-focused = false; } ];
-          opacity = 0.95;
-        }
-        { open-maximized = true; }
+        # {
+        #   # dim unfocused windows
+        #   matches = [ { is-focused = false; } ];
+        #   opacity = 0.95;
+        # }
+        # { open-maximized = true; }
         {
           matches = [
             { app-id = "Alacritty"; }
@@ -4649,7 +4903,7 @@ rec {
           matches = [
             {
               app-id = "^firefox$";
-              title = "Private Browsing";
+              title = ".*Private Browsing$";
             }
           ];
           border.active.color = "purple";
@@ -4683,6 +4937,26 @@ rec {
           ];
           default-column-width.proportion = 1.0 / 3.0;
         }
+        # Make border red when in a read-only directory like /etc or /dev
+        {
+          matches = [
+            {
+              app-id = "kitty";
+              title = "^/";
+            }
+          ];
+          border.active.color = "red";
+
+        }
+        # window-rule {
+        #     match app-id=r#"^org\.wezfurlong\.wezterm$"#
+        #     default-column-width {}
+        # }
+        # {
+        #   matches = [ { app-id = ''r#"^org\.wezfurlong\.wezterm$"#''; } ];
+        #   default-column-width = { };
+        # }
+
       ];
 
       outputs.${monitors.laptop} = {
@@ -4705,13 +4979,14 @@ rec {
         # "telegram-desktop"
         # "udiskie"
         # TODO: does not show-up
+        "${pkgs.telegram-desktop}/bin/telegram-desktop -startintray"
         # "nm-applet"
         # "dunst"
         # "eww daemon"
         # "eww ~/.config/eww/bar open bar" # FIX: not always open, and i want on multiple monitors
         # "wlsunset -t 4000 -T 6500 -S 06:30 -s 18:30"
         # "wluma"
-        "copyq"
+        # "copyq"
       ];
 
       # TODO: experiment with this
@@ -4971,7 +5246,8 @@ rec {
           # "Mod+Return".action = spawn "anyrun";
           # "Mod+Return".action = fish "pidof anyrun; and pkill anyrun; or anyrun";
           # "Mod+Return".action = fish "pidof nwg-drawer; and pkill nwg-drawer; or nwg-drawer -ovl -fm dolphin";
-          "Mod+Return".action = fish "pidof fuzzel; and pkill fuzzel; or fuzzel";
+          # "Mod+Return".action = fish "pidof fuzzel; and pkill fuzzel; or fuzzel";
+          "Mod+Return".action = fish "pidof ${pkgs.walker}/bin/walker; and pkill walker; or ${pkgs.walker}/bin/walker";
 
           "Mod+Shift+P".action = power-off-monitors;
           # Mod+R { switch-preset-column-width; }
@@ -4982,6 +5258,11 @@ rec {
           # "Mod+Shift+R".action = reset-window-height;
           "Mod+C".action = center-column;
           "Mod+Z".action = center-column; # kinda like `zz` in helix
+
+          # TODO: implement
+          # "Mod+BackSpace".action = focus-last-window;
+
+          # TODO: keybind to switch the windows between two outputs/monitors
         };
     };
     # // focus-workspace-keybinds;
@@ -5179,7 +5460,7 @@ rec {
   # xdg.configFile."nushell/starship.nu".source = ./starship.nu;
 
   programs.fuzzel = {
-    enable = true;
+    enable = false;
     # catppuccin.enable = false;
 
     settings = {
@@ -5426,13 +5707,51 @@ rec {
   xdg.configFile."swayosd/style.css".text =
     # css
     ''
+      window#osd {
+        padding: 12px 20px;
+        border-radius: 999px;
+        border: none;
+        background: alpha(green, 0.8);
+      }
 
+        #container {
+          margin: 16px;
+        }
+
+        image,
+        label {
+          color: red;
+        }
+
+        progressbar:disabled,
+        image:disabled {
+          opacity: 0.5;
+        }
+
+        progressbar {
+          min-height: 6px;
+          border-radius: 10%;
+          background: transparent;
+          border: none;
+        }
+        trough {
+          min-height: inherit;
+          border-radius: inherit;
+          border: none;
+          background: alpha(red, 0.5);
+        }
+        progress {
+          min-height: inherit;
+          border-radius: inherit;
+          border: none;
+          background: red;
+        }
     '';
   services.swayosd = {
     enable = true;
     topMargin = 0.5; # center
     display = monitors.laptop;
-    # stylePath = xdg.configFile."swayosd/style.css".path;
+    stylePath = "${config.xdg.configHome}/swayosd/style.css";
   };
 
   # TODO: save user settings for jupyter lab
@@ -5522,26 +5841,26 @@ rec {
         '';
   };
 
-  # FIXME: does not start
-  systemd.user.services.open-https-urls-copied-to-clipboard = {
-    # Unit.description = "Open https urls copied to clipboard in $BROWSER";
-    Install.WantedBy = [ "graphical-session.target" ];
-    Service.ExecStart = (
-      pkgs.lib.getExe (
-        pkgs.writers.writeFishBin "__open-https-urls-copied-to-clipboard" { }
-          # fish
-          ''
-            # wl-paste
-            ${pkgs.wl-clipboard}/bin/wl-paste --watch echo "" | while read _ignore
-              set -l content (${pkgs.wl-clipboard}/bin/wl-paste)
-              if string match --regex "^\s*https?://\S+" -- $content
-                ${pkgs.firefox}/bin/firefox (string trim -- "$content")
-              end
-            end
-          ''
-      )
-    );
-  };
+  # # FIXME: does not start
+  # systemd.user.services.open-https-urls-copied-to-clipboard = {
+  #   # Unit.description = "Open https urls copied to clipboard in $BROWSER";
+  #   Install.WantedBy = [ "graphical-session.target" ];
+  #   Service.ExecStart = (
+  #     pkgs.lib.getExe (
+  #       pkgs.writers.writeFishBin "__open-https-urls-copied-to-clipboard" { }
+  #         # fish
+  #         ''
+  #           # wl-paste
+  #           ${pkgs.wl-clipboard}/bin/wl-paste --watch echo "" | while read _ignore
+  #             set -l content (${pkgs.wl-clipboard}/bin/wl-paste)
+  #             if string match --regex "^\s*https?://\S+" -- $content
+  #               ${pkgs.firefox}/bin/firefox (string trim -- "$content")
+  #             end
+  #           end
+  #         ''
+  #     )
+  #   );
+  # };
 
   # FIXME: find out why fish overwrites with an alias
   programs.eza = {
@@ -5563,7 +5882,7 @@ rec {
 
   programs.swaylock = {
     enable = true;
-    catppuccin.enable = true;
+    # catppuccin.enable = false;
     settings = {
       show-failed-attempts = true;
       indicator-idle-visible = false;
@@ -5707,7 +6026,7 @@ rec {
 
   # TODO: create keybind for niri
   programs.tofi = {
-    enable = true;
+    enable = false;
     settings = {
       width = "100%";
       height = "100%";
@@ -5724,7 +6043,7 @@ rec {
 
   programs.mpv = {
     enable = true;
-    catppuccin.enable = true;
+    # catppuccin.enable = false;
     config = {
       gpu-context = "wayland";
     };
@@ -5737,8 +6056,21 @@ rec {
     terminal = true;
     type = "Application";
     categories = [ "System" ];
-    # mimeType = [ "x-scheme-handler/org-protocol" ];
+    actions = {
+      restart = {
+        exec = "${pkgs.lib.getExe scripts.systemd-failed-units} restart";
+      };
+    };
   };
+
+  # xdg.desktopEntries.zen-browser = {
+  #   name = "Zen Browser";
+  #   exec = "${pkgs.flatpak}/bin/flatpak run io.github.zen_browser.zen";
+  #   type = "Application";
+  #   # icon = ./zen-browser-logo.png;
+  #   # https://specifications.freedesktop.org/menu-spec/latest/category-registry.html
+  #   categories = [ "Network" ];
+  # };
 
   programs.obs-studio.enable = true;
   systemd.user.startServices = "sd-switch";
@@ -5774,4 +6106,51 @@ rec {
     Install.WantedBy = [ "graphical-session.target" ];
     Service.ExecStart = "${inputs.swww.packages.${pkgs.system}.swww}/bin/swww-daemon";
   };
+
+  systemd.user.services.copyq = {
+    Install.WantedBy = [ "graphical-session.target" ];
+    Service.ExecStart = "${pkgs.copyq}/bin/copyq";
+  };
+
+  # FIXME: get to work under wayland and nixos
+  systemd.user.services.birdtray = {
+    Install.WantedBy = [ "graphical-session.target" ];
+    Service.ExecStart = "${pkgs.birdtray}/bin/birdtray";
+  };
+
+  # TODO: add home-manager support to nixd
+  # https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md
+
+  programs.wezterm = {
+    enable = true;
+    extraConfig = # lua
+      ''
+        return {}
+      '';
+  };
+
+  # Make the output of `sqlite3` be more legible by default
+  # https://vld.bg/tips/sqliterc/
+  home.file.".sqliterc".text = ''
+    .headers on
+    .changes on
+    .timer on
+    .mode box
+    .databases
+    .tables
+  '';
+
+  programs.spotify-player = {
+    enable = true;
+    # catppuccin.enable = false;
+  };
+
+  services.spotifyd.enable = true;
+
+  # TODO: write
+  # xdg.configFile."walker/config.toml".source =
+  #   (pkgs.formats.toml { }).generate "walker-config"
+  #     {
+  #     };
+
 }
