@@ -1,6 +1,6 @@
 {
   config,
-  # osConfig,
+  osConfig,
   pkgs,
   inputs,
   system,
@@ -647,6 +647,24 @@ rec {
     with pkgs;
     (builtins.attrValues scripts)
     ++ [
+      # TODO: figure out how this works and see if it can be duplicated for other languages
+      gops # A tool to list and diagnose Go processes currently running on your system
+      # gore 
+      # gosu
+      # godef
+      # mmt
+
+      # gotty
+      # gomp # https://github.com/MarkForged/GOMP
+      # qt version recommended if you use kde-plasma
+      # https://wiki.nixos.org/wiki/LibreOffice
+      libreoffice-qt
+      hunspell # https://github.com/hunspell/hunspell
+      hunspellDicts.da-dk
+      hunspellDicts.en-us
+      desktop-file-utils # https://www.freedesktop.org/wiki/Software/desktop-file-utils/
+      beeper # Universal chat app using matrix protocol bridges to interoperate with messager, telegram etc.
+      vhs
       # ruby_3_3
       swappy
       grim
@@ -679,14 +697,14 @@ rec {
       # libsForQt5.kdialog
       # yad
       # zenity
-      trippy # provides `trip` binary
-      viddy # A modern watch command. Time machine and pager etc.
-      tabview
+      # trippy # provides `trip` binary
+      # viddy # A modern watch command. Time machine and pager etc.
+      # tabview
       rustscan # portscanner like `nmap`
       # ollama
       # ollama-cuda
       # ollama-rocm
-      calibre
+      # calibre
       # calibre-web
       swayosd
       # soco-cli # cli tools to interact with sonos devices
@@ -698,19 +716,16 @@ rec {
       # smassh # TUI based typing test application inspired by MonkeyType
       kondo # cleans dependencies and build artifacts from your projects.
       # TODO: integrate with helix
-      statix # nix linter
-      deadnix # detect unused nix code
       # tickrs #  Realtime ticker data in your terminal 📈
       # ticker #  Terminal stock ticker with live updates and position tracking
       # mop #  Stock market tracker for hackers.
-      newsflash # rss reader
+      # newsflash # rss reader
       wl-color-picker
       # element
-      element-desktop
+      # element-desktop
       gping
-      nixd
       # kdePackages.plasma-workspace # for krunner
-      kdePackages.kolourpaint
+      # kdePackages.kolourpaint
       # fuzzel
       resvg
       miller
@@ -733,7 +748,7 @@ rec {
       # inkscape
       # gimp
       moar # a nice pager
-      dogdns # rust alternative to dig
+      # dogdns # rust alternative to dig
       # TODO: use home-manager module when ready
       zed-editor
       # TODO: integrate with `cmake.fish`
@@ -743,21 +758,21 @@ rec {
       # charm-freeze
       pastel
       vivid
-      wdisplays
-      nwg-dock
-      nwg-drawer
-      nwg-displays
+      # wdisplays
+      # nwg-dock
+      # nwg-drawer
+      # nwg-displays
       # FIXME: no wayland support
       # daktilo # turn your keyboard into a typewriter!
       # lemmyknow # identify anything
       the-way # termial snippet-manager
-      # appflowy # open source alternative to notion
+      appflowy # open source alternative to notion
       # macchina # neofetch like program
       # neovim-remote # TODO: create `darkman` script to toggle light/dark mode with `set background=dark`
       lurk # like `strace` but with colors
       kdiff3
       meld
-      spotify-player
+      # spotify-player
       # micro
       procs
       # jitsi
@@ -771,10 +786,10 @@ rec {
       libwebp # why do 'r/wallpaper' upload all its images in `webp`
       # tabnine
       # grit
-      d2
+      # d2
       graphviz
       aria
-      wofi
+      # wofi
       # rofi-emoji-wayland # `rofimoji`
       # rofi-wayland
       pavucontrol # audio sink gui
@@ -799,7 +814,7 @@ rec {
       telegram-desktop # messaging client
       # spotify # music player
       # zotero # citation/bibliography manager
-      copyq # clipboard manager
+      # copyq # clipboard manager
       libnotify # for `notify-send`
       # TODO: use one of these
       swaylock
@@ -810,19 +825,20 @@ rec {
       playerctl # media player controller
       timg # terminal image viewer
       # swww # wayland wallpaper setter
+      # TODO: setup overlay
       inputs.swww.packages.${pkgs.system}.swww
       # swaynotificationcenter # wayland notification daemon
       # mako # wayland notification daemon
       # cliphist # clipboard history
       # wezterm # terminal
-      alejandra # nix formatter
+      # alejandra # nix formatter
       # eww # custom desktop widgets
       htop # system resource monitor
       just # command runner
       cmake # C/C++ build system generator
       ninja # small build system with a focus on speed
       # kate # text editor
-      # julia # scientific programming language
+      julia # scientific programming language
       duf # disk usage viewer
       du-dust # calculate directory sizes. `du` replacement
       # eza # `ls` replacement
@@ -838,7 +854,7 @@ rec {
       fx # interactive JSON pager
       yq-go # `jq` but for yaml
       htmlq # `jq` but for html
-      bun # javascript runtime and dev tool
+      # bun # javascript runtime and dev tool
       zoxide # intelligent `cd`
       sqlite # sql database in a file
       litecli # A nicer repl for sqlite
@@ -859,14 +875,13 @@ rec {
       glow # terminal markdown viewer
       mdcat # terminal markdown viewer
       hyperfine # powerful cli benchmark tool
-      nickel # configuration language
-      nls # nickel language server
-
+      # nickel # configuration language
+      # nls # nickel language server
       gcc
       gdb
       mold # modern linker
       rustup # rust toolchain manager
-      rclone # rsync for cloud storage
+      # rclone # rsync for cloud storage
       # croc # easily and securely transfer files and folders from one computer to another
       # sshx
       gnuplot # plotting utility
@@ -875,8 +890,6 @@ rec {
       # obs-studio # screen recording and streaming
 
       # brotab
-      manix # TODO: what does it do?
-      comma
       fish
 
       # python3
@@ -1447,6 +1460,7 @@ rec {
     extraPackages =
       with pkgs;
       [
+        jq-lsp
         marksman
         taplo
         typos
@@ -1948,14 +1962,13 @@ rec {
     font.name = "JetBrainsMono Nerd Font Mono";
     # font.name = "Iosevka Nerd Font Mono";
     font.size = 18;
+    # https://sw.kovidgoyal.net/kitty/actions/
     keybindings = {
       "ctrl+c" = "copy_or_interrupt";
       "ctrl+equal" = "change_font_size all +2.0";
       "ctrl+minus" = "change_font_size all -2.0";
       "ctrl+0" = "change_font_size all 0";
       # "ctrl+g" = "show_last_command_output";
-      "ctrl+shift+up" = "scroll_to_prompt -1";
-      "ctrl+shift+down" = "scroll_to_prompt 1";
       "ctrl+shift+h" = "show_scrollback";
       "ctrl+shift+e" = "open_url_with_hints";
       "ctrl+shift+f1" = "show_kitty_doc overview";
@@ -1964,16 +1977,33 @@ rec {
       "ctrl+home" = "scroll_home";
       "ctrl+end" = "scroll_end";
       f11 = "toggle_fullscreen";
+
+      "ctrl+shift+page_up" = "previous_tab";
+      "ctrl+shift+page_down" = "next_tab";
+      "ctrl+shift+home" = "goto_tab 1";
+      "ctrl+shift+end" = "goto_tab 99";
+      "ctrl+shift+d" = "detach_tab";
+
+      # TODO: write a custom python scripts that, check if the window is the one most to the right,
+      # if it is either spawn a new window in that direction, or create a tab in that direction.
+      # Switch focus to the neighboring window in the indicated direction
+      "ctrl+shift+left" = "neighboring_window left";
+      "ctrl+shift+right" = "neighboring_window right";
+      # TODO: combine the 2, based on in alternative screen or not
+      "ctrl+shift+up" = "scroll_to_prompt -1";
+      "ctrl+shift+down" = "scroll_to_prompt 1";
+      # "ctrl+shift+up" = "neighboring_window up";
+      # "ctrl+shift+down" = "neighboring_window down";
     };
     extraConfig = # kittyconf
       ''
-        background_opacity 0.85
         # how much to dim text with the DIM/FAINT escape code attribute
         dim_opacity 0.5
 
         mouse_map left release grabbed,ungrabbed mouse_handle_click link
       '';
     settings = {
+      background_opacity = 0.99;
       allow_remote_control = "yes";
       dynamic_background_opacity = "yes";
       # listen_on =
@@ -1982,7 +2012,7 @@ rec {
       # modify_font = "strikethrough_position 2px";
       undercurl_style = "thick-sparse";
       confirm_os_window_close = 0;
-
+      window_padding_width = 6;
       scrollback_lines = 10000;
       enable_audio_bell = false;
       update_check_interval = 0;
@@ -2007,11 +2037,38 @@ rec {
       paste_actions = "no-op";
 
       watcher = "${config.xdg.configHome}/kitty/watcher.py";
+
+      window_border_width = "4px";
+      draw_minimal_borders = "no";
+
+      tab_bar_edge = "top";
+      tab_bar_margin_width = "0.0";
+      tab_bar_margin_height = "0.0 0.0";
+      # tab_bar_style = "slant";
+      tab_bar_style = "powerline";
+      tab_bar_align = "center";
+      tab_bar_min_tabs = 2;
+      # tab_switch_strategy  = "previous";
+      tab_switch_strategy = "last";
+      tab_activity_symbol = "⏰";
+      # https://sw.kovidgoyal.net/kitty/conf/#opt-kitty.tab_title_template
+      tab_title_template = "{fmt.fg.red}{bell_symbol} {activity_symbol}{fmt.fg.tab}{title}";
+      tab_bar_background = "blue";
+      tab_bar_margin_color = "red";
     };
     shellIntegration.mode = "no-cursor";
     shellIntegration.enableFishIntegration = true;
     shellIntegration.enableBashIntegration = true;
   };
+
+  # TODO: make a custom tab bar
+  # https://sw.kovidgoyal.net/kitty/conf/#opt-kitty.tab_bar_style
+  # https://github.com/kovidgoyal/kitty/discussions/4447
+  xdg.configFile."kitty/tab_bar.py".text =
+    # python
+    ''
+
+    '';
 
   # https://sw.kovidgoyal.net/kitty/launch/#watching-launched-windows
   # TODO: `on_cmd_startstop` create a handler than check if kitty is not in focus, and the last command run took more than 5 seconds,
@@ -2162,6 +2219,16 @@ rec {
 
   # programs.nushell.enable = true;
   programs.pandoc.enable = true;
+  programs.pandoc.defaults = {
+    metadata = {
+      # author = full-name;
+      author = name;
+    };
+    pdf-engine = "xelatex";
+    # pdf-engine = "${pkgs.texliveSmall}/bin/xelatex";
+    citeproc = true;
+  };
+
   programs.pet.enable = true;
 
   programs.ripgrep = {
@@ -2375,91 +2442,138 @@ rec {
   #   enable = true;
   # };
 
-  programs.yazi = {
-    enable = true;
-    # https://yazi-rs.github.io/docs/quick-start#shell-wrapper
-    enableFishIntegration = true;
-    # catppuccin.enable = false;
-    package = inputs.yazi.packages.${pkgs.system}.default;
-    settings = {
-      manager = {
-        ratio = [
-          2
-          4
-          3
-        ];
-        scrolloff = 5;
-        show_hidden = true;
-        show_symlink = true;
-        sort_by = "natural";
-        sort_dirs_first = true;
+  programs.yazi =
+    let
+      plugins-repo = pkgs.fetchFromGitHub {
+        owner = "yazi-rs";
+        repo = "plugins";
+        rev = "a8421d98bbea11bee242883f2f7420e5ca498b3f";
+        hash = "sha256-0RZHBF2J2jMbCHcM71lHdn99diDr0zrMiorFgtVL5pI=";
       };
-      # which = {sort_by = true;};
-    };
-    keymap =
-      let
-        cd = key: dir: {
-          run = "cd ${dir}";
-          on = [ "g" ] ++ (builtins.filter (x: x != "" && x != [ ]) (builtins.split "" key)); # why split function so weird ...
-          desc = "Go to ${dir}";
-        };
-      in
-      {
-        manager.prepend_keymap =
-          let
-            keymap =
-              {
-                keys,
-                run,
-                desc ? "",
-              }:
-              let
-                on = [ ];
-              in
-              {
-                inherit run desc on;
-              };
-          in
-          [
-            {
-              # FIXME: `--all does not work here`
-              run = ''shell "ripdrag --all --and-exit $@" --confirm'';
-              on = [ "<c-d>" ];
-              desc = "Open selected files with `ripdrag`";
-            }
-            {
-              run = "arrow 999999999";
-              on = [
-                "g"
-                "e"
-              ];
-              desc = "Move cursor to end";
-            }
-            {
-              run = "help";
-              on = [ "?" ];
-              desc = "Open help overview";
-            }
-            {
-              run = "close";
-              on = [ "q" ];
-              desc = "Close yazi";
-            }
-            (cd "m" "~/Music")
-            (cd "p" "~/Pictures")
-            (cd "b" "~/Documents") # b for books, which I mostly keep in my ~/Documents folder
-            (cd "v" "~/Videos")
-            (cd "." "~/dotfiles")
-            (cd "r" "/") # r for root
-            (cd "/" "/")
-            (cd "s" "~/Pictures/screenshots")
-            (cd "Do" "~/development/own")
-            (cd "Df" "~/development/forks")
-            (cd "Dc" "~/development/cloned")
-            # (cd "y" "~/.config/yazi")
+    in
+    {
+      enable = true;
+      # https://yazi-rs.github.io/docs/quick-start#shell-wrapper
+      enableFishIntegration = true;
+      shellWrapperName = "y";
+      # catppuccin.enable = false;
+      # TODO: add to overlay
+      package = inputs.yazi.packages.${pkgs.system}.default;
+      settings = {
+        manager = {
+          ratio = [
+            2
+            4
+            3
           ];
+          scrolloff = 5;
+          show_hidden = true;
+          show_symlink = true;
+          sort_by = "natural";
+          sort_dirs_first = true;
+        };
+        # which = {sort_by = true;};
+
+        preview = {
+          max_width = 1000;
+          max_height = 1000;
+        };
+
+        plugin.prepend_fetchers = [
+          {
+            id = "git";
+            name = "*";
+            run = "git";
+          }
+          {
+            id = "git";
+            name = "*/";
+            run = "git";
+          }
+        ];
+
       };
-  };
+
+      plugins = {
+        chmod = "${plugins-repo}/chmod.yazi";
+        full-border = "${plugins-repo}/full-border.yazi";
+        max-preview = "${plugins-repo}/max-preview.yazi";
+      };
+
+      initLua =
+        # lua
+        ''
+          require("full-border"):setup {
+              -- Available values: ui.Border.PLAIN, ui.Border.ROUNDED
+              type = ui.Border.ROUNDED,
+          }
+          require("git"):setup()
+        '';
+
+      keymap =
+        let
+          cd = key: dir: {
+            run = "cd ${dir}";
+            on = [ "g" ] ++ (builtins.filter (x: x != "" && x != [ ]) (builtins.split "" key)); # why split function so weird ...
+            desc = "Go to ${dir}";
+          };
+        in
+        {
+          manager.prepend_keymap =
+            let
+              keymap =
+                {
+                  keys,
+                  run,
+                  desc ? "",
+                }:
+                let
+                  on = [ ];
+                in
+                {
+                  inherit run desc on;
+                };
+            in
+            [
+              {
+                # FIXME: `--all does not work here`
+                run = ''shell "ripdrag --all --and-exit $@" --confirm'';
+                on = [ "<c-d>" ];
+                desc = "Open selected files with `ripdrag`";
+              }
+              {
+                run = "arrow 999999999";
+                on = [
+                  "g"
+                  "e"
+                ];
+                desc = "Move cursor to end";
+              }
+              {
+                run = "help";
+                on = [ "?" ];
+                desc = "Open help overview";
+              }
+              {
+                run = "close";
+                on = [ "q" ];
+                desc = "Close yazi";
+              }
+              (cd "m" "~/Music")
+              (cd "p" "~/Pictures")
+              (cd "b" "~/Documents") # b for books, which I mostly keep in my ~/Documents folder
+              (cd "v" "~/Videos")
+              (cd "." "~/dotfiles")
+              (cd "r" "/") # r for root
+              (cd "/" "/")
+              (cd "s" "~/Pictures/screenshots")
+              (cd "Do" "~/development/own")
+              (cd "Df" "~/development/forks")
+              (cd "Dc" "~/development/cloned")
+              # (cd "y" "~/.config/yazi")
+            ];
+        };
+    };
 
   # TODO: use
   # programs.thunderbird = {
@@ -3211,8 +3325,10 @@ rec {
       fps = 60;
     in
     {
+      # enable = osConfig.programs.hyprland.enable;
       enable = false;
-      xwayland.enable = true;
+      # xwayland.enable = osConfig.programs.hyprland.xwayland.enable;
+      xwayland.enable = false;
       systemd.enable = true;
       plugins = [ ];
       extraConfig =
@@ -3540,7 +3656,8 @@ rec {
     '';
 
   wayland.windowManager.river = {
-    enable = true;
+    # enable = osConfig.programs.river.enable;
+    enable = false;
     xwayland.enable = true;
     extraSessionVariables = {
       MOZ_ENABLE_WAYLAND = "1";
@@ -4781,7 +4898,8 @@ rec {
   # https://github.com/YaLTeR/niri/wiki/Example-systemd-Setup
   # xdg.configFile."systemd/user/niri.service.wants";
   programs.niri = {
-    enable = true;
+    # enable = osConfig.programs.niri.enable;
+    enable = false;
     # config = ''
     #   window-rule {
     #       match app-id=r#"^org\.wezfurlong\.wezterm$"#
@@ -5153,21 +5271,22 @@ rec {
           "Mod+Minus".action = set-column-width "-10%";
           "Mod+Left".action = focus-column-left;
           "Mod+Right".action = focus-column-right;
-          "Mod+Up".action = focus-window-up;
-          "Mod+Down".action = focus-window-down;
+          "Mod+Up".action = focus-window-or-workspace-up;
+          "Mod+Down".action = focus-window-or-workspace-down;
           "Mod+Ctrl+Left".action = move-column-left;
           "Mod+Ctrl+Right".action = move-column-right;
-          "Mod+Ctrl+Up".action = move-window-up;
-          "Mod+Ctrl+Down".action = move-window-down;
-
+          # "Mod+Ctrl+Up".action = move-window-up;
+          # "Mod+Ctrl+Down".action = move-window-down;
+          "Mod+Ctrl+Up".action = move-window-up-or-to-workspace-up;
+          "Mod+Ctrl+Down".action = move-window-down-or-to-workspace-down;
           "Mod+H".action = focus-column-left;
           "Mod+L".action = focus-column-right;
           "Mod+K".action = focus-window-up;
           "Mod+J".action = focus-window-down;
           "Mod+Ctrl+H".action = move-column-left;
           "Mod+Ctrl+L".action = move-column-right;
-          "Mod+Ctrl+K".action = move-window-up;
-          "Mod+Ctrl+J".action = move-window-down;
+          "Mod+Ctrl+K".action = move-window-up-or-to-workspace-up;
+          "Mod+Ctrl+J".action = move-window-down-or-to-workspace-down;
 
           # TODO:
           #       Mod+Home { focus-column-first; }
@@ -6125,7 +6244,17 @@ rec {
     enable = true;
     extraConfig = # lua
       ''
-        return {}
+        -- Pull in the wezterm API
+        -- local wezterm = require 'wezterm'
+
+        -- This will hold the configuration.
+        local config = wezterm.config_builder()
+        -- NOTE: fixes this issue
+        -- https://github.com/NixOS/nixpkgs/issues/336069
+        config.front_end = "WebGpu"
+        config.enable_wayland = false
+
+        return config
       '';
   };
 
@@ -6145,7 +6274,7 @@ rec {
     # catppuccin.enable = false;
   };
 
-  services.spotifyd.enable = true;
+  services.spotifyd.enable = false;
 
   # TODO: write
   # xdg.configFile."walker/config.toml".source =
@@ -6153,4 +6282,63 @@ rec {
   #     {
   #     };
 
+  # TODO: set up `localsend` service to start in background
+
+  home.file.".gdbinit".text = ''
+    set auto-load safe-path /nix/store
+  '';
+
+  gtk.enable = true;
+
+  qt.enable = true;
+  # qt.style.name = "kvantum";
+  # qt.platformTheme.name = "kvantum";
+  qt.style.catppuccin.enable = false;
+  qt.style.name = "breeze";
+  qt.platformTheme.name = "kde";
+
+  # TODO: remove when it is no longer needed to wrap Beeper in a xwayland sandbox, on niri man  2 sep 19:18:05 CEST 2024
+  # Override the .desktop file that comes with `pkgs.beeper` as it does not work out of the box in `niri` due to missing Xwayland support.
+  xdg.desktopEntries.beeper = {
+    name = "Beeper";
+    exec = "${pkgs.cage}/bin/cage -- ${pkgs.beeper}/bin/beeper --no-sandbox %U";
+    terminal = false;
+    type = "Application";
+    icon = "beeper";
+    # https://specifications.freedesktop.org/menu-spec/latest/category-registry.html#main-category-registry
+    categories = [
+      # "Utility"
+      "Network"
+    ];
+    comment = "Beeper: Unified Messenger";
+    settings = {
+      StartupWMClass = "Beeper";
+    };
+  };
+
+  programs.navi.enable = false;
+  programs.navi.enableFishIntegration = false;
+  programs.navi.settings = { };
+
+  programs.micro.enable = true;
+  programs.micro.settings = {
+    cursorline = true;
+  };
+
+  # https://github.com/dhth/omm
+  xdg.configFile."omm/omm.toml".source = (pkgs.formats.toml { }).generate "omm-config" {
+    # db_path                 = "~/.local/share/omm/omm-w.db"
+    # tl_color                = "#b8bb26"
+    # atl_color               = "#fabd2f"
+    # title                   = "work"
+    list_density = "spacious";
+    show_context = true;
+    editor = config.home.sessionVariables.EDITOR;
+    confirm_before_deletion = true;
+    circular_nav = true;
+  };
+
+  # TODO: check if this works with wayland
+  services.conky.enable = true;
+  services.conky.extraConfig = '''';
 }

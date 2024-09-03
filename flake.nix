@@ -128,6 +128,10 @@
       url = "github:Gerg-L/spicetify-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -163,6 +167,7 @@
           inputs.stylix.nixosModules.stylix # provide theming for system level programs such as bootloaders, splash screens, and display managers
           inputs.niri.nixosModules.niri
           inputs.nixos-cli.nixosModules.nixos-cli
+          inputs.catppuccin.nixosModules.catppuccin
 
           # inputs.nixos-cosmic.nixosModules.default
           # inputs.nixos-hardware.nixosModules.tuxedo-infinitybook-pro14-gen7
@@ -190,6 +195,12 @@
             inputs.niri.homeModules.niri
             # inputs.anyrun.homeManagerModules.default
             # inputs.plasma-manager.homeManagerModules.plasma-manager
+            # (
+            #   { ... }:
+            #   {
+            #     imports = [ ./kde-plasma.nix ];
+            #   }
+            # )
             (
               { ... }:
               {
@@ -225,9 +236,9 @@
                       reddit
                       newReleases
                     ];
-                    theme = spicetify-pkgs.themes.fluent;
-                    # theme = spicetify-pkgs.themes.catppuccin;
-                    # colorScheme = "macchiato";
+                    # theme = spicetify-pkgs.themes.fluent;
+                    theme = spicetify-pkgs.themes.catppuccin;
+                    colorScheme = "macchiato";
                   };
               }
             )

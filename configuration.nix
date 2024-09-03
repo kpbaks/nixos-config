@@ -102,29 +102,126 @@ rec {
   boot.loader.efi.canTouchEfiVariables = true;
   boot.supportedFilesystems = [ "ntfs" ]; # Be able to mount USB drives with NTFS fs
 
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+  # boot.kernelPackages = pkgs.linuxPackages_zen;
+  boot.plymouth =
+    let
+      # theme = "rings";
+      theme = "glitch";
+    in
+    {
+      enable = true;
+      inherit theme;
+      # TODO: make jetbrains mono available instead
+      # font = "${pkgs.dejavu_fonts.minimal}/share/fonts/truetype/DejaVuSans.ttf";
+      # theme = "rings";
+      # TODO: checkout
+      # https://github.com/helsinki-systems/plymouth-theme-nixos-bgrt
+      themePackages = with pkgs; [
+        # By default we would install all themes
+        (adi1090x-plymouth-themes.override {
+          selected_themes = [ theme ];
+          # nixosBranding = true;
+          # nixosVersion = config.system.nixosRelease;
+        })
+      ];
+    };
+
+  # Enable "Silent Boot"
+  boot.consoleLogLevel = 0;
+  boot.initrd.verbose = false;
+  boot.kernelParams = [
+    "tuxedo_keyboard.mode=0"
+    "tuxedo_keyboard.brightness=255"
+
+    "quiet"
+    "splash"
+    "boot.shell_on_fail"
+    "loglevel=3"
+    "rd.systemd.show_status=false"
+    "rd.udev.log_level=3"
+    "udev.log_priority=3"
+  ];
+
+  # Hide the OS choice for bootloaders.
+  # It's still possible to open the bootloader list by pressing any key
+  # It will just not appear on screen unless a key is pressed
+  # boot.loader.timeout = 0;
+
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
-    # add shit here
+    alsa-lib
+    at-spi2-atk
+    at-spi2-core
+    atk
+    cairo
+    cups
+    curl
+    dbus
+    expat
+    fontconfig
+    freetype
+    fuse3
+    gdk-pixbuf
+    glib
+    gtk3
+    icu
+    libGL
+    libappindicator-gtk3
+    libdrm
+    libglvnd
+    libnotify
+    libpulseaudio
+    libunwind
+    libusb1
+    libuuid
+    libxkbcommon
+    libxml2
+    mesa
+    nspr
+    nss
+    openssl
+    pango
+    pipewire
+    stdenv.cc.cc
+    vulkan-loader
+    # xorg.libX11
+    # xorg.libXScrnSaver
+    # xorg.libXcomposite
+    # xorg.libXcursor
+    # xorg.libXdamage
+    # xorg.libXext
+    # xorg.libXfixes
+    # xorg.libXi
+    # xorg.libXrandr
+    # xorg.libXrender
+    # xorg.libXtst
+    # xorg.libxcb
+    # xorg.libxkbfile
+    # xorg.libxshmfence
+    zlib
   ];
   programs.direnv.enable = true;
 
   hardware.i2c.enable = true;
 
-  hardware.tuxedo-rs = {
-    enable = true;
-    tailor-gui.enable = true;
-  };
-  hardware.tuxedo-keyboard.enable = true;
+  # hardware.tuxedo-rs = {
+  #   enable = true;
+  #   tailor-gui.enable = true;
+  # };
+
+  # hardware.tuxedo-keyboard.enable = true;
+
   # FIXME: 'evdi' not found
   boot.kernelModules = [
     "evdi"
-    "tuxedo_keyboard"
+    # "tuxedo_keyboard"
   ];
-  boot.kernelParams = [
-    "tuxedo_keyboard.mode=0"
-    "tuxedo_keyboard.brightness=255"
-    # "tuxedo_keyboard.color_left=0xff0a0a"
-  ];
+  # boot.kernelParams = [
+  #   "tuxedo_keyboard.mode=0"
+  #   "tuxedo_keyboard.brightness=255"
+  #   # "tuxedo_keyboard.color_left=0xff0a0a"
+  # ];
 
   hardware.bluetooth = {
     enable = true;
@@ -183,13 +280,92 @@ rec {
     # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
   };
 
-  environment.variables = {
-    DIRENV_LOG_FORMAT = ""; # silence `direnv` msgs
-    # EDITOR = "hx";
-    EDITOR = pkgs.lib.getExe pkgs.helix;
-    NIXPKGS_ALLOW_UNFREE = "1";
-    LIBVA_DRIVER_NAME = "iHD";
-  };
+  # 30 (black)
+  # 31 (red)
+  # 32 (green)
+  # 33 (yellow)
+  # 34 (blue)
+  # 35 (magenta)
+  # 36 (cyan)
+  # 37 (white)
+
+  # 1 (bright)
+  # 2 (dim)
+  # 4 (underscore)
+  # 5 (blink)
+  # 7 (reverse)
+  # 8 (hidden)
+
+  # color for null
+  # color for false
+  # color for true
+  # color for numbers
+  # color for strings
+  # color for arrays
+  # color for objects
+  # color for object keys
+
+  # JQ_COLORS="0;90:0;37:0;37:0;37:0;32:1;37:1;37:1;34"
+
+  environment.variables =
+    let
+      jq_colors =
+        colors:
+        let
+          default = "0;90:0;37:0;37:0;37:0;32:1;37:1;37:1;34";
+          names = [
+            "null"
+            "false"
+            "true"
+            "numbers"
+            "strings"
+            "arrays"
+            "objects"
+            "keys"
+          ];
+          colors = [
+            "black"
+            "red"
+            "green"
+            "yellow"
+            "blue"
+            "magenta"
+            "cyan"
+            "white"
+          ];
+          markup = [
+            "bright"
+            "dim"
+            "underscore"
+            "blink"
+            "reverse"
+            "hidden"
+          ];
+        in
+        # builtins.mapAttrs (name: value: if builtins.isString value then 1 else 2);
+        default;
+    in
+    {
+      DIRENV_LOG_FORMAT = ""; # silence `direnv` msgs
+      # EDITOR = "hx";
+      EDITOR = pkgs.lib.getExe pkgs.helix;
+      NIXPKGS_ALLOW_UNFREE = "1";
+      LIBVA_DRIVER_NAME = "iHD";
+      # https://jqlang.github.io/jq/manual/#colors
+      JQ_COLORS = jq_colors {
+        null = "0;90";
+        false.color = "red";
+        true = {
+          bold = true;
+          color = "green";
+        };
+        numbers.color = "blue";
+        strings.color = "green";
+        arrays.color = "yellow";
+        objects.color = "magenta";
+        keys.color = "cyan";
+      };
+    };
 
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -216,23 +392,26 @@ rec {
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
+  services.displayManager.defaultSession = "niri";
   # Enable the KDE Plasma Desktop Environment.
   services.displayManager.sddm = {
     enable = true;
+    catppuccin.enable = true;
     wayland.enable = true;
-    settings = {
-      Autologin = {
-        Session = "niri";
-        User = username;
-      };
-    };
+    # autoNumlock = true;
+    # settings = {
+    #   Autologin = {
+    #     Session = "niri";
+    #     User = username;
+    #   };
+    # };
   };
   # services.desktopManager.plasma6.enable = true;
   # services.xserver.desktopManager.plasma5.enable = true;
   # services.xserver.desktopManager.gnome.enable = true;
   # Enable the GNOME Desktop Environment.
   # services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  services.xserver.desktopManager.gnome.enable = false;
   services.desktopManager.plasma6.enable = true;
 
   # Configure keymap in X11
@@ -341,9 +520,9 @@ rec {
     mozwire
     # Gaming
     kitty
-    mangohud
-    protonup
-    protonup-qt
+    # mangohud
+    # protonup
+    # protonup-qt
     # lutris
     # heroic
     # bottles
@@ -367,6 +546,7 @@ rec {
     moreutils # `sponge` etc.
 
     # Nix(os) tools
+    nix-prefetch-scripts
     nixfmt-rfc-style
     # alejandra # nix formatter
     # nixpkgs-fmt
@@ -376,7 +556,15 @@ rec {
     # doas # sudo alternative
     cachix
 
+    statix # nix linter
+    deadnix # detect unused nix code
+    nixd # nix lsp
+    manix # TODO: what does it do?
+    comma
+    nurl
+
     # Networking inspection tools
+    ipinfo
     dig # lookup dns name resolving
     dogdns # loopup dns name resolving, but in rust!
     nmap
@@ -391,10 +579,12 @@ rec {
         | string match --regex '\d')
 
         if test (count $session_ids) -gt 1
+        # TODO: check if in a tty, or send a notify-send
           printf '%serror%s: more than one login session active. Not sure what to do, sorry.\n' (set_color red) (set_color normal) >&2
           return 1
         end
 
+        # TODO: change colors to be more legible
         ${pkgs.gum}/bin/gum confirm "Logout?" --default=true --affirmative "Yes" --negative "No"
         and ${pkgs.systemd}/bin/loginctl kill-session $session_ids[1]
 
@@ -478,7 +668,7 @@ rec {
   programs.niri.package = pkgs.niri;
   # programs.niri.package = pkgs.niri-unstable;
 
-  # programs.river.enable = true;
+  programs.river.enable = false;
 
   # qt.enable = true;
   # qt.style = "breeze";
@@ -568,7 +758,6 @@ rec {
 
   # services.tlp.enable = true;
 
-  # services.thermald.enable = true;
   # # TODO: check out services.auto-cpufreq
   # services.tlp = {
   #   enable = true;
@@ -806,4 +995,10 @@ rec {
       };
     };
   };
+
+  # To theme GTK applications and Gnome
+  programs.dconf.enable = true;
+
+  # TODO: checkout this
+  # https://github.com/Mic92/dotfiles/blob/main/nixos/modules/suspend-on-low-power.nix
 }
