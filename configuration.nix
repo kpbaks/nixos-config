@@ -228,7 +228,11 @@ rec {
     powerOnBoot = true;
     package = pkgs.bluez;
     settings = { };
+    input = { };
+    network = { };
   };
+
+  # hardware.ubertooth.enable = config.hardware.bluetooth.enable;
 
   # Make it possible to run downloaded appimages
   boot.binfmt.registrations.appimage = {
@@ -406,14 +410,12 @@ rec {
     #   };
     # };
   };
-  # services.desktopManager.plasma6.enable = true;
-  # services.xserver.desktopManager.plasma5.enable = true;
   # services.xserver.desktopManager.gnome.enable = true;
-  # Enable the GNOME Desktop Environment.
   # services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = false;
+
   services.desktopManager.plasma6.enable = true;
 
+  # TODO: change to en_US
   # Configure keymap in X11
   services.xserver.xkb.layout = "dk";
   services.xserver.xkb.variant = "";
@@ -741,8 +743,8 @@ rec {
   #   excalidraw.enable = true;
   # };
 
-  services.thermald.enable = true;
-  services.auto-cpufreq.enable = true;
+  services.thermald.enable = false;
+  services.auto-cpufreq.enable = false;
   services.auto-cpufreq.settings = {
     battery = {
       governor = "powersave";
@@ -754,7 +756,7 @@ rec {
     };
   };
 
-  services.power-profiles-daemon.enable = false;
+  services.power-profiles-daemon.enable = true;
 
   # services.tlp.enable = true;
 
@@ -1001,4 +1003,10 @@ rec {
 
   # TODO: checkout this
   # https://github.com/Mic92/dotfiles/blob/main/nixos/modules/suspend-on-low-power.nix
+
+  # sudo waydroid upgrade
+  # TODO: get this working
+  virtualisation.waydroid.enable = true;
+
+  harware.keyboard.zsa.enable = true;
 }

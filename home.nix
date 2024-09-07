@@ -3,12 +3,12 @@
   osConfig,
   pkgs,
   inputs,
-  system,
+  # system,
   username,
   ...
-}@args:
+}:
+# TURN some of these into options instead
 let
-  bluetooth-blue = "#0082FC";
   name = "Kristoffer Sørensen";
   full-name = "Kristoffer Plagborg Bak Sørensen";
   gmail = "kristoffer.pbs@gmail.com";
@@ -16,16 +16,12 @@ let
   tutamail = "kristoffer.pbs@tuta.io";
   email = gmail;
   telephone-number = "21750049";
-  city = "Aarhus";
-  country = "Denmark";
+  # city = "Aarhus";
+  # country = "Denmark";
 
-  # TODO: remove the `xdg` property can be used for these
-  config_dir = "/home/" + username + "/.config";
-  cache_dir = "/home/" + username + "/.cache";
-  data_dir = "/home/" + username + "/.local/share";
   lib = pkgs.lib;
   # join = lib.strings.concatStringsSep;
-  mapjoin = lib.strings.concatMapStringsSep;
+  # mapjoin = lib.strings.concatMapStringsSep;
   range = from: to: builtins.genList (i: from + i) (to - from);
   merge = list: builtins.foldl' (acc: it: acc // it) { } list;
   font.monospace = "Iosevka Nerd Font Mono";
@@ -35,7 +31,7 @@ let
   monitors.acer = "DP-5";
   terminal = pkgs.lib.getExe pkgs.kitty;
   # palette.catppuccin = pkgs.lib.importJSON (config.catppuccin.sources.palette + "/palette.json").${config.catppuccin.flavor}.colors;
-  flavor = "macchiato";
+  # flavor = "macchiato";
   # palette.catppuccin.sky.hex = string
   # palette.catppuccin.sky.rgb = {r, g, b}
   # palette.catppuccin.sky.hsl = {h, s, l}
@@ -647,6 +643,24 @@ rec {
     with pkgs;
     (builtins.attrValues scripts)
     ++ [
+      ripgrep-all # `rga`
+      cmd-wrapped
+      delta
+      superfile # `spf`
+      completely
+      complgen
+      # TODO: package this for nixpkgs
+      # csvtk # https://github.com/shenwei356/csvtk
+      datamash
+      youplot
+      xsv
+      # kdeplasma-addons
+      # davinci-resolve
+      # kdenlive
+      video-trimmer
+      identity
+      # image-analyzer
+      # kaf
       # TODO: figure out how this works and see if it can be duplicated for other languages
       gops # A tool to list and diagnose Go processes currently running on your system
       # gore 
@@ -1451,25 +1465,26 @@ rec {
   # programs.gpg.enable = true;
 
   # TODO: convert
+  programs.helix.enable = true;
+  programs.helix.defaultEditor = true;
   programs.helix = {
-    enable = true;
     catppuccin.enable = false;
     # package = pkgs.helix;
     package = inputs.helix.packages.${pkgs.system}.default;
-    defaultEditor = true;
-    extraPackages =
-      with pkgs;
-      [
-        jq-lsp
-        marksman
-        taplo
-        typos
-        # vscode-langservers-extracted
-        dprint
-        python3Packages.python-lsp-server
-        python3Packages.python-lsp-ruff
-      ]
-      ++ [ inputs.simple-completion-language-server.defaultPackage.${pkgs.system} ];
+    extraPackages = [
+      pkgs.jq-lsp
+      pkgs.marksman
+      pkgs.taplo
+      pkgs.typos
+      # pkgs.vscode-langservers-extracted
+      pkgs.dprint
+      pkgs.python3Packages.python-lsp-server
+      pkgs.python3Packages.python-lsp-ruff
+      inputs.simple-completion-language-server.defaultPackage.${pkgs.system}
+      pkgs.lua-language-server
+      pkgs.stylua
+      pkgs.selene
+    ];
 
     ignores = [
       ".build/"
@@ -1480,7 +1495,9 @@ rec {
 
     settings = {
       # theme = "catppuccin_mocha";
-      theme = "ao";
+      # theme = "ao";
+      # theme = "pop-dark";
+      theme = "tokyonight";
       editor = {
         cursorline = true;
         line-number = "relative";
@@ -1833,12 +1850,18 @@ rec {
             };
           }
           {
+            name = "lua";
+            auto-format = true;
+            formatter.command = "${pkgs.stylua}/bin/stylua";
+          }
+          {
             name = "nickel";
             auto-format = true;
             formatter = {
               command = "${pkgs.nickel}/bin/nickel";
               args = [ "format" ];
             };
+            inherit indent;
           }
           {
             name = "nix";
@@ -2003,7 +2026,7 @@ rec {
         mouse_map left release grabbed,ungrabbed mouse_handle_click link
       '';
     settings = {
-      background_opacity = 0.99;
+      background_opacity = "0.99";
       allow_remote_control = "yes";
       dynamic_background_opacity = "yes";
       # listen_on =
@@ -2189,7 +2212,7 @@ rec {
   # xdg.configFile."kitty/kitty-logo.png" = ./kitty-logo.png;
 
   programs.neovim = {
-    enable = true;
+    enable = false;
     defaultEditor = false;
     package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
 
@@ -2498,6 +2521,12 @@ rec {
         chmod = "${plugins-repo}/chmod.yazi";
         full-border = "${plugins-repo}/full-border.yazi";
         max-preview = "${plugins-repo}/max-preview.yazi";
+        git = "${plugins-repo}/git.yazi";
+        no-status = "${plugins-repo}/no-status.yazi";
+        # TODO: setup this plug
+        mime-ext = "${plugins-repo}/mime-ext.yazi";
+        smart-filter = "${plugins-repo}/smart-filter.yazi";
+        jump-to-char = "${plugins-repo}/jump-to-char.yazi";
       };
 
       initLua =
@@ -2508,6 +2537,7 @@ rec {
               type = ui.Border.ROUNDED,
           }
           require("git"):setup()
+          require("no-status"):setup()
         '';
 
       keymap =
@@ -2571,6 +2601,22 @@ rec {
               (cd "Df" "~/development/forks")
               (cd "Dc" "~/development/cloned")
               # (cd "y" "~/.config/yazi")
+
+              {
+                on = [ "F" ];
+                run = "plugin smart-filter";
+                desc = "Smart filter";
+              }
+              {
+                on = [ "f" ];
+                run = "plugin jump-to-char";
+                desc = "Jump to char";
+              }
+              {
+                on = [ "T" ];
+                run = "plugin --sync max-preview";
+                desc = "Maximize or restore preview";
+              }
             ];
         };
     };
@@ -2584,7 +2630,7 @@ rec {
   programs.vscode =
     let
       # inherit (pkgs) vscode-with-extensions;
-      extensions = inputs.nix-vscode-extensions.extensions.${system};
+      extensions = inputs.nix-vscode-extensions.extensions.${pkgs.system};
     in
     {
       enable = true;
@@ -3269,56 +3315,57 @@ rec {
 
   # xdg-mime query default image/svg+xml
   # xdg.mimeApps.enable = true;
+  # TODO: find way to validate that all *.desktop files exist for each mime-type
+  # https://www.reddit.com/r/linuxquestions/comments/iypx8k/where_does_xdgmime_store_its_actual_default_app/
+  # ~/.config/mimeapps.list
   xdg.mimeApps.defaultApplications =
     let
       loupe = "org.gnome.Loupe.desktop";
-      browser = "firefox.desktop";
-      image-viewer = loupe;
+      # browser = "firefox.desktop";
+      browser = "dev.zed.Zed.desktop";
+      okular = "org.kde.okular.desktop";
+      gwenview = "org.kde.gwenview.desktop";
+      zathura = "org.pwmt.zathura.desktop";
+      image-viewer = gwenview;
     in
     {
       "application/pdf" = [
-        "zathura.desktop"
-        "evince.desktop"
+        okular
+        zathura
       ];
+      "text/html" = [ browser ];
       "image/svg+xml" = [ browser ];
       "image/png" = [ image-viewer ];
       "image/jpeg" = [ image-viewer ];
+      "image/webp" = [ image-viewer ];
+      "inode/directory" = [ "yazi.desktop" ];
+      # TODO: create a cool handler
+
+      # "application/x-ipynb+json" 
       # TODO: create .desktop for `jnv`
       # "application/json" = [jnv];
     };
 
-  xdg.portal = {
-    enable = true;
-    xdgOpenUsePortal = true;
-    config = {
-      common = {
-        default = "gtk";
-      };
-    };
-    # config.preferred = {
-    #   default = "hyprland";
-    #   "org.freedesktop.impl.portal.Settings" = "darkman";
-    # };
-    # config.common.default = "hyprland";
-    extraPortals = [
-      pkgs.xdg-desktop-portal-gtk
-      pkgs.xdg-desktop-portal-kde
-      pkgs.xdg-desktop-portal-hyprland
-      pkgs.xdg-desktop-portal-wlr
-      pkgs.xdg-desktop-portal-cosmic
-    ];
-  };
+  xdg.portal.enable = true;
+  xdg.portal.xdgOpenUsePortal = true;
+  xdg.portal.config.common.default = "kde";
+  xdg.portal.extraPortals = [
+    pkgs.xdg-desktop-portal-gtk
+    pkgs.xdg-desktop-portal-kde
+    # pkgs.xdg-desktop-portal-hyprland
+    pkgs.xdg-desktop-portal-wlr
+    # pkgs.xdg-desktop-portal-cosmic
+  ];
 
-  # home.file.".config/hypr/bin/hyprland-arise".source = ./target/release/hyprland-arise;
-
-  xdg.configFile."xdg-desktop-portal/hyprland-portals.conf".text =
-    # ini
-    ''
-      [preferred]
-      default=hyprland;gtk
-      org.freedesktop.impl.portal.FileChooser=kde
-      org.freedesktop.impl.portal.Screencast=kde
-    '';
+  # # TODO: use ini generator from nixpkgs.
+  # xdg.configFile."xdg-desktop-portal/hyprland-portals.conf".text =
+  #   # ini
+  #   ''
+  #     [preferred]
+  #     default=hyprland;gtk
+  #     org.freedesktop.impl.portal.FileChooser=kde
+  #     org.freedesktop.impl.portal.Screencast=kde
+  #   '';
 
   wayland.windowManager.hyprland =
     let
@@ -3685,6 +3732,7 @@ rec {
     # catppuccin.enable = false;
     catppuccin.mode = "prependImport";
     # FIXME: does not start with `niri`
+    # TODO: change service to only activate if target is niri, and not apply on kde aswell
     systemd.enable = true;
     settings =
       let
@@ -4820,21 +4868,16 @@ rec {
 
   # TODO: create and submit a home-manager module for this
   # TODO: install some .thThemes and .sublime-syntax
-  home.file.".config/the-way/config.toml".text = ''
-    theme = 'base16-ocean.dark'
-    # db_dir = 'the_way_db'
-    db_dir = '${cache_dir}/the-way/the_way_db'
-    themes_dir '${data_dir}/the-way/themes'
-    # themes_dir = 'the_way_themes'
-    # copy_cmd = 'xclip -in -selection clipboard'
-    copy_cmd = 'wl-copy --trim-newline'
-  '';
+  home.file.".config/the-way/config.toml".source = (pkgs.formats.toml { }).generate "the-way-config" {
+    theme = "base16-ocean.dark";
+    copy_cmd = "${pkgs.wl-clipboard}/bin/wl-copy --trim-newline";
+  };
 
   # https://haseebmajid.dev/posts/2023-07-25-nixos-kanshi-and-hyprland/
   # "eDP-1" is laptop screen
   services.kanshi = {
-    enable = true;
-    systemdTarget = "hyprland-session.target";
+    enable = config.programs.niri.enable;
+    systemdTarget = "niri-session.target";
     settings = [
       {
         profile.name = "undocked";
@@ -5830,41 +5873,42 @@ rec {
         padding: 12px 20px;
         border-radius: 999px;
         border: none;
-        background: alpha(green, 0.8);
+        background: alpha(${palette.catppuccin.crust.hex}, 0.8);
       }
 
-        #container {
-          margin: 16px;
-        }
+      #container {
+        margin: 16px;
+      }
 
-        image,
-        label {
-          color: red;
-        }
+      image, label {
+        color: ${palette.catppuccin.teal.hex};
+      }
 
-        progressbar:disabled,
-        image:disabled {
-          opacity: 0.5;
-        }
+      progressbar:disabled,
+      image:disabled {
+        opacity: 0.5;
+      }
 
-        progressbar {
-          min-height: 6px;
-          border-radius: 10%;
-          background: transparent;
-          border: none;
-        }
-        trough {
-          min-height: inherit;
-          border-radius: inherit;
-          border: none;
-          background: alpha(red, 0.5);
-        }
-        progress {
-          min-height: inherit;
-          border-radius: inherit;
-          border: none;
-          background: red;
-        }
+      progressbar {
+        min-height: 6px;
+        border-radius: 10%;
+        background: transparent;
+        border: none;
+      }
+
+      trough {
+        min-height: inherit;
+        border-radius: inherit;
+        border: none;
+        background: alpha(${palette.catppuccin.mauve.hex}, 0.5);
+      }
+
+      progress {
+        min-height: inherit;
+        border-radius: inherit;
+        border: none;
+        background: ${palette.catppuccin.mauve.hex};
+      }
     '';
   services.swayosd = {
     enable = true;
@@ -6325,6 +6369,7 @@ rec {
     cursorline = true;
   };
 
+  # TODO: package for nixpkgs, and create home-manager module
   # https://github.com/dhth/omm
   xdg.configFile."omm/omm.toml".source = (pkgs.formats.toml { }).generate "omm-config" {
     # db_path                 = "~/.local/share/omm/omm-w.db"
@@ -6338,7 +6383,51 @@ rec {
     circular_nav = true;
   };
 
-  # TODO: check if this works with wayland
-  services.conky.enable = true;
+  # NOTE: does not work with niri fre  6 sep 17:58:10 CEST 2024
+  services.conky.enable = false;
   services.conky.extraConfig = '''';
+
+  xdg.configFile."uplot/uplot.yml".source =
+    let
+      ratio = 1920 / 1080;
+      width = 80;
+      height = builtins.floor (width / ratio);
+    in
+    (pkgs.formats.yaml { }).generate "uplot-config"
+
+      {
+        inherit width height;
+        # width = 80; # cells
+        # height = 40; # cells
+      };
+
+  # TODO: create a script for something similar ... or just use yazi
+  # https://gist.github.com/wolandark/6b138cbea468f1e4e5f697f8a9c85a68
+
+  # TODO: checkout
+  # https://github.com/arunsupe/semantic-grep
+  # https://github.com/piotrmurach/tty-pie
+  # https://github.com/Martin-Nyaga/termplot
+  # https://github.com/DeterminateSystems/flake-checker
+
+  # upstream superfile config
+  # https://superfile.netlify.app/configure/config-file-path/#config
+  # xdg.configFile."superfile/config.toml".source =
+  #   (pkgs.formats.toml { }).generate "superfile-config"
+  #     {
+  #       theme = "catppuccin";
+  #       auto_check_update = false;
+  #       cd_on_quit = true;
+  #       default_open_file_preview = true;
+  #       file_size_use_si = false;
+  #       default_directory = ".";
+  #       nerdfont = true;
+  #       transparent_background = false;
+  #       metadata = false; # true requires `exiftool`
+  #       # Enable MD5 checksum generation for files
+  #       enable_md5_checksum = false;
+  #     };
+
+  # ~/.config/superfile/hotkeys.toml
+  # https://superfile.netlify.app/configure/custom-hotkeys/
 }
