@@ -30,3 +30,5 @@ This repository contain all the code and settings I use to setup my NixOS enviro
 - [ ] Install instructions
 - [ ] Explain fish scripts and how to use them
 - [ ] Clean up unused files
+
+

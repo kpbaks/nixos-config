@@ -13,7 +13,6 @@ rec {
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     # ./tuxedo-laptop-second-nvme-drive.nix
-
   ];
 
   nix.settings = {
@@ -23,6 +22,7 @@ rec {
       "nix-command"
       "flakes"
     ];
+    # TODO: remove keys and caches here as they are specified in `./flake.nix`
     builders-use-substitutes = true;
     substituters = [
       "https://cache.nixos.org"
@@ -97,10 +97,27 @@ rec {
   systemd.tmpfiles.rules = [ "L /lib - - - - /run/current/system/lib" ];
 
   # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.enableContainers = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.supportedFilesystems = [ "ntfs" ]; # Be able to mount USB drives with NTFS fs
+
+  boot.loader.timeout = 10; # seconds (default is 5)
+  # boot.loader.timeout = null; # wait indefinitely for user to select
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot.memtest86.enable = true;
+
+  # TODO: try out using `grub` instead of `systemd-boot`
+  # https://discourse.nixos.org/t/change-bootloader-from-systemd-to-grub/5977
+  # boot.loader.grub = {
+  #   enable = true;
+  #   useOSProber = false;
+  #   device = "/dev/sda";
+  #   efiSupport = true;
+  # };
+
+  boot.enableContainers = true;
+  boot.supportedFilesystems = {
+    ntfs = true; # Be able to mount USB drives with NTFS fs
+    # btrfs = true;
+  };
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
   # boot.kernelPackages = pkgs.linuxPackages_zen;
@@ -212,9 +229,21 @@ rec {
 
   # hardware.tuxedo-keyboard.enable = true;
 
+  # https://lavafroth.is-a.dev/post/android-phone-for-webcam-nixos/
+  boot.extraModulePackages = with pkgs; [
+    linuxPackages_latest.v4l2loopback
+  ];
+  boot.extraModprobeConfig = ''
+    options v4l2loopback exclusive_caps=1 card_label="Virtual Webcam"
+  '';
+
   # FIXME: 'evdi' not found
   boot.kernelModules = [
     "evdi"
+    "snd-aloop" # needed for `droidcam`
+    "v4l2loopback"
+    "kvm-intel" # support for hardware virtualisation with Intel CPUs
+    # "kvm-amd"
     # "tuxedo_keyboard"
   ];
   # boot.kernelParams = [
@@ -251,6 +280,7 @@ rec {
     services.xserver.videoDrivers = [ "nvidia" ];
     hardware.graphics.enable = true;
     hardware.nvidia.modesetting.enable = true;
+    hardware.nvidia-container-toolkit.enable = true;
     hardware.nvidia.open = true;
     hardware.nvidia.prime =
       let
@@ -482,13 +512,27 @@ rec {
   users.users.kpbaks = {
     isNormalUser = true;
     description = "Kristoffer Sørensen";
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-      "docker"
-      "podman"
-      "storage"
-    ];
+    # TODO: document why it is necessary to be part of each group
+    extraGroups = pkgs.lib.lists.unique (
+      [
+        "networkmanager"
+        "wheel"
+        "docker"
+        "storage"
+        "i2c-dev"
+      ]
+      ++ (if config.virtualisation.podman.enable then [ "podman" ] else [ ])
+      ++ (
+        # https://nixos.wiki/wiki/Android
+        if config.programs.adb.enable then
+          [
+            "adbusers"
+            "kvm"
+          ]
+        else
+          [ ]
+      )
+    );
     packages = [ ]; # managed by home-manager, see ./home.nix
   };
   users.groups.input.members = [ username ];
@@ -511,7 +555,16 @@ rec {
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
+    # TODO: checkout and experiment with (tir 10 sep 21:58:53 CEST 2024)
+    numactl
+    numad
+    numatop
+    inetutils
     # inputs.nixos-cli.packages.${system}.default
+    scrcpy
+    # android-tools
+
+    distrobox
     libinput
     qemu
     quickemu
@@ -685,15 +738,15 @@ rec {
   # };
 
   # List services that you want to enable:
-  services.tailscale.enable = true;
-  services.tailscale.openFirewall = true;
+  services.tailscale.enable = false;
+  services.tailscale.openFirewall = false;
   # services.netbird.enable = true;
 
   services.flatpak.enable = true;
   # FIXME: get to work
   #   services.espanso.enable = false;
-  services.mullvad-vpn.enable = true;
-  services.mozillavpn.enable = true;
+  services.mullvad-vpn.enable = false;
+  services.mozillavpn.enable = false;
   services.wg-netmanager.enable = true;
 
   # security.pam.services.gdm.enableGnomeKeyring = false;
@@ -723,7 +776,7 @@ rec {
   programs.gamescope.enable = true;
   hardware.steam-hardware.enable = true;
   programs.steam.enable = true;
-  programs.steam.gamescopeSession.enable = true;
+  programs.steam.gamescopeSession.enable = false;
   programs.gamemode.enable = true;
   # programs.steam = {
   #   enable = true;
@@ -743,8 +796,8 @@ rec {
   #   excalidraw.enable = true;
   # };
 
-  services.thermald.enable = false;
-  services.auto-cpufreq.enable = false;
+  services.thermald.enable = true;
+  services.auto-cpufreq.enable = true;
   services.auto-cpufreq.settings = {
     battery = {
       governor = "powersave";
@@ -756,7 +809,7 @@ rec {
     };
   };
 
-  services.power-profiles-daemon.enable = true;
+  services.power-profiles-daemon.enable = false;
 
   # services.tlp.enable = true;
 
@@ -819,9 +872,19 @@ rec {
   #   extraPackages = with pkgs; [criu];
   # };
 
-  # virtualisation.podman = {
-  #   enable = false;
-  # };
+  virtualisation.containers.enable = true;
+  # virtualisation.containers.cdi.dynamic.nvidia.enable = true;
+
+  virtualisation.podman.enable = true;
+  virtualisation.podman.extraPackages = [
+    # pkgs.gvisor
+  ];
+  # Users must be in the podman group in order to connect. As with Docker, members of this group can gain root access.
+  virtualisation.podman.dockerSocket.enable = builtins.elem "podman" config.users.users.kpbaks.extraGroups;
+  virtualisation.podman.autoPrune.enable = false;
+  virtualisation.podman.autoPrune.dates = "monthly";
+  virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
+  virtualisation.podman.dockerCompat = !config.virtualisation.docker.enable;
 
   # services.mosquitto = {
   #   enable = true;
@@ -1004,9 +1067,19 @@ rec {
   # TODO: checkout this
   # https://github.com/Mic92/dotfiles/blob/main/nixos/modules/suspend-on-low-power.nix
 
+  hardware.keyboard.zsa.enable = true;
+
+  # *** Android ***
   # sudo waydroid upgrade
   # TODO: get this working
   virtualisation.waydroid.enable = true;
+  programs.adb.enable = true;
+  # services.udev.packages = with pkgs; [
+  #   android-udev-rules
+  # ];
 
-  harware.keyboard.zsa.enable = true;
+  # TODO: `systemctl status avahi-daemon.service` prints this, fix it (tir 10 sep 17:35:56 CEST 2024)
+  # WARNING: No NSS support for mDNS detected, consider installing nss-mdns!
+  # *** WARNING: Detected another IPv4 mDNS stack running on this host. This makes mDNS unreliable and is thus not recommended. ***
+  services.avahi.enable = true;
 }

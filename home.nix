@@ -99,6 +99,48 @@ let
         # inputs.yazi.packages.${pkgs.system}.default;
       '';
 
+  scripts.search-clipboard-content-with-browser-search-engine =
+    pkgs.writers.writeFishBin "search-clipboard-content-with-browser-search-engine" { }
+      # fish
+      ''
+        set -l title search
+        if not string match --quiet --regex text/plain -- (${pkgs.wl-clipboard}/bin/wl-paste --list-types)
+          # TODO: handle images with google image search
+          set -l icon error-symbolic
+
+           ${pkgs.libnotify}/bin/notify-send --icon=$icon $title "ERROR: Searching for images is not supported!"
+          return 1
+        end
+
+
+
+        # TODO: should multi line strings be handled differently?
+        set -l text (command wl-paste)
+
+        set -l icon internet-web-browser
+        set -l url
+        # TODO: handle other protocols like mailto: tel: s?ftp file:/// etc. appropriate
+        if string match --regex "^\s*https?://" -- $text
+          set url (string trim -- $text)
+        else
+          set -l body "Searching for:
+          $text
+          "
+          ${pkgs.libnotify}/bin/notify-send --transient --icon=$icon $title $body
+
+          set -l query (string escape --style url -- $text)
+          # TODO: figure out what is the maximum length that browsers support
+          # i.e. if we copy a full page of text the http query param probably breaks
+          # TODO: should it be handled specially if the clipboard item is a abs path to a file/dir
+          # that exists on disk?
+
+          set -l base_url https://duckduckgo.com/
+          set url "$base_url?q=$query"
+        end
+
+        ${pkgs.flatpak}/bin/flatpak run io.github.zen_browser.zen --new-tab $url
+      '';
+
   scripts.systemd-failed-units =
     pkgs.writers.writeFishBin "systemd-failed-units" { } # fish
       ''
@@ -640,9 +682,21 @@ rec {
   # TODO: checkout https://github.com/azzamsa/zman
   # TODO: checkout https://github.com/6543/batmon/
   home.packages =
-    with pkgs;
+    # with pkgs;
     (builtins.attrValues scripts)
-    ++ [
+    ++ (with pkgs; [
+      hurl
+      # bruno # non shitty alternative to postman and insomnia
+      droidcam
+      xwayland-satellite
+      speedtest-cli
+      cfspeedtest
+      hut # sourcehut cli
+      tea # gitea cli
+      codeberg-cli
+      eww
+      p7zip # opt dependency of `yazi`
+      ueberzugpp # opt dependency of `yazi`
       ripgrep-all # `rga`
       cmd-wrapped
       delta
@@ -656,7 +710,7 @@ rec {
       xsv
       # kdeplasma-addons
       # davinci-resolve
-      # kdenlive
+      kdenlive
       video-trimmer
       identity
       # image-analyzer
@@ -670,12 +724,14 @@ rec {
 
       # gotty
       # gomp # https://github.com/MarkForged/GOMP
+      openjdk
       # qt version recommended if you use kde-plasma
       # https://wiki.nixos.org/wiki/LibreOffice
       libreoffice-qt
       hunspell # https://github.com/hunspell/hunspell
       hunspellDicts.da-dk
       hunspellDicts.en-us
+      onlyoffice-bin
       desktop-file-utils # https://www.freedesktop.org/wiki/Software/desktop-file-utils/
       beeper # Universal chat app using matrix protocol bridges to interoperate with messager, telegram etc.
       vhs
@@ -707,8 +763,8 @@ rec {
       # jetbrains.rust-rover
       # jetbrains.clion
       # jetbrains.pycharm-community-bin
-      # teams-for-linux
-      # libsForQt5.kdialog
+      teams-for-linux
+      # teams
       # yad
       # zenity
       # trippy # provides `trip` binary
@@ -901,8 +957,6 @@ rec {
       gnuplot # plotting utility
       vulkan-tools # vulkan utilities
 
-      # obs-studio # screen recording and streaming
-
       # brotab
       fish
 
@@ -930,7 +984,7 @@ rec {
       presenterm # A markdown terminal slideshow tool
       # https://github.com/chase/awrit
 
-    ];
+    ]);
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
@@ -2020,13 +2074,11 @@ rec {
     };
     extraConfig = # kittyconf
       ''
-        # how much to dim text with the DIM/FAINT escape code attribute
-        dim_opacity 0.5
-
         mouse_map left release grabbed,ungrabbed mouse_handle_click link
       '';
     settings = {
       background_opacity = "0.99";
+      dim_opacity = "0.5";
       allow_remote_control = "yes";
       dynamic_background_opacity = "yes";
       # listen_on =
@@ -2038,14 +2090,38 @@ rec {
       window_padding_width = 6;
       scrollback_lines = 10000;
       enable_audio_bell = false;
+      bell_on_tab = "🔔 ";
+      visual_bell_duration = "2.0 ease-in linear";
+      visual_bell_color = palette.catppuccin.red.hex;
       update_check_interval = 0;
+      sync_to_monitor = true; # sync frame-rate to match with monitor
+      window_alert_on_bell = "yes";
+      # command_on_bell = "none";
+      # https://sw.kovidgoyal.net/kitty/conf/#opt-kitty.command_on_bell
+      # TODO: on `niri` ask compositor to focus window, and kitty to focus the tab
+      # TODO: or more general use the wayland protocol to ask for window/focus to be more
+      # compositor agnostic
+      command_on_bell = pkgs.lib.getExe (
+        pkgs.writers.writeFishBin "kitty_command_on_bell" { }
+          # fish
+          ''
+            # TODO: estimate which binary we have run, e.g. if we ran cargo build it would be funny to have the
+            # icon be a ferris crab
+            ${pkgs.libnotify}/bin/notify-send --icon=kitty kitty "The bell rang: KITTY_CHILD_CMDLINE"
+          ''
+      );
+      # https://sw.kovidgoyal.net/kitty/conf/#opt-kitty.bell_path
+      # TODO: find some funny soundclip to play
+      bell_path = "none";
       # background_opacity = 0.9;
       strip_trailing_spaces = "smart";
       # Links
       allow_hyperlinks = "yes";
       # TODO: use catppuccin color
-      url_color = "#0087bd";
-      url_style = "curly";
+      # url_color = "#0087bd";
+      url_color = palette.catppuccin.sky.hex;
+      # url_style = "curly";
+      url_style = "dotted";
       open_url_with = "default";
       detect_urls = "yes";
       show_hyperlink_targets = "yes";
@@ -2074,10 +2150,11 @@ rec {
       # tab_switch_strategy  = "previous";
       tab_switch_strategy = "last";
       tab_activity_symbol = "⏰";
+      # TODO: use catppuccin color
       # https://sw.kovidgoyal.net/kitty/conf/#opt-kitty.tab_title_template
       tab_title_template = "{fmt.fg.red}{bell_symbol} {activity_symbol}{fmt.fg.tab}{title}";
-      tab_bar_background = "blue";
-      tab_bar_margin_color = "red";
+      tab_bar_background = palette.catppuccin.surface0.hex;
+      tab_bar_margin_color = palette.catppuccin.flamingo.hex;
     };
     shellIntegration.mode = "no-cursor";
     shellIntegration.enableFishIntegration = true;
@@ -2304,9 +2381,26 @@ rec {
 
   programs.rio = {
     enable = true;
-    catppuccin.enable = false;
+    # catppuccin.enable = false;
     settings = {
-      editor = "hx";
+      shell = {
+        program = "${pkgs.fish}/bin/fish";
+        args = [ "--login" ];
+      };
+      editor = {
+        program = "hx";
+        args = [ ];
+      };
+      # confirm-before-quit = true;
+      # cursor = {
+      #   shape = "beam";
+      #   blinking = false;
+      # };
+      # env-vars = [];
+      # hide-mouse-cursor-when-typing = false;
+      # window = {
+      #   blur = true;
+      # };
       # blinking-cursor = false;
       # hide-cursor-when-typing = false;
       # confirm-before-quit = true;
@@ -2473,6 +2567,12 @@ rec {
         rev = "a8421d98bbea11bee242883f2f7420e5ca498b3f";
         hash = "sha256-0RZHBF2J2jMbCHcM71lHdn99diDr0zrMiorFgtVL5pI=";
       };
+      kdeconnect-yazi = pkgs.fetchFromGitHub {
+        owner = "kpbaks";
+        repo = "kdeconnect.yazi";
+        rev = "f6ae6bd007be970ac17fafc0a84d87eeeb1c4494";
+        hash = "sha256-sr92pLVzY/f+MnhhAEbdefz99QdlZRN3x+yQFtXUMD8=";
+      };
     in
     {
       enable = true;
@@ -2527,6 +2627,7 @@ rec {
         mime-ext = "${plugins-repo}/mime-ext.yazi";
         smart-filter = "${plugins-repo}/smart-filter.yazi";
         jump-to-char = "${plugins-repo}/jump-to-char.yazi";
+        # kdeconnect = "${kdeconnect-yazi}";
       };
 
       initLua =
@@ -2538,6 +2639,9 @@ rec {
           }
           require("git"):setup()
           require("no-status"):setup()
+          require("kdeconnect"):setup {
+            device = "c439e91904ce0298"
+          }
         '';
 
       keymap =
@@ -2616,6 +2720,11 @@ rec {
                 on = [ "T" ];
                 run = "plugin --sync max-preview";
                 desc = "Maximize or restore preview";
+              }
+              {
+                on = [ "K" ];
+                run = "plugin --sync kdeconnect";
+                desc = "";
               }
             ];
         };
@@ -4940,15 +5049,8 @@ rec {
   # TODO: see if this is possible in home-manager
   # https://github.com/YaLTeR/niri/wiki/Example-systemd-Setup
   # xdg.configFile."systemd/user/niri.service.wants";
+  programs.niri.enable = true;
   programs.niri = {
-    # enable = osConfig.programs.niri.enable;
-    enable = false;
-    # config = ''
-    #   window-rule {
-    #       match app-id=r#"^org\.wezfurlong\.wezterm$"#
-    #       default-column-width {}
-    #   }
-    # '';
     settings = {
       input.keyboard.xkb = {
         layout = "us,dk";
@@ -4974,7 +5076,8 @@ rec {
       };
       prefer-no-csd = true;
       environment = {
-        DISPLAY = null;
+        # DISPLAY = null;
+        DISPLAY = ":0";
         MOZ_ENABLE_WAYLAND = "1";
         NIXOS_OZONE_WL = "1";
         QT_QPA_PLATFORM = "wayland";
@@ -4984,18 +5087,24 @@ rec {
       };
 
       layout = {
-        gaps = 8; # px
+        gaps = 16; # px
         struts =
           let
             strut = 16;
             vertical = 8;
             horizontal = 16;
           in
+          # {
+          #   left = 4;
+          #   right = 4;
+          #   top = 8;
+          #   bottom = 8;
+          # };
           {
-            left = 4;
-            right = 4;
-            top = 8;
-            bottom = 8;
+            left = 0;
+            right = 0;
+            top = 0;
+            bottom = 0;
           };
         center-focused-column = "on-overflow";
         # center-focused-column = "never";
@@ -5006,16 +5115,19 @@ rec {
           { proportion = 2.0 / 3.0; }
         ];
         # default-column-width = {proportion = 1.0 / 3.0;};
-        default-column-width.proportion = 1.0 / 2.0;
+        # default-column-width.proportion = 1.0 / 2.0;
+        default-column-width.proportion = 2.0 / 3.0;
         # default-column-width = {proportion = 1.0;};
         focus-ring = {
           enable = true;
-          width = 2;
-          active.gradient = {
-            from = "#80c8ff";
-            to = "#d3549a";
-            angle = 45;
-          };
+          width = 4;
+          active.color = palette.catppuccin.lavender.hex;
+          inactive.color = palette.catppuccin.flamingo.hex;
+          # active.gradient = {
+          #   from = "#80c8ff";
+          #   to = "#d3549a";
+          #   angle = 45;
+          # };
         };
       };
       screenshot-path = "~/Pictures/screenshots/screenshot-%Y-%m-%d %H-%M-%S.png";
@@ -5026,19 +5138,31 @@ rec {
       # };
       window-rules = [
         {
+          matches = [
+            {
+              app-id = "^.?scrcpy(-wrapped)?$";
+              at-startup = true;
+            }
+          ];
+
+          default-column-width.proportion =
+            1.0 - config.programs.niri.settings.layout.default-column-width.proportion;
+          # variable-refresh-rate = true;
+        }
+        {
           draw-border-with-background = false;
           # draw each corner as rounded with the same radius
-          geometry-corner-radius =
-            let
-              r = 8.0;
-            in
-            {
-              top-left = r;
-              top-right = r;
-              bottom-left = r;
-              bottom-right = r;
-            };
-          clip-to-geometry = true;
+          # geometry-corner-radius =
+          #   let
+          #     r = 8.0;
+          #   in
+          #   {
+          #     top-left = r;
+          #     top-right = r;
+          #     bottom-left = r;
+          #     bottom-right = r;
+          #   };
+          # clip-to-geometry = true;
         }
         # {
         #   # dim unfocused windows
@@ -5206,6 +5330,8 @@ rec {
           bluetoothctl = spawn "bluetoothctl";
           swayosd-client = spawn "swayosd-client";
           run-flatpak = spawn "flatpak" "run";
+          # browser = spawn "${pkgs.firefox}/bin/firefox";
+          browser = run-flatpak "io.github.zen_browser.zen";
           # run-in-terminal = spawn "kitty";
           # run-in-terminal = spawn "${pkgs.alacritty}/bin/alacritty";
           # run-in-terminal = spawn "${pkgs.kitty}/bin/kitty";
@@ -5285,8 +5411,10 @@ rec {
           # "Mod+?".action = show-hotkey-overlay;
           "Mod+T".action = spawn terminal;
           "Mod+Shift+T".action = spawn terminal "${pkgs.fish}/bin/fish" "--private";
-          "Mod+F".action = spawn "firefox";
-          "Mod+Shift+F".action = spawn "firefox" "--private-window";
+          # "Mod+F".action = spawn "firefox";
+          # "Mod+Shift+F".action = spawn "firefox" "--private-window";
+          "Mod+F".action = browser;
+          "Mod+Shift+F".action = browser "--private-window";
           "Mod+G".action = spawn "telegram-desktop";
           "Mod+S".action = spawn "spotify";
           # "Mod+D".action = spawn "webcord";
@@ -5299,6 +5427,10 @@ rec {
           "Mod+B".action = run-in-terminal (pkgs.lib.getExe scripts.bluetoothctl-startup);
           "Mod+A".action = run-in-terminal (pkgs.lib.getExe scripts.audio-sink);
 
+          "Mod+P".action = spawn (
+            pkgs.lib.getExe scripts.search-clipboard-content-with-browser-search-engine
+          );
+
           # "Mod+B".action = run-in-terminal "bluetoothctl" "--init-script" "/home/${username}/.local/share/bluetoothctl/init-script";
 
           # (pkgs.lib.getExe bluetoothctl-init-script);
@@ -5308,7 +5440,8 @@ rec {
           # "Mod+Shift+E".action = quit;
           # "Mod+Ctrl+Shift+E".action = quit {skip-confirmation = true;};
 
-          "Mod+Y".action = spawn "${pkgs.firefox}/bin/firefox" "https://youtube.com";
+          # "Mod+Y".action = spawn "${pkgs.firefox}/bin/firefox" "https://youtube.com";
+          "Mod+Y".action = browser "https://youtube.com";
 
           "Mod+Plus".action = set-column-width "+10%";
           "Mod+Minus".action = set-column-width "-10%";
@@ -5379,7 +5512,8 @@ rec {
           # "Mod+Comma".action = run-in-fish-within-kitty "${pkgs.helix}/bin/hx ~/dotfiles/{flake,configuration,home}.nix";
           # TODO: improve by checking if an editor process instance is already running, before spawning another
           "Mod+Comma".action = run-with-fish-within-terminal "hx ~/dotfiles/{flake,configuration,home}.nix";
-          "Mod+Period".action = spawn "${pkgs.swaynotificationcenter}/bin/swaync-client" "--toggle-panel";
+          # "Mod+Period".action = spawn "${pkgs.swaynotificationcenter}/bin/swaync-client" "--toggle-panel";
+          "Mod+Period".action = spawn "${pkgs.plasma-desktop}/bin/plasma-emojier";
           # TODO: color picker keybind
 
           # // Actions to switch layouts.
@@ -5409,7 +5543,9 @@ rec {
           # "Mod+Return".action = fish "pidof anyrun; and pkill anyrun; or anyrun";
           # "Mod+Return".action = fish "pidof nwg-drawer; and pkill nwg-drawer; or nwg-drawer -ovl -fm dolphin";
           # "Mod+Return".action = fish "pidof fuzzel; and pkill fuzzel; or fuzzel";
+          # TODO: use for a dashboard like view. Whenever you manage to implement it...
           "Mod+Return".action = fish "pidof ${pkgs.walker}/bin/walker; and pkill walker; or ${pkgs.walker}/bin/walker";
+          "Mod+Slash".action = fish "pidof ${pkgs.walker}/bin/walker; and pkill walker; or ${pkgs.walker}/bin/walker";
 
           "Mod+Shift+P".action = power-off-monitors;
           # Mod+R { switch-preset-column-width; }
@@ -6216,6 +6352,8 @@ rec {
     name = "Systemd - List Failed Units";
     # exec = "emacsclient -- %u";
     exec = pkgs.lib.getExe scripts.systemd-failed-units;
+    # TODO: use this icon
+    # https://raw.githubusercontent.com/systemd/systemd/main/docs/assets/systemd-logo.svg
     terminal = true;
     type = "Application";
     categories = [ "System" ];
@@ -6236,6 +6374,31 @@ rec {
   # };
 
   programs.obs-studio.enable = true;
+  programs.obs-studio.plugins = with pkgs.obs-studio-plugins; [
+    # waveform
+    wlrobs
+    obs-vaapi
+    droidcam-obs
+    # obs-gstreamer
+    # input-overlay
+    # obs-shaderfilter
+    # obs-vintage-filter
+    # obs-composite-blur
+    # obs-source-switcher
+    # obs-gradient-source
+    # obs-pipewire-audio-capture
+  ];
+  xdg.configFile."obs-studio/themes" = {
+    source =
+      (pkgs.fetchFromGitHub {
+        owner = "catppuccin";
+        repo = "obs";
+        rev = "b17939991545bdd6232e688ec5004b6dfae46f69";
+        hash = "sha256-1Stlcfcl/DZMPPqsShst849Ns0Lgk9D2SekMhTy7zZY=";
+      })
+      + "/themes";
+  };
+
   systemd.user.startServices = "sd-switch";
 
   programs.nushell = {
@@ -6257,6 +6420,7 @@ rec {
   };
 
   # FIXME: something is incorrect
+  # TODO: upstream to home-manager
   xdg.configFile."erdtree/.erdtree.toml".source = (pkgs.formats.toml { }).generate "erdtree-config" {
     icons = true;
     human = true;
@@ -6275,10 +6439,35 @@ rec {
     Service.ExecStart = "${pkgs.copyq}/bin/copyq";
   };
 
+  systemd.user.services.eww-daemon = {
+    Install.WantedBy = [ "graphical-session.target" ];
+    Service.ExecStart = "${pkgs.eww}/bin/eww daemon";
+  };
+
   # FIXME: get to work under wayland and nixos
   systemd.user.services.birdtray = {
     Install.WantedBy = [ "graphical-session.target" ];
     Service.ExecStart = "${pkgs.birdtray}/bin/birdtray";
+  };
+
+  # TODO: check it works correctly
+  # Used for Xwayland integration in `niri`
+  # Copied from: https://github.com/Supreeeme/xwayland-satellite/blob/main/resources/xwayland-satellite.service
+  systemd.user.services.xwayland-satellite = {
+    Unit = {
+      Description = "Xwayland outside your Wayland";
+      BindsTo = "graphical-session.target";
+      PartOf = "graphical-session.target";
+      After = "graphical-session.target";
+      Requisite = "graphical-session.target";
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+    Service = {
+      Type = "notify";
+      NotifyAccess = "all";
+      ExecStart = "${pkgs.xwayland-satellite}/bin/xwayland-satellite";
+      StandardOutput = "journal";
+    };
   };
 
   # TODO: add home-manager support to nixd
@@ -6289,7 +6478,7 @@ rec {
     extraConfig = # lua
       ''
         -- Pull in the wezterm API
-        -- local wezterm = require 'wezterm'
+        -- local wezterm = require "wezterm"
 
         -- This will hold the configuration.
         local config = wezterm.config_builder()
@@ -6313,11 +6502,7 @@ rec {
     .tables
   '';
 
-  programs.spotify-player = {
-    enable = true;
-    # catppuccin.enable = false;
-  };
-
+  programs.spotify-player.enable = true;
   services.spotifyd.enable = false;
 
   # TODO: write
@@ -6333,6 +6518,10 @@ rec {
   '';
 
   gtk.enable = true;
+  gtk.theme = {
+    name = "adw-gtk3";
+    package = pkgs.adw-gtk3;
+  };
 
   qt.enable = true;
   # qt.style.name = "kvantum";
@@ -6430,4 +6619,36 @@ rec {
 
   # ~/.config/superfile/hotkeys.toml
   # https://superfile.netlify.app/configure/custom-hotkeys/
+
+  # systemd.user.services.xwayland-satellite = {
+  #   Unit = {
+  #     Description = "Xwayland outside your Wayland";
+  #     BindsTo = "graphical-session.target";
+  #     PartOf = "graphical-session.target";
+  #     After = "graphical-session.target";
+  #     Requisite = "graphical-session.target";
+  #   };
+  #   Install.WantedBy = [ "graphical-session.target" ];
+  #   Service = {
+  #     Type = "notify";
+  #     NotifyAccess = "all";
+  #     ExecStart = "${pkgs.xwayland-satellite}/bin/xwayland-satellite";
+  #     StandardOutput = "journal";
+  #   };
+  # };
+
+  systemd.user.services.droidcam = {
+    Unit = {
+      Description = "Start the droidcam client and connect to your phone over IP LAN";
+      BindsTo = "graphical-session.target";
+      PartOf = "graphical-session.target";
+      After = "graphical-session.target";
+      Requisite = "graphical-session.target";
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+    Service = {
+      ExecStart = "${pkgs.droidcam}/bin/droidcam-cli 192.168.0.134 4747 -a -v";
+      StandardOutput = "journal";
+    };
+  };
 }

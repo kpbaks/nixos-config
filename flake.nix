@@ -123,6 +123,7 @@
     # TODO: checkout
     # https://github.com/fufexan/nix-gaming
 
+    # FIXME: why is no `nixos` binary available?
     nixos-cli = {
       url = "github:water-sucks/nixos";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -136,11 +137,18 @@
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # TODO: try out and setup
+    # https://github.com/Toqozz/wired-notify
+    wired-notify = {
+      url = "github:Toqozz/wired-notify";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
     {
-      self,
+      # self,
       nixpkgs,
       home-manager,
       ...
@@ -321,6 +329,7 @@
                     ];
                     cmd = verb: "<cmd>${verb}<cr>";
                     leader = keys: "<leader>${keys}";
+                    ctrl = key: "<c-${key}>";
                   in
 
                   [
@@ -337,23 +346,45 @@
                       key = "gn";
                       options.silent = true;
                       options.desc = "focus next buffer";
-
+                      inherit mode;
                     }
                     {
-                      action = cmd "bclose";
+                      action = cmd "bdelete";
                       key = leader "q";
+                      inherit mode;
                     }
                     {
                       action = "G";
                       key = "ge";
+                      inherit mode;
+                    }
+                    {
+                      key = ctrl "s";
+                      action = cmd "update";
+                      inherit mode;
+
                     }
                     {
                       action = cmd "Telescope find_files";
                       key = "<leader>f";
+                      inherit mode;
                     }
                     {
                       action = cmd "Telescope diagnostics";
                       key = "<leader>d";
+                      inherit mode;
+                    }
+                    {
+                      key = "gw";
+                      mode = [
+                        "n"
+                        "x"
+                        "o"
+                      ];
+                      action.__raw = ''
+                        function() require("flash").jump() end
+                      '';
+                      # option.desc = "Flash";
                     }
                   ];
 
@@ -473,7 +504,13 @@
                   enhancedDiffHl = true;
                 };
 
-                programs.nixvim.plugins.flash.enable = true;
+                programs.nixvim.plugins.flash = {
+                  enable = true;
+                  settings = {
+                    continue = true;
+                    modes.char.jump_labels = true; # `f` `t` `F` and `T` with labels
+                  };
+                };
                 programs.nixvim.plugins.markview.enable = true;
                 # programs.nixvim.plugins.trim.enable = true;
                 programs.nixvim.plugins.zen-mode.enable = true;
@@ -491,7 +528,7 @@
                     # TODO: map to ctrl-c
                     comment = { };
                     files = { };
-                    jump = { };
+                    # jump = { };
                     # indentscope = { };
                     trailspace = { };
                     map = { };
@@ -608,6 +645,57 @@
                   # url = "https://www.pixelstalk.net/wp-content/uploads/2016/05/Epic-Anime-Awesome-Wallpapers.jpg";
                   # sha256 = "enQo3wqhgf0FEPHj2coOCvo7DuZv+x5rL/WIo4qPI50=";
                 };
+              }
+            )
+            (
+              { ... }:
+              {
+                imports = [
+                  inputs.plasma-manager.homeManagerModules.plasma-manager
+                ];
+
+                programs.plasma.enable = true;
+                programs.kate.enable = true;
+                programs.kate.editor.brackets = {
+                  automaticallyAddClosing = true;
+                  flashMatching = true;
+                  highlightMatching = true;
+                  highlightRangeBetween = true;
+                };
+                programs.kate.editor.font = {
+                  family = "JetBrains Mono";
+                  pointSize = 14;
+                };
+
+                programs.okular = {
+                  enable = true;
+                  accessibility.highlightLinks = true;
+                  general = {
+                    obeyDrm = false;
+                    showScrollbars = true;
+                    zoomMode = "fitPage";
+                    viewMode = "FacingFirstCentered";
+                  };
+                  performance = {
+                    enableTransparencyEffects = false;
+                  };
+                };
+
+                # programs.plasma.kwin.enable = true;
+                # programs.plasma.scripts.polonium.enable = true;
+
+                programs.plasma.spectacle.shortcuts = {
+                  # launch = null;
+                  # enable = true;
+                };
+
+                programs.plasma.workspace.cursor = {
+                  size = 24;
+                  theme = "Breeze_Snow";
+                };
+
+                programs.plasma.workspace.iconTheme = "Papirus";
+                programs.plasma.workspace.lookAndFeel = "org.kde.breeze.desktop";
               }
             )
           ];
