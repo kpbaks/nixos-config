@@ -144,6 +144,15 @@
       url = "github:Toqozz/wired-notify";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # TODO: create a similar implementation that is native to `niri`
+    # can use a similar overlay to the print screen feature
+    # Should it be possible to zoom in, while stuff is being rendered?
+    # TODO: upstream to nixpkgs
+    woomer = {
+      url = "github:coffeeispower/woomer";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -696,6 +705,14 @@
 
                 programs.plasma.workspace.iconTheme = "Papirus";
                 programs.plasma.workspace.lookAndFeel = "org.kde.breeze.desktop";
+              }
+            )
+            (
+              { ... }:
+              {
+                home.packages = [
+                  inputs.woomer.packages.${system}.default
+                ];
               }
             )
           ];

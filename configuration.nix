@@ -443,6 +443,16 @@ rec {
   # services.xserver.desktopManager.gnome.enable = true;
   # services.xserver.displayManager.gdm.enable = true;
 
+  services.xserver.desktopManager.gnome.enable = true;
+  # Exclude applications installed with Gnome
+  environment.gnome.excludePackages = with pkgs; [
+    gnome-tour
+    gnome-connections
+    epiphany
+    geary
+    evince
+  ];
+
   services.desktopManager.plasma6.enable = true;
 
   # TODO: change to en_US
@@ -1082,4 +1092,7 @@ rec {
   # WARNING: No NSS support for mDNS detected, consider installing nss-mdns!
   # *** WARNING: Detected another IPv4 mDNS stack running on this host. This makes mDNS unreliable and is thus not recommended. ***
   services.avahi.enable = true;
+
+  # TODO: enable if you ever get a device that has this sensor
+  # hardware.sensor.iio.enable = false;
 }
