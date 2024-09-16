@@ -565,6 +565,7 @@ rec {
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
+    adbfs-rootless
     # TODO: checkout and experiment with (tir 10 sep 21:58:53 CEST 2024)
     numactl
     numad
@@ -1095,4 +1096,14 @@ rec {
 
   # TODO: enable if you ever get a device that has this sensor
   # hardware.sensor.iio.enable = false;
+
+  services.vnstat.enable = true;
+
+  # TODO: try this service
+  # services.netdata.enable = true;
+
+  systemd.oomd.enable = true;
+  systemd.oomd.enableUserSlices = true;
+  systemd.oomd.extraConfig = { };
+  # services.earlyoom.enable = true;
 }

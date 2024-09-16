@@ -685,8 +685,9 @@ rec {
     # with pkgs;
     (builtins.attrValues scripts)
     ++ (with pkgs; [
-      vlc
-      hurl
+      curlie # prettier alternative to `curl`
+      vlc # media player
+      hurl # http request test tool
       # bruno # non shitty alternative to postman and insomnia
       droidcam
       xwayland-satellite
@@ -1036,20 +1037,68 @@ rec {
     options = null;
   };
 
-  programs.atuin = {
-    enable = true;
-    enableFishIntegration = true;
-    flags = [
-      "--disable-up-arrow"
-      # "--disable-ctrl-r"
-    ];
-    settings = {
-      auto_sync = true;
-      sync_frequency = "5m";
-      sync_address = "https://api.atuin.sh";
-      search_mode = "prefix";
-    };
+  # TODO:
+  # 1. add pr to add a `shell` column to the `history` sqlite table, to differentiate between
+  #    commands that are valid in `fish` and not in `nushell` and vice versa.
+  # 2. See if catppuccin has a color theme
+  # 3. Add pr that adds syntax coloring for completion candidates
+  # 4. Add pr to search for specific status code e.g. `$?=139` to search for all segfaults
+  programs.atuin.enable = true;
+  programs.atuin.enableFishIntegration = true;
+  programs.atuin.flags = [
+    "--disable-up-arrow"
+    # "--disable-ctrl-r"
+  ];
+  programs.atuin.settings = {
+    auto_sync = true;
+    invert = false;
+    inline_height = 20;
+    show_preview = true;
+    max_preview_height = 4;
+    style = "compact";
+    workspaces = true;
+    filter_mode_shell_up_key_binding = "session";
+    sync_frequency = "1h";
+    store_failed = true;
+    secrets_filter = true;
+    sync_address = "https://api.atuin.sh";
+    # search_mode = "prefix";:w
 
+    search_mode = "fuzzy";
+    theme.name = "marine";
+    stats = {
+      common_subcommands = [
+        "apt"
+        "cargo"
+        "composer"
+        "dnf"
+        "docker"
+        "git"
+        "go"
+        "ip"
+        "kubectl"
+        "nix"
+        "nmcli"
+        "npm"
+        "pecl"
+        "pnpm"
+        "podman"
+        "port"
+        "systemctl"
+        "tmux"
+        "yarn"
+      ];
+      common_prefix = [
+        "sudo"
+        "run0"
+      ];
+      ignored_commands = [
+        "cd"
+        "ls"
+        "hx"
+      ];
+    };
+    daemon.systemd_socket = true;
   };
 
   # https://alacritty.org/config-alacritty.html
@@ -2907,14 +2956,9 @@ rec {
     };
   };
 
-  programs.zellij = {
-    enable = true;
-    # catppuccin.enable = false;
-  };
+  programs.zellij.enable = true;
 
-  programs.zoxide = {
-    enable = true;
-  };
+  programs.zoxide.enable = true;
 
   programs.zsh.enable = true;
 
@@ -2929,15 +2973,13 @@ rec {
       dbusserver = true;
     };
     # TODO: change fish color theme
+    # TODO: change qt apps
     darkModeScripts = {
       gtk-theme = ''
         ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
       '';
       desktop-notification = ''
         ${pkgs.libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear-night "switching to dark mode"
-      '';
-      hyprland-wallpaper = ''
-        ${pkgs.swww}/bin/swww img ~/Pictures/wallpapers/dark
       '';
     };
     # TODO: change fish color theme
@@ -2947,9 +2989,6 @@ rec {
       '';
       desktop-notification = ''
         ${pkgs.libnotify}/bin/notify-send notify-send --app-name="darkman" --urgency=low --icon=weather-clear "switching to light mode"
-      '';
-      hyprland-wallpaper = ''
-        ${pkgs.swww}/bin/swww img ~/Pictures/wallpapers/light
       '';
     };
   };
@@ -3384,6 +3423,7 @@ rec {
   services.kdeconnect = {
     enable = true;
     indicator = true;
+    package = pkgs.kdePackages.kdeconnect-kde;
   };
 
   services.espanso =
@@ -3395,7 +3435,9 @@ rec {
       };
     in
     {
-      enable = false;
+      enable = true;
+      package = pkgs.espanso-wayland;
+
       configs.default = {
         backend = "Auto";
         auto_restart = true;
@@ -3406,21 +3448,67 @@ rec {
         toggle_key = "ALT";
         search_shortcut = "ALT+SHIFT+ENTER";
       };
-      matches.base.matches = [
-        (espanso-match "tuta" tutamail)
-        (espanso-match "gmail" gmail)
-        (espanso-match "email" email)
-        (espanso-match "aumail" aumail)
-        (espanso-match "tf" telephone-number)
-        (espanso-match "phone" telephone-number)
-        (espanso-match "name" name)
-        (espanso-match "fname" full-name)
-        (espanso-match "addr" "Helsingforsgade 19 st, 4")
-        (espanso-match "rg" ''
-          Regards
-          ${full-name}
-        '')
-      ];
+      matches.base.matches =
+
+        # [
+        #   (espanso-match "tuta" tutamail)
+        #   (espanso-match "gmail" gmail)
+        #   (espanso-match "email" email)
+        #   # (espanso-match "aumail" aumail)
+        #   (espanso-match "tf" telephone-number)
+        #   (espanso-match "phone" telephone-number)
+        #   (espanso-match "name" name)
+        #   (espanso-match "fname" full-name)
+        #   # (espanso-match "addr" "Helsingforsgade 19 st, 4")
+        #   (espanso-match "addr" "Søren Frichs Vej 55G, 2.12")
+        #   (espanso-match "rg" ''
+        #     Regards
+        #     ${full-name}
+        #   '')
+        # ];
+        [
+          [
+            "tuta"
+            tutamail
+          ]
+          [
+            "gmail"
+            gmail
+          ]
+          [
+            "email"
+            email
+          ]
+          # (espanso-match "aumail" aumail)
+          [
+            "tf"
+            telephone-number
+          ]
+          [
+            "phone"
+            telephone-number
+          ]
+          [
+            "name"
+            name
+          ]
+          [
+            "fname"
+            full-name
+          ]
+          # (espanso-match "addr" "Helsingforsgade 19 st, 4")
+          [
+            "addr"
+            "Søren Frichs Vej 55G, 2.12"
+          ]
+          [
+            "rg"
+            ''
+              Regards
+              ${full-name}
+            ''
+          ]
+        ];
     };
 
   # xdg-mime query default image/svg+xml
@@ -3460,10 +3548,10 @@ rec {
   xdg.portal.xdgOpenUsePortal = true;
   xdg.portal.config.common.default = "kde";
   xdg.portal.extraPortals = [
-    pkgs.xdg-desktop-portal-gtk
+    # pkgs.xdg-desktop-portal-gtk
     pkgs.xdg-desktop-portal-kde
     # pkgs.xdg-desktop-portal-hyprland
-    pkgs.xdg-desktop-portal-wlr
+    # pkgs.xdg-desktop-portal-wlr
     # pkgs.xdg-desktop-portal-cosmic
   ];
 
@@ -3838,7 +3926,7 @@ rec {
   # TODO: use https://github.com/raffaem/waybar-mediaplayer
   # https://github.com/raffaem/waybar-screenrecorder
   programs.waybar = {
-    enable = true;
+    enable = false;
     # catppuccin.enable = false;
     catppuccin.mode = "prependImport";
     # FIXME: does not start with `niri`
@@ -5067,7 +5155,7 @@ rec {
   programs.niri.settings.input.warp-mouse-to-focus = true;
   programs.niri.settings.input.keyboard.track-layout = "window";
 
-  programs.niri.settings.input.mouse.left-handed = true;
+  programs.niri.settings.input.mouse.left-handed = false;
 
   programs.niri.settings.environment = {
     # DISPLAY = null;
@@ -5124,6 +5212,15 @@ rec {
     };
   };
   programs.niri.settings.window-rules = [
+    {
+      # TODO: verify it works
+      matches = [
+        { app-id = "^org.freedesktop.impl.portal.desktop.kde$"; }
+      ];
+
+      default-column-width.proportion =
+        1.0 - config.programs.niri.settings.layout.default-column-width.proportion;
+    }
     {
       matches = [
         {
@@ -6433,6 +6530,7 @@ rec {
     Service.ExecStart = "${pkgs.birdtray}/bin/birdtray";
   };
 
+  # FIXME: does not load correctly
   # TODO: check it works correctly
   # Used for Xwayland integration in `niri`
   # Copied from: https://github.com/Supreeeme/xwayland-satellite/blob/main/resources/xwayland-satellite.service
@@ -6634,4 +6732,9 @@ rec {
       StandardOutput = "journal";
     };
   };
+
+  # TODO: change
+  # https://litecli.com/config/
+  # xdg.configFile."litecli/config".text = '''';
+
 }

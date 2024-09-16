@@ -5,6 +5,7 @@
 
   description = "@kpbaks' NixOS configuration";
 
+  # TODO(learn): what is the difference between `*` and `extra-*` options?
   nixConfig = {
     extra-experimental-features = "nix-command flakes";
     extra-substituters = [
@@ -15,6 +16,7 @@
       "https://helix.cachix.org"
       "https://yazi.cachix.org"
       "https://cosmic.cachix.org/"
+      "https://cache.garnix.io" # used by `ironbar`
     ];
     extra-trusted-public-keys = [
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
@@ -24,6 +26,7 @@
       "helix.cachix.org-1:ejp9KQpR1FBI2onstMQ34yogDm4OgU2ru6lIwPvuCVs="
       "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
       "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE="
+      "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
     ];
   };
 
@@ -151,6 +154,11 @@
     # TODO: upstream to nixpkgs
     woomer = {
       url = "github:coffeeispower/woomer";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    ironbar = {
+      url = "github:JakeStanger/ironbar";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -715,6 +723,26 @@
                 ];
               }
             )
+            # (
+            #   { ... }:
+            #   {
+            #     imports = [
+            #       inputs.ironbar.homeManagerModules.default
+            #     ];
+
+            #     # And configure
+            #     programs.ironbar = {
+            #       enable = true;
+            #       config = { };
+            #       style = "";
+            #       package = inputs.ironbar;
+            #       features = [
+            #         # "feature"
+            #         # "another_feature"
+            #       ];
+            #     };
+            #   }
+            # )
           ];
         };
       };
