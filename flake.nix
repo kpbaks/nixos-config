@@ -161,6 +161,17 @@
       url = "github:JakeStanger/ironbar";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # TODO: checkout
+    # https://github.com/vinceliuice/grub2-themes
+    # grub2-themes = {
+    #   url = "github:vinceliuice/grub2-themes";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
+
+    zjstatus = {
+      url = "github:dj95/zjstatus";
+    };
   };
 
   outputs =
@@ -176,6 +187,7 @@
       system = "x86_64-linux";
       overlays = [
         inputs.niri.overlays.niri
+        (final: prev: { zjstatus = inputs.zjstatus.packages.${prev.system}.default; })
         # inputs.neovim-nightly-overlay.overlay
       ];
       pkgs = import nixpkgs {
@@ -664,57 +676,57 @@
                 };
               }
             )
-            (
-              { ... }:
-              {
-                imports = [
-                  inputs.plasma-manager.homeManagerModules.plasma-manager
-                ];
+            # (
+            #   { ... }:
+            #   {
+            #     imports = [
+            #       inputs.plasma-manager.homeManagerModules.plasma-manager
+            #     ];
 
-                programs.plasma.enable = true;
-                programs.kate.enable = true;
-                programs.kate.editor.brackets = {
-                  automaticallyAddClosing = true;
-                  flashMatching = true;
-                  highlightMatching = true;
-                  highlightRangeBetween = true;
-                };
-                programs.kate.editor.font = {
-                  family = "JetBrains Mono";
-                  pointSize = 14;
-                };
+            #     programs.plasma.enable = true;
+            #     programs.kate.enable = true;
+            #     programs.kate.editor.brackets = {
+            #       automaticallyAddClosing = true;
+            #       flashMatching = true;
+            #       highlightMatching = true;
+            #       highlightRangeBetween = true;
+            #     };
+            #     programs.kate.editor.font = {
+            #       family = "JetBrains Mono";
+            #       pointSize = 14;
+            #     };
 
-                programs.okular = {
-                  enable = true;
-                  accessibility.highlightLinks = true;
-                  general = {
-                    obeyDrm = false;
-                    showScrollbars = true;
-                    zoomMode = "fitPage";
-                    viewMode = "FacingFirstCentered";
-                  };
-                  performance = {
-                    enableTransparencyEffects = false;
-                  };
-                };
+            #     programs.okular = {
+            #       enable = true;
+            #       accessibility.highlightLinks = true;
+            #       general = {
+            #         obeyDrm = false;
+            #         showScrollbars = true;
+            #         zoomMode = "fitPage";
+            #         viewMode = "FacingFirstCentered";
+            #       };
+            #       performance = {
+            #         enableTransparencyEffects = false;
+            #       };
+            #     };
 
-                # programs.plasma.kwin.enable = true;
-                # programs.plasma.scripts.polonium.enable = true;
+            #     # programs.plasma.kwin.enable = true;
+            #     # programs.plasma.scripts.polonium.enable = true;
 
-                programs.plasma.spectacle.shortcuts = {
-                  # launch = null;
-                  # enable = true;
-                };
+            #     programs.plasma.spectacle.shortcuts = {
+            #       # launch = null;
+            #       # enable = true;
+            #     };
 
-                programs.plasma.workspace.cursor = {
-                  size = 24;
-                  theme = "Breeze_Snow";
-                };
+            #     programs.plasma.workspace.cursor = {
+            #       size = 24;
+            #       theme = "Breeze_Snow";
+            #     };
 
-                programs.plasma.workspace.iconTheme = "Papirus";
-                programs.plasma.workspace.lookAndFeel = "org.kde.breeze.desktop";
-              }
-            )
+            #     programs.plasma.workspace.iconTheme = "Papirus";
+            #     programs.plasma.workspace.lookAndFeel = "org.kde.breeze.desktop";
+            #   }
+            # )
             (
               { ... }:
               {
@@ -723,26 +735,70 @@
                 ];
               }
             )
-            # (
-            #   { ... }:
-            #   {
-            #     imports = [
-            #       inputs.ironbar.homeManagerModules.default
-            #     ];
+            (
+              { config, ... }:
+              {
+                imports = [
+                  inputs.ironbar.homeManagerModules.default
+                ];
 
-            #     # And configure
-            #     programs.ironbar = {
-            #       enable = true;
-            #       config = { };
-            #       style = "";
-            #       package = inputs.ironbar;
-            #       features = [
-            #         # "feature"
-            #         # "another_feature"
-            #       ];
-            #     };
-            #   }
-            # )
+                # And configure
+
+                # [[start]]
+                # type = "workspaces"
+                # all_monitors = false
+
+                # [start.name_map]
+                # 1 = "󰙯"
+                # 2 = "icon:firefox"
+                # 3 = ""
+                # Games = "icon:steam"
+                # Code = ""
+
+                programs.ironbar = {
+                  enable = true;
+                  config = {
+                    position = "bottom";
+                    # start = [
+                    #   {
+                    #     type = "workspaces";
+                    #     all_monitors = true;
+                    #     name_map = {
+                    #       "1" = 
+                    #     }
+                    #   }
+                    # ]
+
+                    # [end]]
+                    # type = "music"
+                    # player_type = "mpd"
+                    # music_dir = "/home/jake/Music"
+
+                    end = [
+                      {
+                        type = "music";
+                        player_type = "mpd";
+                        music_dir = "${config.home.homeDirectory}/Music";
+                      }
+                      {
+                        type = "network_manager";
+                        icon_size = 32;
+                      }
+                      {
+                        type = "clock";
+                        format = "%d/%m/%Y %H:%M";
+                      }
+                    ];
+                  };
+                  style = "";
+                  # package = inputs.ironbar;
+                  features = [
+                    # "feature"
+                    # "another_feature"
+                  ];
+                };
+              }
+            )
           ];
         };
       };

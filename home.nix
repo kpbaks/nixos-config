@@ -19,9 +19,6 @@ let
   # city = "Aarhus";
   # country = "Denmark";
 
-  lib = pkgs.lib;
-  # join = lib.strings.concatStringsSep;
-  # mapjoin = lib.strings.concatMapStringsSep;
   range = from: to: builtins.genList (i: from + i) (to - from);
   merge = list: builtins.foldl' (acc: it: acc // it) { } list;
   font.monospace = "Iosevka Nerd Font Mono";
@@ -685,6 +682,9 @@ rec {
     # with pkgs;
     (builtins.attrValues scripts)
     ++ (with pkgs; [
+      tparse
+      rich-cli
+      plocate # Much faster `locate`
       curlie # prettier alternative to `curl`
       vlc # media player
       hurl # http request test tool
@@ -1055,7 +1055,7 @@ rec {
     inline_height = 20;
     show_preview = true;
     max_preview_height = 4;
-    style = "compact";
+    # style = "compact";
     workspaces = true;
     filter_mode_shell_up_key_binding = "session";
     sync_frequency = "1h";
@@ -1686,6 +1686,7 @@ rec {
         C-space = "signature_help";
       };
       keys.normal = {
+        y.d = [ ":yank-diagnostic" ];
         ret = [
           "open_below"
           "normal_mode"
@@ -3446,69 +3447,69 @@ rec {
         preserve_clipboard = true;
         undo_backspace = true;
         toggle_key = "ALT";
-        search_shortcut = "ALT+SHIFT+ENTER";
+        # search_shortcut = "ALT+SHIFT+ENTER";
+        search_shortcut = "ALT+SPACE"; # default
       };
-      matches.base.matches =
-
-        # [
-        #   (espanso-match "tuta" tutamail)
-        #   (espanso-match "gmail" gmail)
-        #   (espanso-match "email" email)
-        #   # (espanso-match "aumail" aumail)
-        #   (espanso-match "tf" telephone-number)
-        #   (espanso-match "phone" telephone-number)
-        #   (espanso-match "name" name)
-        #   (espanso-match "fname" full-name)
-        #   # (espanso-match "addr" "Helsingforsgade 19 st, 4")
-        #   (espanso-match "addr" "Søren Frichs Vej 55G, 2.12")
-        #   (espanso-match "rg" ''
-        #     Regards
-        #     ${full-name}
-        #   '')
-        # ];
-        [
-          [
-            "tuta"
-            tutamail
-          ]
-          [
-            "gmail"
-            gmail
-          ]
-          [
-            "email"
-            email
-          ]
-          # (espanso-match "aumail" aumail)
-          [
-            "tf"
-            telephone-number
-          ]
-          [
-            "phone"
-            telephone-number
-          ]
-          [
-            "name"
-            name
-          ]
-          [
-            "fname"
-            full-name
-          ]
-          # (espanso-match "addr" "Helsingforsgade 19 st, 4")
-          [
-            "addr"
-            "Søren Frichs Vej 55G, 2.12"
-          ]
-          [
-            "rg"
-            ''
-              Regards
-              ${full-name}
-            ''
-          ]
-        ];
+      matches.base.matches = [
+        (espanso-match "tuta" tutamail)
+        (espanso-match "gmail" gmail)
+        (espanso-match "email" email)
+        # (espanso-match "aumail" aumail)
+        (espanso-match "tf" telephone-number)
+        (espanso-match "phone" telephone-number)
+        (espanso-match "name" name)
+        (espanso-match "fname" full-name)
+        # (espanso-match "addr" "Helsingforsgade 19 st, 4")
+        (espanso-match "city" "8230 Åbyhøj")
+        (espanso-match "addr" "Søren Frichs Vej 55G, 2.12")
+        (espanso-match "rg" ''
+          Regards
+          ${full-name}
+        '')
+      ];
+      # map (it: espanso-match )[
+      #   [
+      #     "tuta"
+      #     tutamail
+      #   ]
+      #   [
+      #     "gmail"
+      #     gmail
+      #   ]
+      #   [
+      #     "email"
+      #     email
+      #   ]
+      #   # (espanso-match "aumail" aumail)
+      #   [
+      #     "tf"
+      #     telephone-number
+      #   ]
+      #   [
+      #     "phone"
+      #     telephone-number
+      #   ]
+      #   [
+      #     "name"
+      #     name
+      #   ]
+      #   [
+      #     "fname"
+      #     full-name
+      #   ]
+      #   # (espanso-match "addr" "Helsingforsgade 19 st, 4")
+      #   [
+      #     "addr"
+      #     "Søren Frichs Vej 55G, 2.12"
+      #   ]
+      #   [
+      #     "rg"
+      #     ''
+      #       Regards
+      #       ${full-name}
+      #     ''
+      #   ]
+      # ];
     };
 
   # xdg-mime query default image/svg+xml
@@ -5169,12 +5170,13 @@ rec {
   };
   programs.niri.settings.cursor = {
     theme = "breeze_cursors";
-    size = 32;
+    size = 24;
   };
   programs.niri.settings.input.workspace-auto-back-and-forth = true;
   programs.niri.settings.input.keyboard.xkb = {
     layout = "us,dk";
-    variant = "colemak_dh_ortho";
+    variant = "colemak_dh_ortho"; # FIXME: xkbcommon does not regognize this value
+
     # options = "grp:win_space_toggle,compose:ralt,ctrl:nocaps";
     options = "compose:ralt,ctrl:nocaps";
   };
@@ -5344,11 +5346,12 @@ rec {
   programs.niri.settings.spawn-at-startup =
     map (s: { command = pkgs.lib.strings.splitString " " s; })
       [
-        # "swww-daemon"
+        "ironbar"
+        "swww-daemon"
         # "waybar"
-        "${pkgs.systemd}/bin/systemctl --user reset-failed waybar.service" # recommeded by https://github.com/sodiboo/niri-flake
+        # "${pkgs.systemd}/bin/systemctl --user reset-failed waybar.service" # recommeded by https://github.com/sodiboo/niri-flake
         # TODO: does not show-up
-        "${pkgs.telegram-desktop}/bin/telegram-desktop -startintray"
+        # "${pkgs.telegram-desktop}/bin/telegram-desktop -startintray"
         # FIXME: does not work
         # "${pkgs.obs-studio}/bin/obs --minimize-to-tray"
       ];
@@ -6493,7 +6496,7 @@ rec {
             ^kitten diff $default_config $nu.config-path
             ^rm $default_config
           } else {
-            config nu --default | ${lib.getExe config.programs.vscode.package} --diff - $nu.config-path
+            config nu --default | ${pkgs.lib.getExe config.programs.vscode.package} --diff - $nu.config-path
           }
         }
       '';
@@ -6736,5 +6739,67 @@ rec {
   # TODO: change
   # https://litecli.com/config/
   # xdg.configFile."litecli/config".text = '''';
+
+  xdg.configFile."zellij/layouts/default.kdl".text =
+    # kdl
+    ''
+      pane_frames false
+      simplified_ui false
+
+      layout {
+        default_tab_template {
+          pane size=1 borderless=false {
+            plugin location="file:${pkgs.zjstatus}/bin/zjstatus.wasm" {
+              format_left   "{mode} #[fg=#89B4FA,bold]{tabs}"
+              format_center "{session}"
+              format_right  "{command_git_branch} {datetime}"
+              format_space  ""
+
+              border_enabled  "false"
+              border_char     "─"
+              border_format   "#[fg=#6C7086]{char}"
+              border_position "top"
+
+              hide_frame_for_single_pane "true"
+
+              mode_normal  "#[bg=blue] "
+              mode_tmux    "#[bg=#ffc387] "
+
+              tab_normal   "#[fg=#6C7086] {name} "
+              tab_active   "#[fg=#9399B2,bold,italic] {name} "
+
+              command_git_branch_command     "git rev-parse --abbrev-ref HEAD"
+              command_git_branch_format      "#[fg=blue] {stdout} "
+              command_git_branch_interval    "10"
+              command_git_branch_rendermode  "static"
+
+               // formatting for inactive tabs
+              tab_normal              "#[fg=#6C7086]{name}"
+              tab_normal_fullscreen   "#[fg=#6C7086]{name}"
+              tab_normal_sync         "#[fg=#6C7086]{name}"
+
+              // formatting for the current active tab
+              tab_active              "#[fg=blue,bold]{name}#[fg=yellow,bold]{floating_indicator}"
+              tab_active_fullscreen   "#[fg=yellow,bold]{name}#[fg=yellow,bold]{fullscreen_indicator}"
+              tab_active_sync         "#[fg=green,bold]{name}#[fg=yellow,bold]{sync_indicator}"
+
+              // separator between the tabs
+              tab_separator           "#[fg=cyan,bold] ⋮ "
+
+              // indicators
+              tab_sync_indicator       " "
+              tab_fullscreen_indicator " "
+              tab_floating_indicator   ""
+
+              datetime        "#[fg=#6C7086,bold] {format} "
+              datetime_format "%A, %d %b %Y %H:%M:%s"
+              datetime_timezone "Europe/Copenhagen"
+            }
+          }
+
+          children
+        }
+      }
+    '';
 
 }

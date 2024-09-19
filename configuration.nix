@@ -4,45 +4,43 @@
 {
   config,
   pkgs,
-  inputs,
+  # inputs,
   username,
   ...
 }:
-rec {
+{
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     # ./tuxedo-laptop-second-nvme-drive.nix
   ];
 
-  nix.settings = {
-    use-xdg-base-directories = true;
+  nix.settings.use-xdg-base-directories = true;
 
-    experimental-features = [
-      "nix-command"
-      "flakes"
-    ];
-    # TODO: remove keys and caches here as they are specified in `./flake.nix`
-    builders-use-substitutes = true;
-    substituters = [
-      "https://cache.nixos.org"
-      "https://nix-community.cachix.org"
-      "https://cosmic.cachix.org/"
-    ];
-    extra-substituters = [
-      "https://anyrun.cachix.org"
-      "https://yazi.cachix.org"
-    ];
-    trusted-public-keys = [
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE="
-    ];
-    extra-trusted-public-keys = [
-      "anyrun.cachix.org-1:pqBobmOjI7nKlsUMV25u9QHa9btJK65/C8vnO3p346s="
-      "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
-    ];
-    trusted-substituters = [ "https://cache.nixos.org" ];
-  };
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
+  # TODO: remove keys and caches here as they are specified in `./flake.nix`
+  nix.settings.builders-use-substitutes = true;
+  nix.settings.substituters = [
+    "https://cache.nixos.org"
+    "https://nix-community.cachix.org"
+    "https://cosmic.cachix.org/"
+  ];
+  nix.settings.extra-substituters = [
+    "https://anyrun.cachix.org"
+    "https://yazi.cachix.org"
+  ];
+  nix.settings.trusted-public-keys = [
+    "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE="
+  ];
+  nix.settings.extra-trusted-public-keys = [
+    "anyrun.cachix.org-1:pqBobmOjI7nKlsUMV25u9QHa9btJK65/C8vnO3p346s="
+    "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
+  ];
+  nix.settings.trusted-substituters = [ "https://cache.nixos.org" ];
 
   nix.settings.trusted-users = [
     "root"
@@ -103,6 +101,8 @@ rec {
   # boot.loader.timeout = null; # wait indefinitely for user to select
   boot.loader.systemd-boot.enable = true;
   boot.loader.systemd-boot.memtest86.enable = true;
+  boot.loader.systemd-boot.configurationLimit = 10; # Make it harder to fill up /boot partition
+  boot.loader.systemd-boot.consoleMode = "max";
 
   # TODO: try out using `grub` instead of `systemd-boot`
   # https://discourse.nixos.org/t/change-bootloader-from-systemd-to-grub/5977
@@ -202,6 +202,7 @@ rec {
     pipewire
     stdenv.cc.cc
     vulkan-loader
+    # libegl
     # xorg.libX11
     # xorg.libXScrnSaver
     # xorg.libXcomposite
@@ -410,19 +411,33 @@ rec {
 
   networking.networkmanager.enable = true;
   time.timeZone = "Europe/Copenhagen";
-  i18n.defaultLocale = "en_DK.UTF-8";
+  i18n.defaultLocale = "en_US.UTF-8";
 
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "da_DK.UTF-8";
-    LC_IDENTIFICATION = "da_DK.UTF-8";
-    LC_MEASUREMENT = "da_DK.UTF-8";
-    LC_MONETARY = "da_DK.UTF-8";
-    LC_NAME = "da_DK.UTF-8";
-    LC_NUMERIC = "da_DK.UTF-8";
-    LC_PAPER = "da_DK.UTF-8";
-    LC_TELEPHONE = "da_DK.UTF-8";
-    LC_TIME = "da_DK.UTF-8";
-  };
+  i18n.extraLocaleSettings =
+    let
+      # locale = "da_DK.UTF-8";
+      locale = "en_US.UTF-8";
+    in
+    {
+      # LC_ADDRESS = "da_DK.UTF-8";
+      # LC_IDENTIFICATION = "da_DK.UTF-8";
+      # LC_MEASUREMENT = "da_DK.UTF-8";
+      # LC_MONETARY = "da_DK.UTF-8";
+      # LC_NAME = "da_DK.UTF-8";
+      # LC_NUMERIC = "da_DK.UTF-8";
+      # LC_PAPER = "da_DK.UTF-8";
+      # LC_TELEPHONE = "da_DK.UTF-8";
+      # LC_TIME = "da_DK.UTF-8";
+      LC_ADDRESS = config.i18n.defaultLocale;
+      LC_IDENTIFICATION = config.i18n.defaultLocale;
+      LC_MEASUREMENT = config.i18n.defaultLocale;
+      LC_MONETARY = config.i18n.defaultLocale;
+      LC_NAME = config.i18n.defaultLocale;
+      LC_NUMERIC = config.i18n.defaultLocale;
+      LC_PAPER = config.i18n.defaultLocale;
+      LC_TELEPHONE = config.i18n.defaultLocale;
+      LC_TIME = config.i18n.defaultLocale;
+    };
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
@@ -433,17 +448,22 @@ rec {
     catppuccin.enable = true;
     wayland.enable = true;
     # autoNumlock = true;
-    # settings = {
-    #   Autologin = {
-    #     Session = "niri";
-    #     User = username;
-    #   };
-    # };
+    # https://man.archlinux.org/man/sddm.conf.5
+    settings = {
+      Users = {
+        RememberLastUser = true;
+        RememberLastSession = true;
+      };
+      # Autologin = {
+      # Session = "niri";
+      # User = username;
+      # };
+    };
   };
   # services.xserver.desktopManager.gnome.enable = true;
   # services.xserver.displayManager.gdm.enable = true;
 
-  services.xserver.desktopManager.gnome.enable = true;
+  services.xserver.desktopManager.gnome.enable = false;
   # Exclude applications installed with Gnome
   environment.gnome.excludePackages = with pkgs; [
     gnome-tour
@@ -565,6 +585,7 @@ rec {
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
+    fh # flakehub cli
     adbfs-rootless
     # TODO: checkout and experiment with (tir 10 sep 21:58:53 CEST 2024)
     numactl
@@ -616,7 +637,7 @@ rec {
     nixfmt-rfc-style
     # alejandra # nix formatter
     # nixpkgs-fmt
-    nh # nix helper
+    # nh # nix helper
     nix-output-monitor # `nom`
     nvd # nix version diff
     # doas # sudo alternative
@@ -1106,4 +1127,38 @@ rec {
   systemd.oomd.enableUserSlices = true;
   systemd.oomd.extraConfig = { };
   # services.earlyoom.enable = true;
+
+  programs.nh = {
+    enable = true;
+    clean.enable = true;
+    clean.extraArgs = "--keep-since 30d --keep 10";
+    flake = "/home/${username}/dotfiles";
+  };
+
+  # TODO(ons 18 sep 10:53:21 CEST 2024): figure out how to configure `niri` and logind
+  # to power off the laptop monitor, when the lid is closed and it is
+  # connected to an external display.
+  # When the lid is then transitioning from "closed" -> "open" it should
+  # reconnect the monitor/output
+  # (closed, disconnect-external) => suspend|hibernate
+
+  # The lid state of a laptop monitor can be read from the file /proc/acpi/button/lid/*/state
+  services.logind = rec {
+    killUserProcesses = true;
+    powerKey = "hybrid-sleep";
+    powerKeyLongPress = "poweroff";
+    lidSwitchDocked = "ignore";
+    lidSwitch = "suspend";
+    lidSwitchExternalPower = lidSwitch;
+
+    extraConfig = "";
+  };
+
+  services.acpid = {
+    enable = true;
+    logEvents = false;
+    lidEventCommands = '''';
+    # powerEventCommands = ;
+  };
+
 }
