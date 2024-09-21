@@ -585,7 +585,8 @@
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
-    fh # flakehub cli
+    alsa-utils # `alsamixer`
+    # fh # flakehub cli
     adbfs-rootless
     # TODO: checkout and experiment with (tir 10 sep 21:58:53 CEST 2024)
     numactl

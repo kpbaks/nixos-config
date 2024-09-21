@@ -30,19 +30,6 @@
     ];
   };
 
-  # https://github.com/NixOS/nix/issues/4945#issuecomment-1869931785
-  # inputs = let
-  #   dep = url: { inherit url; inputs.nixpkgs.follows = "nixpkgs"; };
-  # in {
-  #   nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-  #   nix-darwin = (dep "github:LnL7/nix-darwin");
-  #   home-manager = (dep "github:nix-community/home-manager");
-  #   zig = (dep "github:Cloudef/nix-zig-stdenv");
-  #   zls = (dep "github:zigtools/zls");
-  #   hyprland = (dep "github:hyprwm/Hyprland");
-  #   eww = (dep "github:elkowar/eww");
-  # };
-
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
@@ -171,7 +158,11 @@
 
     zjstatus = {
       url = "github:dj95/zjstatus";
+
+      inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    fh.url = "https://flakehub.com/f/DeterminateSystems/fh/*.tar.gz";
   };
 
   outputs =
@@ -187,7 +178,10 @@
       system = "x86_64-linux";
       overlays = [
         inputs.niri.overlays.niri
+        (final: prev: { woomer = inputs.woomer.packages.${system}.default; })
+        (final: prev: { swww = inputs.swww.packages.${prev.system}.swww; })
         (final: prev: { zjstatus = inputs.zjstatus.packages.${prev.system}.default; })
+        (final: prev: { yazi = inputs.yazi.packages.${prev.system}.default; })
         # inputs.neovim-nightly-overlay.overlay
       ];
       pkgs = import nixpkgs {
@@ -212,6 +206,11 @@
           inputs.niri.nixosModules.niri
           inputs.nixos-cli.nixosModules.nixos-cli
           inputs.catppuccin.nixosModules.catppuccin
+          {
+            environment.systemPackages = [
+              inputs.fh.packages.${system}.default
+            ];
+          }
 
           # inputs.nixos-cosmic.nixosModules.default
           # inputs.nixos-hardware.nixosModules.tuxedo-infinitybook-pro14-gen7
@@ -234,571 +233,62 @@
             inherit inputs username system;
           };
           modules = [
-            ./home.nix
-            # ./kde-plasma.nix
-            inputs.niri.homeModules.niri
+            ./home
+            {
+
+              home.username = username;
+              home.homeDirectory = "/home/" + username;
+              # TODO: sync with `configuration.nix`
+              home.stateVersion = "24.05";
+              home.enableDebugInfo = false;
+
+              # Let Home Manager install and manage itself.
+              programs.home-manager.enable = true;
+              nixpkgs.config.allowUnfree = true;
+              nixpkgs.config.permittedInsecurePackages = [
+                "electron-29.4.6"
+                # "electron-28.3.3" # needed for `logseq` 05-07-2024
+                # "electron-27.3.11"
+              ];
+            }
             (
-              { ... }:
-              {
-                imports = [ inputs.nixvim.homeManagerModules.nixvim ];
-
-                programs.nixvim.enable = true;
-                programs.nixvim.package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
-                programs.nixvim.extraPackages = with pkgs; [
-                  gnumake
-                  tree-sitter
-                  nodejs # for copilot.lua
-                  marksman # markdown lsp
-                  libgit2 # c library to interact with git repositories, needed by fugit2.nvim plugin
-
-                  # nice for configuring neovim
-                  stylua # formatter
-                  selene # linter
-                  lua-language-server # lsp
-                  lua51Packages.lua
-                  libgit2
-                  luajit
-                  luajitPackages.luarocks
-                  ripgrep
-                  fd
-                ];
-                programs.nixvim.vimdiffAlias = true;
-                programs.nixvim.diagnostics = {
-                  virtual_lines.only_current_line = true;
-                  virtual_text = true;
-                };
-                programs.nixvim.globals = {
-                  mapleader = " ";
-                  maplocalleader = " ";
-                  # Disable useless providers
-                  loaded_ruby_provider = 0; # Ruby
-                  loaded_perl_provider = 0; # Perl
-                  loaded_python_provider = 0; # Python 2
-
-                };
-                programs.nixvim.clipboard = {
-                  # Use system clipboard
-                  register = "unnamedplus";
-                  providers.wl-copy.enable = true;
-                };
-                programs.nixvim.opts = {
-                  updatetime = 100;
-                  relativenumber = true;
-                  number = true;
-                  hidden = true;
-                  mouse = "a";
-                  splitbelow = true;
-                  splitright = true;
-
-                  swapfile = false;
-                  undofile = true;
-                  incsearch = true;
-
-                  tabstop = 4;
-                  shiftwidth = 4;
-                  expandtab = false;
-                  autoindent = true;
-                  signcolumn = "yes";
-                  spell = true;
-                  spelllang = "en_us";
-                };
-
-                programs.nixvim.autoGroups =
-                  let
-                    togroup =
-                      strings:
-                      builtins.listToAttrs (
-                        map (s: {
-                          name = s;
-                          value = {
-                            clear = true;
-                          };
-                        }) strings
-                      );
-                  in
-
-                  togroup [
-                    "highlight-yank"
-                    "custom"
-                  ];
-
-                programs.nixvim.autoCmd = [
-
-                  {
-                    event = [ "TextYankPost" ];
-                    desc = "Highlight when yanking (copying) text";
-                    group = "highlight-yank";
-                    callback.__raw = ''
-                      function()
-                        vim.highlight.on_yank()
-                      end
-                    '';
-                  }
-                  {
-                    event = [ "VimEnter" ];
-                    group = "custom";
-                    callback.__raw = ''
-                      function()
-                      MiniMap.open()
-
-                      end
-
-                    '';
-                  }
-                ];
-
-                # TODO: make a keybind `<leader>a` that check if there is a code action available for the cursor position, and opens a panel to select a handler
-                # if not then check if there is a mispell and suggest `z=`
-                # if not then go to next code action or mispell, whichever is closest.
-                programs.nixvim.keymaps =
-                  let
-                    mode = [
-                      "n"
-                      "x"
-                    ];
-                    cmd = verb: "<cmd>${verb}<cr>";
-                    leader = keys: "<leader>${keys}";
-                    ctrl = key: "<c-${key}>";
-                  in
-
-                  [
-                    {
-                      action = cmd "bprevious";
-                      key = "gp";
-                      inherit mode;
-
-                      options.silent = true;
-                      options.desc = "focus previous buffer";
-                    }
-                    {
-                      action = cmd "bnext";
-                      key = "gn";
-                      options.silent = true;
-                      options.desc = "focus next buffer";
-                      inherit mode;
-                    }
-                    {
-                      action = cmd "bdelete";
-                      key = leader "q";
-                      inherit mode;
-                    }
-                    {
-                      action = "G";
-                      key = "ge";
-                      inherit mode;
-                    }
-                    {
-                      key = ctrl "s";
-                      action = cmd "update";
-                      inherit mode;
-
-                    }
-                    {
-                      action = cmd "Telescope find_files";
-                      key = "<leader>f";
-                      inherit mode;
-                    }
-                    {
-                      action = cmd "Telescope diagnostics";
-                      key = "<leader>d";
-                      inherit mode;
-                    }
-                    {
-                      key = "gw";
-                      mode = [
-                        "n"
-                        "x"
-                        "o"
-                      ];
-                      action.__raw = ''
-                        function() require("flash").jump() end
-                      '';
-                      # option.desc = "Flash";
-                    }
-                  ];
-
-                programs.nixvim.plugins.lsp = {
-                  enable = true;
-                  servers = {
-                    lua-ls.enable = true;
-                    nixd.enable = true;
-                  };
-                };
-                programs.nixvim.plugins.fidget.enable = true;
-                programs.nixvim.plugins.telescope = {
-                  enable = true;
-                  extensions = {
-                    fzf-native.enable = true;
-                    ui-select.enable = true;
-                  };
-
-                  settings = {
-                    extensions.__raw = "{ ['ui-select'] = { require('telescope.themes').get_dropdown() } }";
-                  };
-                };
-                programs.nixvim.plugins.nvim-autopairs.enable = true;
-                programs.nixvim.plugins.indent-blankline = {
-                  enable = true;
-                  settings = {
-                    exclude = {
-                      buftypes = [
-                        "terminal"
-                        "quickfix"
-                      ];
-                      filetypes = [
-                        ""
-                        "checkhealth"
-                        "help"
-                        "lspinfo"
-                        "packer"
-                        "TelescopePrompt"
-                        "TelescopeResults"
-                        "yaml"
-                      ];
-                    };
-                    indent = {
-                      char = "│";
-                    };
-                    scope = {
-                      show_end = false;
-                      show_exact_scope = true;
-                      show_start = false;
-                    };
-                  };
-                };
-                programs.nixvim.plugins.oil.enable = true;
-                programs.nixvim.plugins.gitsigns.enable = true;
-                programs.nixvim.plugins.treesitter = {
-                  enable = true;
-                  settings = {
-                    auto_install = false;
-                    ensure_installed = [
-                      "bash"
-                      "c"
-                      "diff"
-                      "html"
-                      "css"
-
-                      "lua"
-                      "luadoc"
-                      "markdown"
-                      "markdown_inline"
-                      "query"
-                      "vim"
-                      "vimdoc"
-                      "nix"
-                      "fish"
-                      "python"
-                      "rust"
-                    ];
-                    indent.enable = true;
-                    sync_install = false;
-                    highlight = {
-                      additional_vim_regex_highlighting = true;
-                      custom_captures = { };
-                      disable = [
-                        # "rust"
-                      ];
-                      enable = true;
-                    };
-                  };
-                };
-
-                programs.nixvim.plugins.luasnip.enable = true;
-                programs.nixvim.extraLuaPackages = ps: [
-                  # Required by luasnip
-                  ps.jsregexp
-                ];
-
-                programs.nixvim.plugins.cmp = {
-                  enable = true;
-                  autoEnableSources = true;
-                  settings.sources = [
-                    { name = "nvim_lsp"; }
-                    { name = "path"; }
-                    { name = "buffer"; }
-                  ];
-                  settings.completion.completeopt = "menu,menuone,noinsert";
-                  settings.mapping = {
-                    "<C-n>" = "cmp.mapping.select_next_item()";
-                    "<C-p>" = "cmp.mapping.select_prev_item()";
-                    "<C-y>" = "cmp.mapping.confirm { select = true }";
-                    "<C-Space>" = "cmp.mapping.complete {}";
-
-                  };
-                };
-
-                programs.nixvim.plugins.diffview = {
-                  enable = true;
-                  enhancedDiffHl = true;
-                };
-
-                programs.nixvim.plugins.flash = {
-                  enable = true;
-                  settings = {
-                    continue = true;
-                    modes.char.jump_labels = true; # `f` `t` `F` and `T` with labels
-                  };
-                };
-                programs.nixvim.plugins.markview.enable = true;
-                # programs.nixvim.plugins.trim.enable = true;
-                programs.nixvim.plugins.zen-mode.enable = true;
-                programs.nixvim.plugins.rest.enable = true;
-                programs.nixvim.plugins.lualine.enable = true;
-                programs.nixvim.plugins.mini = {
-                  enable = true;
-                  modules = {
-                    ai = {
-                      n_lines = 100;
-                      search_method = "cover_or_next";
-                    };
-                    clue = { };
-                    cursorword = { };
-                    # TODO: map to ctrl-c
-                    comment = { };
-                    files = { };
-                    # jump = { };
-                    # indentscope = { };
-                    trailspace = { };
-                    map = { };
-                    tabline = { };
-                    # hipatterns = {
-                    # TODO: figure out how to do this
-                    # highlighters.__raw = ''
-                    #     -- Highlight hex color strings (`#rrggbb`) using that color
-                    #     hex_color = require("mini.hipatterns").gen_highlighter.hex_color(),
-                    # '';
-                    # };
-                    # };
-                  };
-                };
-
-                programs.nixvim.plugins.yazi.enable = true;
-                programs.nixvim.plugins.notify.enable = true;
-
-                programs.nixvim.plugins.none-ls.enable = true;
-                programs.nixvim.plugins.crates-nvim.enable = true;
-                programs.nixvim.plugins.todo-comments = {
-                  enable = true;
-                  settings.signs = true;
-                };
-
-                programs.nixvim.colorschemes.tokyonight = {
-                  enable = true;
-                  settings.style = "night";
-                };
-                programs.nixvim.colorschemes.catppuccin = {
-                  enable = false;
-                  settings = {
-                    flavour = "macchiato";
-                    dim_inactive = {
-                      enable = true;
-                      percentage = 0.1;
-                    };
-                  };
-                };
-
-                programs.nixvim.performance = {
-                  byteCompileLua = {
-                    enable = true;
-                    configs = true;
-                    initLua = true;
-                    nvimRuntime = true;
-                    plugins = true;
-                  };
-                };
-              }
-            )
-            # inputs.anyrun.homeManagerModules.default
-            # inputs.plasma-manager.homeManagerModules.plasma-manager
-            # (
-            #   { ... }:
-            #   {
-            #     imports = [ ./kde-plasma.nix ];
-            #   }
-            # )
-            (
-              { ... }:
+              { config, ... }:
+              let
+                cfg = config.catppuccin;
+              in
               {
                 imports = [
                   inputs.catppuccin.homeManagerModules.catppuccin
                 ];
-                catppuccin.enable = true; # Enable for all available programs you're using!
-                catppuccin.flavor = "macchiato";
-                catppuccin.accent = "lavender";
-              }
-            )
-            (
-              { pkgs, ... }:
-              {
-                imports = [
-                  inputs.spicetify-nix.homeManagerModules.default
-                ];
-                programs.spicetify =
-                  let
-                    spicetify-pkgs = inputs.spicetify-nix.legacyPackages.${pkgs.system};
-                  in
-                  {
-                    enable = true;
-                    enabledExtensions = with spicetify-pkgs.extensions; [
-                      adblock
-                      hidePodcasts
-                      shuffle # shuffle+ (special characters are sanitized out of extension names)
-                      autoVolume
-                      betterGenres
-                      powerBar
-                    ];
-                    enabledCustomApps = with spicetify-pkgs.apps; [
-                      reddit
-                      newReleases
-                    ];
-                    # theme = spicetify-pkgs.themes.fluent;
-                    theme = spicetify-pkgs.themes.catppuccin;
-                    colorScheme = "macchiato";
-                  };
-              }
-            )
-            (
-              { ... }:
-              {
-                imports = [
-                  inputs.stylix.homeManagerModules.stylix
-                ];
-                stylix.enable = false;
-                stylix.polarity = "dark";
-                stylix.image = pkgs.fetchurl {
-                  # url = "https://github.com/NixOS/nixos-artwork/blob/master/wallpapers/nixos-wallpaper-catppuccin-macchiato.png";
-                  url = "https://github.com/NixOS/nixos-artwork/blob/master/wallpapers/nixos-wallpaper-catppuccin-macchiato.png?raw=true";
-                  sha256 = "SkXrLbHvBOItJ7+8vW+6iXV+2g0f8bUJf9KcCXYOZF0=";
+                config.catppuccin.enable = true; # Enable for all available programs you're using!
+                config.catppuccin.flavor = "macchiato";
+                config.catppuccin.accent = "lavender";
 
-                  # url = "https://www.pixelstalk.net/wp-content/uploads/2016/05/Epic-Anime-Awesome-Wallpapers.jpg";
-                  # sha256 = "enQo3wqhgf0FEPHj2coOCvo7DuZv+x5rL/WIo4qPI50=";
+                options.flavor = pkgs.lib.mkOption {
+                  type = pkgs.lib.types.attrs;
                 };
+
+                config.flavor = pkgs.lib.mkIf cfg.enable (
+                  (pkgs.lib.importJSON (config.catppuccin.sources.palette + "/palette.json"))
+                  .${config.catppuccin.flavor}.colors
+                );
               }
             )
-            # (
-            #   { ... }:
-            #   {
-            #     imports = [
-            #       inputs.plasma-manager.homeManagerModules.plasma-manager
-            #     ];
+            {
+              imports = [
+                inputs.stylix.homeManagerModules.stylix
+              ];
+              stylix.enable = false;
+              stylix.polarity = "dark";
+              stylix.image = pkgs.fetchurl {
+                # url = "https://github.com/NixOS/nixos-artwork/blob/master/wallpapers/nixos-wallpaper-catppuccin-macchiato.png";
+                url = "https://github.com/NixOS/nixos-artwork/blob/master/wallpapers/nixos-wallpaper-catppuccin-macchiato.png?raw=true";
+                sha256 = "SkXrLbHvBOItJ7+8vW+6iXV+2g0f8bUJf9KcCXYOZF0=";
 
-            #     programs.plasma.enable = true;
-            #     programs.kate.enable = true;
-            #     programs.kate.editor.brackets = {
-            #       automaticallyAddClosing = true;
-            #       flashMatching = true;
-            #       highlightMatching = true;
-            #       highlightRangeBetween = true;
-            #     };
-            #     programs.kate.editor.font = {
-            #       family = "JetBrains Mono";
-            #       pointSize = 14;
-            #     };
-
-            #     programs.okular = {
-            #       enable = true;
-            #       accessibility.highlightLinks = true;
-            #       general = {
-            #         obeyDrm = false;
-            #         showScrollbars = true;
-            #         zoomMode = "fitPage";
-            #         viewMode = "FacingFirstCentered";
-            #       };
-            #       performance = {
-            #         enableTransparencyEffects = false;
-            #       };
-            #     };
-
-            #     # programs.plasma.kwin.enable = true;
-            #     # programs.plasma.scripts.polonium.enable = true;
-
-            #     programs.plasma.spectacle.shortcuts = {
-            #       # launch = null;
-            #       # enable = true;
-            #     };
-
-            #     programs.plasma.workspace.cursor = {
-            #       size = 24;
-            #       theme = "Breeze_Snow";
-            #     };
-
-            #     programs.plasma.workspace.iconTheme = "Papirus";
-            #     programs.plasma.workspace.lookAndFeel = "org.kde.breeze.desktop";
-            #   }
-            # )
-            (
-              { ... }:
-              {
-                home.packages = [
-                  inputs.woomer.packages.${system}.default
-                ];
-              }
-            )
-            (
-              { config, ... }:
-              {
-                imports = [
-                  inputs.ironbar.homeManagerModules.default
-                ];
-
-                # And configure
-
-                # [[start]]
-                # type = "workspaces"
-                # all_monitors = false
-
-                # [start.name_map]
-                # 1 = "󰙯"
-                # 2 = "icon:firefox"
-                # 3 = ""
-                # Games = "icon:steam"
-                # Code = ""
-
-                programs.ironbar = {
-                  enable = true;
-                  config = {
-                    position = "bottom";
-                    # start = [
-                    #   {
-                    #     type = "workspaces";
-                    #     all_monitors = true;
-                    #     name_map = {
-                    #       "1" = 
-                    #     }
-                    #   }
-                    # ]
-
-                    # [end]]
-                    # type = "music"
-                    # player_type = "mpd"
-                    # music_dir = "/home/jake/Music"
-
-                    end = [
-                      {
-                        type = "music";
-                        player_type = "mpd";
-                        music_dir = "${config.home.homeDirectory}/Music";
-                      }
-                      {
-                        type = "network_manager";
-                        icon_size = 32;
-                      }
-                      {
-                        type = "clock";
-                        format = "%d/%m/%Y %H:%M";
-                      }
-                    ];
-                  };
-                  style = "";
-                  # package = inputs.ironbar;
-                  features = [
-                    # "feature"
-                    # "another_feature"
-                  ];
-                };
-              }
-            )
+                # url = "https://www.pixelstalk.net/wp-content/uploads/2016/05/Epic-Anime-Awesome-Wallpapers.jpg";
+                # sha256 = "enQo3wqhgf0FEPHj2coOCvo7DuZv+x5rL/WIo4qPI50=";
+              };
+            }
           ];
         };
       };
