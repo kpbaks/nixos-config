@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 {
 
   # TODO: use
@@ -55,4 +55,6 @@
     display = "eDP-1";
     stylePath = "${config.xdg.configHome}/swayosd/style.css";
   };
+
+  home.packages = [ pkgs.swayosd ];
 }

@@ -1,9 +1,10 @@
 { ... }:
 {
   imports = [
-    ./julia.nix
     ./csharp.nix
-    ./python.nix
     ./go.nix
+    ./julia.nix
+    ./odin.nix
+    ./python.nix
   ];
 }

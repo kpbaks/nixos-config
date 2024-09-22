@@ -6,8 +6,7 @@
     settings = {
       main = {
         term = "xterm-256color";
-
-        font = "${font.monospace}:size=14";
+        font = "JetBrains Nerd Font Mono:size=14";
         dpi-aware = "yes";
       };
       colors = {

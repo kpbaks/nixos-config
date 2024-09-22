@@ -5,6 +5,15 @@
 }:
 with config.flavor;
 {
+  home.packages = with pkgs; [
+
+    # Kitty tools
+    pixcat
+    # termpdfpy # TODO: also try out tdf https://github.com/itsjunetime/tdf when it gets a nixpkgs
+    kitty-img # Print images inline in kitty
+    # presenterm # A markdown terminal slideshow tool
+    # https://github.com/chase/awrit
+  ];
 
   # home.file.".config/kitty/tokyonight-storm.conf".source = ./extra/kitty/tokyonight-storm.conf;
   # home.file.".config/kitty/catppuccin-latte.conf".source = ./extra/kitty/catppuccin-latte.conf;

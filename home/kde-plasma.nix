@@ -1,5 +1,5 @@
 {
-  config,
+  # config,
   # osConfig,
   pkgs,
   inputs,

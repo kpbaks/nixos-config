@@ -12,7 +12,7 @@
   # ~/.config/mimeapps.list
   xdg.mimeApps.defaultApplications =
     let
-      loupe = "org.gnome.Loupe.desktop";
+      # loupe = "org.gnome.Loupe.desktop";
       # browser = "firefox.desktop";
       browser = "dev.zed.Zed.desktop";
       okular = "org.kde.okular.desktop";

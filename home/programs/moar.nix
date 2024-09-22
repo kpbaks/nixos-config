@@ -1,5 +1,7 @@
 { pkgs, ... }:
 {
+  home.packages = with pkgs; [ moar ];
+
   home.sessionVariables = {
     PAGER = "${pkgs.moar}/bin/moar";
     MOAR = builtins.concatStringsSep " " [

@@ -1,12 +1,36 @@
 { ... }:
 {
   imports = [
-    ./bat.nix
     ./atuin.nix
     ./bacon.nix
-    ./zellij.nix
-    ./wlogout.nix
-    ./spicetify.nix
+    ./bat.nix
+    ./beeper.nix
+    ./bluetoothctl.nix
+    ./broot.nix
+    ./cava.nix
+    ./droidcam.nix
+    ./eza.nix
+    ./fd.nix
     ./fzf.nix
+    ./gdb.nix
+    ./gum.nix
+    ./moar.nix
+    ./mpv.nix
+    ./obs-studio.nix
+    ./pandoc.nix
+    ./ripgrep.nix
+    ./sioyek.nix
+    ./spicetify.nix
+    ./sqlite3.nix
+    ./ssh.nix
+    ./starship.nix
+    ./swaylock.nix
+    ./tealdeer.nix
+    ./wlogout.nix
+    ./yt-dlp.nix
+    ./zathura.nix
+    ./yazi.nix
+    ./zellij.nix
+    ./zoxide.nix
   ];
 }

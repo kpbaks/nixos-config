@@ -61,6 +61,19 @@ let
 in
 {
 
+  home.packages = with pkgs; [
+    # python3
+    (python3.withPackages (
+      python-pkgs: with python-pkgs; [
+        bpython
+        tabulate
+        psutil
+        numpy
+        python-lsp-server
+      ]
+    ))
+  ];
+
   home.sessionVariables = {
     # https://docs.python.org/3/using/cmdline.html#envvar-PYTHONSTARTUP
     PYTHONSTARTUP = pkgs.lib.getExe PYTHONSTARTUP;

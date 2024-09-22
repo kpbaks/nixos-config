@@ -1,6 +1,8 @@
 { pkgs, ... }:
 {
 
+  home.packages = with pkgs; [ julia ];
+
   # sourced every time the `julia` is started
   home.file.".julia/config/startup.jl".text =
     let

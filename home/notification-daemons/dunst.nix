@@ -25,7 +25,7 @@
       # };
     };
     iconTheme.name = "Adwaita";
-    iconTheme.package = pkgs.gnome.adwaita-icon-theme;
+    iconTheme.package = pkgs.adwaita-icon-theme;
     iconTheme.size = "32x32";
   };
 }

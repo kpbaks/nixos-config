@@ -27,7 +27,12 @@ in
     inputs.spicetify-nix.homeManagerModules.default
   ];
 
-  home.packages = builtins.attrValues scripts;
+  home.packages =
+    builtins.attrValues scripts
+    ++ (with pkgs; [
+      spotify-tray
+      spotify-cli-linux
+    ]);
 
   programs.spotify-player.enable = true;
   services.spotifyd.enable = false;

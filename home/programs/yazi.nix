@@ -199,5 +199,12 @@ in
         };
     };
 
-  home.packages = builtins.attrVales scripts;
+  home.packages =
+    builtins.attrValues scripts
+    ++ (with pkgs; [
+      p7zip # opt dependency of `yazi`
+      ueberzugpp # opt dependency of `yazi`
+      exiftool # needed for `yazi` functionality
+
+    ]);
 }

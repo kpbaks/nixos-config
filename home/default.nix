@@ -1,8 +1,6 @@
 { pkgs, ... }:
 {
   imports = [
-    # ./programs/default.nix
-    # ./services/default.nix
     ./modules
     ./programs
     ./services
@@ -16,6 +14,7 @@
     ./kde-plasma.nix
     ./nixvim.nix
     ./packages.nix
+    ./git.nix
     ./xdg.nix
     ./email.nix
     ./calendar.nix
@@ -46,7 +45,7 @@
   systemd.user.startServices = "sd-switch";
 
   # automatically set some environment variables that will ease usage of software installed with nix on non-NixOS linux (fixing local issues, settings XDG_DATA_DIRS, etc.)
-  targets.genericLinux.enable = false;
+  # targets.genericLinux.enable = false;
 
   programs.btop.enable = true;
 

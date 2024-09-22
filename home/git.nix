@@ -1,6 +1,8 @@
 { config, pkgs, ... }:
 {
 
+  home.packages = with pkgs; [ delta ];
+
   programs.gh = {
     enable = true;
     gitCredentialHelper.enable = true;
@@ -30,7 +32,7 @@
   # https://sw.kovidgoyal.net/kitty/kittens/diff/#integrating-with-git
   programs.git = {
     enable = true;
-    userName = config.personal.username;
+    userName = config.home.username;
     userEmail = config.personal.email;
     extraConfig = {
       init.defaultBranch = "main";

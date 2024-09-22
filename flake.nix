@@ -195,6 +195,16 @@
       # TODO: use flake-checker
       # checks
 
+      # TODO: setup raspberrypi
+      nixosConfigurations."raspberrypi" = nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          inherit inputs username;
+        };
+        modules = [
+          ./hosts/raspberrypi.nix
+        ];
+      };
+
       nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
         inherit system;
         specialArgs = {
@@ -246,7 +256,8 @@
               programs.home-manager.enable = true;
               nixpkgs.config.allowUnfree = true;
               nixpkgs.config.permittedInsecurePackages = [
-                "electron-29.4.6"
+                "olm-3.2.16"
+                # "electron-29.4.6"
                 # "electron-28.3.3" # needed for `logseq` 05-07-2024
                 # "electron-27.3.11"
               ];

@@ -1,6 +1,11 @@
 { pkgs, ... }:
 {
 
+  home.packages = with pkgs; [
+    sqlite # sql database in a file
+    litecli # A nicer repl for sqlite
+  ];
+
   # Make the output of `sqlite3` be more legible by default
   # https://vld.bg/tips/sqliterc/
   # home.file.".sqliterc".text = ''

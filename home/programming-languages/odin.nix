@@ -34,6 +34,7 @@ in
       eww
       ripgrep-all # `rga`
       cmd-wrapped
+      delta
       # superfile # `spf`
       completely
       complgen
@@ -61,6 +62,7 @@ in
       hunspellDicts.en-us
       onlyoffice-bin
       desktop-file-utils # https://www.freedesktop.org/wiki/Software/desktop-file-utils/
+      beeper # Universal chat app using matrix protocol bridges to interoperate with messager, telegram etc.
       vhs
       # ruby_3_3
       swappy
@@ -75,8 +77,12 @@ in
       nb
       wl-clipboard
       # wl-clipboard-rs
+      cage
+      xwayland-run
+      xwayland-satellite
       erdtree
       process-compose # Like `docker-compose` for ordinary processes
+      exiftool # needed for `yazi` functionality
       wtype # xdotool for wayland
       # jetbrains-toolbox
       # jetbrains.rider
@@ -234,6 +240,9 @@ in
       htmlq # `jq` but for html
       # bun # javascript runtime and dev tool
       zoxide # intelligent `cd`
+      sqlite # sql database in a file
+      litecli # A nicer repl for sqlite
+      gum # tool to create rich interactive prompts for shell scripts
       fastfetch # a faster neofetch
       # TODO: use in `git.fish`
       onefetch # git repo fetch
@@ -263,13 +272,31 @@ in
       vulkan-tools # vulkan utilities
 
       # brotab
+      fish
 
+      # python3
+      (python3.withPackages (
+        python-pkgs: with python-pkgs; [
+          bpython
+          tabulate
+          psutil
+          numpy
+          python-lsp-server
+        ]
+      ))
       ouch # {,de}compression tool
       # inlyne # markdown viewer
       # neovide # neovim gui
       taplo # toml formatter/linter/lsp
       web-ext # helper program to build browser extensions and debug instrument firefox
       # firefox-devedition
+
+      # Kitty tools
+      pixcat
+      # termpdfpy # TODO: also try out tdf https://github.com/itsjunetime/tdf when it gets a nixpkgs
+      kitty-img # Print images inline in kitty
+      # presenterm # A markdown terminal slideshow tool
+      # https://github.com/chase/awrit
 
     ]
     ++ kde-packages;

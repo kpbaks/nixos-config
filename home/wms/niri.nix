@@ -9,6 +9,13 @@
     inputs.niri.homeModules.niri
   ];
 
+  # `niri` does not have built-in Xwayland support
+  home.packages = with pkgs; [
+    cage
+    xwayland-run
+    xwayland-satellite
+  ];
+
   # TODO: see if this is possible in home-manager
   # https://github.com/YaLTeR/niri/wiki/Example-systemd-Setup
   # xdg.configFile."systemd/user/niri.service.wants";

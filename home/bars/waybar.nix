@@ -1207,5 +1207,9 @@ in
   # TODO: create and submit a home-manager module for this
   # TODO: install some .thThemes and .sublime-syntax
 
-  home.packages = builtins.attrValues scripts;
+  home.packages =
+    builtins.attrValues scripts
+    ++ (with pkgs; [
+      wttrbar # Dependency of `waybar`
+    ]);
 }

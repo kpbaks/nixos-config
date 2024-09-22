@@ -33,7 +33,7 @@ let
       '';
 in
 {
-  home.packages = builtins.attrNames scripts;
+  home.packages = builtins.attrValues scripts;
 
   # TODO: save path as a let binding to use in niri config
   home.file.".local/share/bluetoothctl/init-script".text = ''
