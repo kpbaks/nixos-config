@@ -49,14 +49,13 @@
       # player_type = "mpd"
       # music_dir = "/home/jake/Music"
       start = [
-
         {
           type = "launcher";
           favorites = [
             "kitty"
             "thunderbird"
           ];
-          show_names = false;
+          show_names = true;
         }
       ];
       center = [

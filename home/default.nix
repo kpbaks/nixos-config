@@ -4,13 +4,21 @@
     ./modules
     ./programs
     ./services
-    ./wms
-    ./terminals
     ./bars
-    ./text-editors
-    ./launchers
+    ./browsers
     ./custom-modules
+    ./launchers
+    ./notification-daemons
     ./programming-languages
+    ./programs
+    ./scripts
+    ./services
+    ./shells
+    ./terminals
+    ./text-editors
+    ./wms
+
+    ./packages.nix
     ./kde-plasma.nix
     ./nixvim.nix
     ./packages.nix
