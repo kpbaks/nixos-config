@@ -1,6 +1,8 @@
 { ... }:
 {
   imports = [
-    ./swaync.nix
+    ./swaync
+    ./dunst.nix
+    ./wired-notify
   ];
 }

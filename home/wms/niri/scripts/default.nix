@@ -1,0 +1,6 @@
+{ ... }:
+{
+  imports = [
+    ./show-outputs.nix
+  ];
+}

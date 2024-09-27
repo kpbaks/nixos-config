@@ -59,6 +59,7 @@ let
 in
 
 {
+  imports = [ ./scripts ];
 
   # home.file.".config/waybar/nix-logo.png".source = ./nix-logo.png;
   # xdg.configFile."waybar-nixos-logo.png".source = ./nixos-logo.png;

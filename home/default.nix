@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ osConfig, pkgs, ... }:
 {
   imports = [
     ./modules
@@ -82,4 +82,7 @@
   qt.style.catppuccin.enable = false;
   qt.style.name = "breeze";
   qt.platformTheme.name = "kde";
+
+  # services.poweralertd.enable = osConfig.services.upower.enable;
+  services.poweralertd.enable = true;
 }

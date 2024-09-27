@@ -1,4 +1,9 @@
-{ inputs, pkgs, ... }:
+{
+  config,
+  inputs,
+  pkgs,
+  ...
+}:
 let
 
   # TODO: improve
@@ -34,9 +39,10 @@ in
       spotify-cli-linux
     ]);
 
-  programs.spotify-player.enable = true;
+  programs.spotify-player.enable = false;
   services.spotifyd.enable = false;
 
+  # TODO: override the spotify package used by spicetify to add a proper icon
   programs.spicetify =
     let
       spicetify-pkgs = inputs.spicetify-nix.legacyPackages.${pkgs.system};
@@ -52,11 +58,12 @@ in
         powerBar
       ];
       enabledCustomApps = with spicetify-pkgs.apps; [
-        reddit
+        # reddit
         newReleases
       ];
       # theme = spicetify-pkgs.themes.fluent;
       theme = spicetify-pkgs.themes.catppuccin;
-      colorScheme = "macchiato";
+      colorScheme = config.catppuccin.flavor;
+      # colorScheme = "macchiato";
     };
 }

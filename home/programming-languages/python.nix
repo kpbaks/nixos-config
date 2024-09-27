@@ -77,5 +77,9 @@ in
   home.sessionVariables = {
     # https://docs.python.org/3/using/cmdline.html#envvar-PYTHONSTARTUP
     PYTHONSTARTUP = pkgs.lib.getExe PYTHONSTARTUP;
+    PYTHON_COLORS = "1"; # use colors in the new python repl introduced in v3.13 (default)
   };
+
+  programs.matplotlib.enable = true;
+  programs.matplotlib.config = { };
 }

@@ -116,7 +116,7 @@ with config.flavor;
       # underline_hyperlinks = "hover";
       underline_hyperlinks = "always";
 
-      touch_scroll_multiplier = 20;
+      touch_scroll_multiplier = 18;
       # window_logo_path = xdg.configFile."kitty/kitty-logo.png";
       # window_logo_position = "bottom-right";
       # window_logo_alpha = "0.5";
@@ -163,117 +163,147 @@ with config.flavor;
   # and then create a notification to inform user that the task has completed, with a button to focus the terminal
   # This can be done with `kitten` and `notify-send`
   # man 26 aug 11:52:04 CEST 2024
-  xdg.configFile."kitty/watcher.py".text =
-    # python
-    ''
-      from typing import Any, Dict
-
-      from kitty.boss import Boss
-      from kitty.window import Window
-      import subprocess
-      from dataclasses import dataclass
-      from enum import Enum
-
-      class Urgency(Enum):
-          Low = 1
-          Normal = 2
-          Critical = 3
-
-      def notify_send(title: str, msg: str, urgency: Urgency = Urgency.Normal, transient: bool = False) -> None:
-          subprocess.run("${pkgs.libnotify}/bin/notify-send")
-
-      def on_resize(boss: Boss, window: Window, data: Dict[str, Any]) -> None:
-          # Here data will contain old_geometry and new_geometry
-          # Note that resize is also called the first time a window is created
-          # which can be detected as old_geometry will have all zero values, in
-          # particular, old_geometry.xnum and old_geometry.ynum will be zero.
-          # boss.call_remote_control(window, ('send-text', f'--match=id:{window.id}', 'hello world'))
-          pass
-
-      def on_focus_change(boss: Boss, window: Window, data: Dict[str, Any])-> None:
-          # Here data will contain focused
-          pass
-
-      def on_close(boss: Boss, window: Window, data: Dict[str, Any])-> None:
-          # called when window is closed, typically when the program running in
-          # it exits
-          pass
-
-      def on_set_user_var(boss: Boss, window: Window, data: Dict[str, Any]) -> None:
-          # called when a "user variable" is set or deleted on a window. Here
-          # data will contain key and value
-          pass
-
-      def on_title_change(boss: Boss, window: Window, data: Dict[str, Any]) -> None:
-          # called when the window title is changed on a window. Here
-          # data will contain title and from_child. from_child will be True
-          # when a title change was requested via escape code from the program
-          # running in the terminal
-          pass
-
-      def on_cmd_startstop(boss: Boss, window: Window, data: Dict[str, Any]) -> None:
-          # called when the shell starts/stops executing a command. Here
-          # data will contain is_start, cmdline and time.
-          pass
-    '';
+  xdg.configFile."kitty/watcher.py".source = ./watcher.py;
 
   # TODO: create pr to `home-manager` to have a dedicated option for this
   # https://sw.kovidgoyal.net/kitty/open_actions/
-  xdg.configFile."kitty/open-actions.conf".text = ''
-    # Open any image in the full kitty window by clicking on it
-    protocol file
-    mime image/*
-    action launch --type=overlay kitten icat --hold -- $${FILE_PATH}
+  # TODO: create pr to `kitty` to have mouse_over_hyperlink events to react to
+  xdg.configFile."kitty/open-actions.conf".text =
+    # kittyconf
+    ''
+      # Open any image in the full kitty window by clicking on it
+      protocol file
+      mime image/*
+      action launch --type=vsplit kitten icat --hold -- $${FILE_PATH}
 
-    # Tail a log file (*.log) in a new OS Window and reduce its font size
-    protocol file
-    ext log
-    action launch --title $${FILE} --type=os-window tail -f -- $${FILE_PATH}
-    action change_font_size current -2
+      # Tail a log file (*.log) in a new OS Window and reduce its font size
+      protocol file
+      ext log
+      action launch --title $${FILE} --type=os-window tail -f -- $${FILE_PATH}
+      action change_font_size current -2
 
-    # Open ssh URLs with ssh command
-    protocol ssh
-    action launch --type=os-window ssh -- $URL
+      # Open ssh URLs with ssh command
+      protocol ssh
+      action launch --type=os-window ssh -- $URL
 
-    # Open man URLs with man command
-    protocol man
-    action launch --type=window man -- $URL
+      # Open man URLs with man command
+      protocol man
+      action launch --type=window man -- $URL
 
-    # Open a compose mail window in thunderbird to any mail address clicked on
-    protocol mailto
-    action launch thunderbird -compose "to=\'$${FILE_PATH}\'"
+      # Open a compose mail window in thunderbird to any mail address clicked on
+      protocol mailto
+      action launch thunderbird -compose "to=\'$${FILE_PATH}\'"
 
-    # TODO: figure out something useful to do here
-    # protocol tel
-    # action launch ...
+      # TODO: figure out something useful to do here
+      # protocol tel
+      # action launch ...
 
-    protocol file
-    mime inode/file
-    action launch --type=os-window --cwd -- hx $FILE_PATH
+      protocol file
+      mime inode/file
+      action launch --type=os-window --cwd -- hx $FILE_PATH
 
 
-    # Open directories
-    # TODO: use yazi
-    protocol file
-    mime inode/directory
-    action launch --type=os-window --cwd -- $FILE_PATH
-  '';
+      # Open directories
+      # TODO: use yazi
+      protocol file
+      mime inode/directory
+      action launch --type=os-window --cwd -- $FILE_PATH
+    '';
 
   # https://sw.kovidgoyal.net/kitty/kittens/diff/
-  xdg.configFile."kitty/diff.conf".text = ''
-    map q quit
-    map esc quit
+  xdg.configFile."kitty/diff.conf".text = # kittyconf
+    ''
+      map q quit
+      map esc quit
 
-    map j scroll_by 1
-    map down scroll_by 1
+      map j scroll_by 1
+      map down scroll_by 1
 
-    map k scroll_by -1
-    map up scroll_by -1
+      map k scroll_by -1
+      map up scroll_by -1
 
-    map home scroll_to start
-    map end scroll_to end
-  '';
+      map home scroll_to start
+      map end scroll_to end
+    '';
 
   # xdg.configFile."kitty/kitty-logo.png" = ./kitty-logo.png;
 
 }
+
+# function kitty-options
+#     if not set -q KITTY_PID
+#         return 2
+#     end
+
+#     set -l reset (set_color normal)
+#     set -l dim (set_color --dim)
+#     set -l b (set_color --bold)
+
+#     set -l i 0
+#     set -l base_url https://sw.kovidgoyal.net/kitty/conf/#opt-kitty
+
+#     set -l query '*'
+#     if test (count $argv) -gt 0
+#         if contains -- '*' (string split '' -- $argv)
+#             set query $argv[1]
+#         else
+#             set query "*$argv[1]*"
+#         end
+#     end
+
+#     command kitty +runpy "
+# import kitty.config
+# for opt in kitty.config.option_names_for_completion():
+#     print(opt)
+# " | string match -- $query | while read opt
+#         set -l opt_urlname $opt
+#         if string match --regex --groups-only 'color(\d+)' -- $opt | read n
+#             test $n -gt 16; and continue # There are no anchor links to colors >=16
+#             if test $n -ge 8
+#                 # quirk of how the colors are anchored in the documentation
+#                 # color0 and color8 are shown together
+#                 # https://sw.kovidgoyal.net/kitty/conf/#opt-kitty.color0
+#                 # color1 and color9
+#                 # and so on
+#                 set opt_urlname color(math "$n - 8")
+#             end
+#         end
+
+#         set -l color $b
+#         if test (math "$i % 2") -eq 1
+#             set color $dim
+#         end
+
+#         # TODO: highlight the characters the query matches
+
+#         set -l url "$base_url.$opt_urlname"
+#         printf "\e]8;;"
+#         printf '%s' $url
+#         printf '\e\\'
+#         printf '%s%s%s' $color $opt $reset
+#         # printf '%s%s%s.%s\n' $dim $base_url $reset $opt
+#         printf '\e]8;;\e\\'
+#         printf '\n'
+
+#         set i (math $i + 1)
+#     end
+# end
+
+# function kitty-resolution
+#     if not set -q KITTY_PID
+#         return 2
+#     end
+
+#     command kitten icat --print-window-size | read --delimiter x width height
+#     set -l cell_width_px (math "round($width / $COLUMNS)")
+#     set -l cell_height_px (math "round($height / $LINES)")
+
+#     set -l reset (set_color normal)
+#     set -l c (set_color $fish_color_option)
+#     printf '%scolumns%s = %d cells\n' $c $reset $COLUMNS
+#     printf '%slines%s = %d cells\n' $c $reset $LINES
+#     printf '%swidth%s = %dpx\n' $c $reset $width
+#     printf '%sheight%s = %dpx\n' $c $reset $height
+#     printf '%scell.density.width%s = %dpx\n' $c $reset $cell_width_px
+#     printf '%scell.density.height%s = %dpx\n' $c $reset $cell_height_px
+# end

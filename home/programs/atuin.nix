@@ -10,7 +10,7 @@
   programs.atuin.enable = true;
   programs.atuin.enableFishIntegration = true;
   programs.atuin.flags = [
-    "--disable-up-arrow"
+    # "--disable-up-arrow"
     # "--disable-ctrl-r"
   ];
 

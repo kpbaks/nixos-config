@@ -1,3 +1,6 @@
+# TODO: package these for nixpkgs:
+# - https://github.com/darrenburns/posting
+# - https://github.com/achristmascarl/rainfrog
 { pkgs, ... }:
 let
   kde-packages = with pkgs.kdePackages; [
@@ -15,7 +18,8 @@ in
   home.packages =
     with pkgs;
     [
-
+      cfonts
+      zbar # `zbarimg` and `zbarcam`, utilities to work with qr codes
       nodePackages_latest.fkill-cli
       tparse
       rich-cli
@@ -66,7 +70,6 @@ in
       swappy
       grim
       tesseract
-      walker
       legit
       birdtray
       pstree
@@ -242,7 +245,6 @@ in
       file
       anki # flashcard app
       mpv # media player
-      grc # "generic colorizer" improves the output of many commands by adding colors
       bitwarden # password manager
       bitwarden-cli # bitwarden cli
       pass # password manager

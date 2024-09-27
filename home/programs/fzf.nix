@@ -1,8 +1,7 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 {
   programs.fzf = {
     enable = true;
-    enableFishIntegration = false;
     defaultCommand = "${pkgs.fd}/bin/fd --type file";
     # FIXME: this does not match the generated $FZF_DEFAULT_OPTS
     defaultOptions = [
@@ -10,7 +9,7 @@
       "--border"
       "--ansi"
       "--cycle"
-      "--default=reverse-list"
+      "--layout=reverse-list"
       "--scroll-off=5"
       "--filepath-word"
       # "--jump-labels="

@@ -1,3 +1,5 @@
+# TODO: integrate https://github.com/imsi32/yatline.yazi
+# https://github.com/ndtoan96/ouch.yazi
 { pkgs, ... }:
 let
   scripts.yazi-downloads =
@@ -207,4 +209,52 @@ in
       exiftool # needed for `yazi` functionality
 
     ]);
+
+  # https://yazi-rs.github.io/docs/quick-start#shell-wrapper
+  programs.fish.functions.y =
+    # fish
+    ''
+      function y
+        set -l latest_mtime 0
+        set -l latest_file
+        for f in *
+            set -l mtime (path mtime $f)
+            if test $mtime -gt $latest_mtime
+                set latest_mtime $mtime
+                set latest_file $f
+            end
+        end
+
+      	set tmp (mktemp -t "yazi-cwd.XXXXXX")
+      	${pkgs.yazi}/bin/yazi $argv --cwd-file="$tmp" $latest_file
+      	if set cwd (command cat -- "$tmp"); and [ -n "$cwd" ]; and [ "$cwd" != "$PWD" ]
+      		builtin cd -- "$cwd"
+      	end
+      	command rm -f -- "$tmp"
+      end
+    '';
+
+  programs.nushell.extraConfig =
+    # nu
+    ''
+      def --env y [...args] {
+      	let tmp = (mktemp -t "yazi-cwd.XXXXXX")
+      	${pkgs.yazi}/bin/yazi ...$args --cwd-file $tmp
+      	let cwd = (open $tmp)
+      	if $cwd != "" and $cwd != $env.PWD {
+      		cd $cwd
+      	}
+      	rm -fp $tmp
+      }
+    '';
+
+  # programs.bash.shellInit = ;
+  # function y() {
+  # 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+  # 	yazi "$@" --cwd-file="$tmp"
+  # 	if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+  # 		builtin cd -- "$cwd"
+  # 	fi
+  # 	rm -f -- "$tmp"
+  # }
 }

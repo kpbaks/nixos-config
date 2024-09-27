@@ -6,5 +6,6 @@
     ./julia.nix
     ./odin.nix
     ./python.nix
+    ./ocaml.nix
   ];
 }

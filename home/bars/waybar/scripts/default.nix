@@ -1,0 +1,6 @@
+{ ... }:
+{
+  imports = [
+    ./edit-ephemeral.nix
+  ];
+}

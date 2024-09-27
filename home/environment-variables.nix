@@ -21,6 +21,8 @@
       LESS_TERMCAP_ue = reset; # end underline
       LESS_TERMCAP_us = ""; # begin underline
 
+      # NOTE: file generated with `vivid generate <theme>`
+      LS_COLORS = builtins.readFile ./LS_COLORS;
     };
 
 }

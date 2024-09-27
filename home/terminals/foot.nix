@@ -1,7 +1,7 @@
 { ... }:
 {
   programs.foot = {
-    enable = false;
+    enable = true;
     server.enable = true;
     settings = {
       main = {

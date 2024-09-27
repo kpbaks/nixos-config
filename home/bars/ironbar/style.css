@@ -1,0 +1,31 @@
+* {
+  font-family: Noto Sans Nerd Font, sans-serif;
+  font-size: 16px;
+  border: none;
+  border-radius: 0;
+}
+
+.background { background-color: @crust; }
+    
+.workspaces .item:hover {
+    box-shadow: inset 0 -3px;
+}
+.notifications {}
+
+.notifications .count {}
+.sysinfo { margin-left = 10px; }
+.sysinfo .item {
+  margin-left = 5px;
+}
+
+#bar #start {}
+#bar #center {}
+#bar #end {}
+
+.upower {
+  background: @teal;
+}
+
+.popup-volume {
+  padding: 10px;
+}

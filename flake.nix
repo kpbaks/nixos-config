@@ -40,7 +40,6 @@
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
 
-    # TODO use
     plasma-manager = {
       url = "github:pjones/plasma-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -66,11 +65,14 @@
       inputs.hyprland.follows = "hyprland"; # IMPORTANT
     };
     # TODO: use
-    # sops-nix.url = "github:Mic92/sops-nix";
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # TODO: use
     # nur.url = "github:nix-community/NUR";
 
-    neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     helix = {
       url = "github:helix-editor/helix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -85,9 +87,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     catppuccin.url = "github:catppuccin/nix";
-    # TODO: use
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
-    # TODO: use
     stylix = {
       url = "github:danth/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -98,7 +98,10 @@
     # anyrun-nixos-options.url = "github:n3oney/anyrun-nixos-options";
 
     # TODO: use
-    ags.url = "github:Aylur/ags";
+    ags = {
+      url = "github:Aylur/ags";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # atdo.url = "github:kpbaks/atdo";
     # atdo.inputs.nixpkgs.follows = "nixpkgs";
     swww = {
@@ -111,7 +114,10 @@
     };
 
     # TODO: checkout
-    # https://github.com/fufexan/nix-gaming
+    # nix-gaming = {
+    #   url = "github:fufexan/nix-gaming";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     # FIXME: why is no `nixos` binary available?
     nixos-cli = {
@@ -127,6 +133,7 @@
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
 
     # TODO: try out and setup
     # https://github.com/Toqozz/wired-notify
@@ -146,6 +153,7 @@
 
     ironbar = {
       url = "github:JakeStanger/ironbar";
+      # url = "github:anant-357/ironbar"; # has "niri workspaces" pr waiting to be merged
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -163,6 +171,16 @@
     };
 
     fh.url = "https://flakehub.com/f/DeterminateSystems/fh/*.tar.gz";
+
+    walker = {
+      url = "github:abenz1267/walker";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -176,16 +194,19 @@
       hostname = "nixos";
       username = "kpbaks";
       system = "x86_64-linux";
-      overlays = [
-        inputs.niri.overlays.niri
-        (final: prev: { woomer = inputs.woomer.packages.${system}.default; })
-        (final: prev: { swww = inputs.swww.packages.${prev.system}.swww; })
-        (final: prev: { zjstatus = inputs.zjstatus.packages.${prev.system}.default; })
-        (final: prev: { yazi = inputs.yazi.packages.${prev.system}.default; })
-        # inputs.neovim-nightly-overlay.overlay
-      ];
       pkgs = import nixpkgs {
-        inherit system overlays;
+        inherit system;
+        overlays = [
+          inputs.rust-overlay.overlays.default
+          inputs.wired-notify.overlays.default
+          inputs.niri.overlays.niri
+          (final: prev: { woomer = inputs.woomer.packages.${system}.default; })
+          inputs.swww.overlays.default
+          # (final: prev: { swww = inputs.swww.packages.${prev.system}.swww; })
+          (final: prev: { zjstatus = inputs.zjstatus.packages.${prev.system}.default; })
+          (final: prev: { yazi = inputs.yazi.packages.${prev.system}.default; })
+          # inputs.neovim-nightly-overlay.overlay         
+        ];
         config.allowUnfree = true;
       };
     in
@@ -196,6 +217,7 @@
       # checks
 
       # TODO: setup raspberrypi
+      # TODO: setup nextcloud
       nixosConfigurations."raspberrypi" = nixpkgs.lib.nixosSystem {
         specialArgs = {
           inherit inputs username;
@@ -213,6 +235,7 @@
         modules = [
           ./configuration.nix
           inputs.stylix.nixosModules.stylix # provide theming for system level programs such as bootloaders, splash screens, and display managers
+          inputs.sops-nix.nixosModules.sops
           inputs.niri.nixosModules.niri
           inputs.nixos-cli.nixosModules.nixos-cli
           inputs.catppuccin.nixosModules.catppuccin
@@ -222,7 +245,7 @@
             ];
           }
 
-          # inputs.nixos-cosmic.nixosModules.default
+          inputs.nixos-cosmic.nixosModules.default
           # inputs.nixos-hardware.nixosModules.tuxedo-infinitybook-pro14-gen7
           # inputs.sops-nix.nixosModules.sops
           (
@@ -300,6 +323,10 @@
                 # sha256 = "enQo3wqhgf0FEPHj2coOCvo7DuZv+x5rL/WIo4qPI50=";
               };
             }
+
+            inputs.nix-index-database.hmModules.nix-index
+            # optional to also wrap and install comma
+            { programs.nix-index-database.comma.enable = true; }
           ];
         };
       };

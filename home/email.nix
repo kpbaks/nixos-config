@@ -1,7 +1,23 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 {
-
   programs.aerc.enable = false;
+
+  # programs.thunderbird.enable = true;
+  # programs.thunderbird.package = pkgs.thunderbird;
+  # programs.thunderbird.settings = {
+  #   "general.useragent.override" = "";
+  #   "privacy.donottrackheader.enabled" = true;
+  # };
+
+  # programs.thunderbird.profiles.personal = {
+  #   name = "personal";
+  #   isDefault = true;
+  #   userContent = # css
+  #     ''
+  #       /* Hide scrollbar on Thunderbird pages */
+  #       *{scrollbar-width:none !important}
+  #     '';
+  # };
 
   # # TODO: get to work
   # accounts.email.accounts.gmail = {
@@ -21,4 +37,10 @@
     settings = { };
   };
   services.himalaya-watch.enable = config.programs.himalaya.enable;
+
+  # FIXME: get to work under wayland and nixos
+  # systemd.user.services.birdtray = {
+  #   Install.WantedBy = [ "graphical-session.target" ];
+  #   Service.ExecStart = "${pkgs.birdtray}/bin/birdtray";
+  # };
 }

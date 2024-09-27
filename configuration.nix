@@ -265,13 +265,22 @@
   # hardware.ubertooth.enable = config.hardware.bluetooth.enable;
 
   # Make it possible to run downloaded appimages
-  boot.binfmt.registrations.appimage = {
-    wrapInterpreterInShell = false;
-    interpreter = "${pkgs.appimage-run}/bin/appimage-run";
-    recognitionType = "magic";
-    offset = 0;
-    mask = ''\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff'';
-    magicOrExtension = ''\x7fELF....AI\x02'';
+  # boot.binfmt.registrations.appimage = {
+  #   wrapInterpreterInShell = false;
+  #   interpreter = "${pkgs.appimage-run}/bin/appimage-run";
+  #   recognitionType = "magic";
+  #   offset = 0;
+  #   mask = ''\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff'';
+  #   magicOrExtension = ''\x7fELF....AI\x02'';
+  # };
+
+  programs.appimage.enable = true;
+  programs.appimage.binfmt = true;
+  programs.appimage.package = pkgs.appimage-run.override {
+    extraPkgs = pkgs: [
+      pkgs.ffmpeg
+      pkgs.imagemagick
+    ];
   };
 
   # TODO: get steam to work
@@ -442,6 +451,7 @@
   # Enable the X11 windowing system.
   services.xserver.enable = true;
   services.displayManager.defaultSession = "niri";
+
   # Enable the KDE Plasma Desktop Environment.
   services.displayManager.sddm = {
     enable = true;
@@ -569,11 +579,15 @@
 
   fonts.packages = with pkgs; [
     (nerdfonts.override {
+      # https://github.com/NixOS/nixpkgs/blob/65798d5f42e530714419bc17cae83cfe1d3b0dca/pkgs/data/fonts/nerdfonts/shas.nix
       fonts = [
         "JetBrainsMono"
         "FiraCode"
         "Iosevka"
         "VictorMono"
+        "CommitMono"
+        "SourceCodePro"
+        "ZedMono"
         # "NotoSans"
       ];
     })
@@ -585,6 +599,7 @@
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
+    wayland-utils
     alsa-utils # `alsamixer`
     # fh # flakehub cli
     adbfs-rootless
@@ -595,7 +610,6 @@
     inetutils
     # inputs.nixos-cli.packages.${system}.default
     scrcpy
-    # android-tools
 
     distrobox
     libinput
@@ -754,6 +768,10 @@
 
   programs.niri.enable = true;
   programs.niri.package = pkgs.niri;
+
+  services.desktopManager.cosmic.enable = true;
+  services.displayManager.cosmic-greeter.enable = true;
+  # programs.cosmic.enable = true;
   # programs.niri.package = pkgs.niri-unstable;
 
   programs.river.enable = false;
@@ -776,6 +794,11 @@
   # services.netbird.enable = true;
 
   services.flatpak.enable = true;
+  systemd.services.add-flathub-remote = {
+    wantedBy = [ "multi-user.target" ];
+    path = [ pkgs.flatpak ];
+    script = "flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo";
+  };
   # FIXME: get to work
   #   services.espanso.enable = false;
   services.mullvad-vpn.enable = false;
@@ -1079,6 +1102,9 @@
   # };
 
   programs.kdeconnect.enable = true;
+  programs.localsend.enable = true;
+  programs.nm-applet.enable = true;
+  programs.usbtop.enable = true;
 
   services.keyd = {
     enable = true;
@@ -1107,9 +1133,6 @@
   # TODO: get this working
   virtualisation.waydroid.enable = true;
   programs.adb.enable = true;
-  # services.udev.packages = with pkgs; [
-  #   android-udev-rules
-  # ];
 
   # TODO: `systemctl status avahi-daemon.service` prints this, fix it (tir 10 sep 17:35:56 CEST 2024)
   # WARNING: No NSS support for mDNS detected, consider installing nss-mdns!
@@ -1161,5 +1184,15 @@
     lidEventCommands = '''';
     # powerEventCommands = ;
   };
+
+  services.upower = {
+    enable = true;
+    percentageLow = 10;
+    percentageCritical = 5;
+    criticalPowerAction = "HybridSleep";
+    # ignoreLid = false;
+  };
+
+  programs.bandwhich.enable = true;
 
 }

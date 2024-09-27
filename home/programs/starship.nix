@@ -1,15 +1,36 @@
-{ ... }:
+{ lib, ... }:
 {
   programs.starship = {
     enable = true;
-    # catppuccin.enable = false;
     enableTransience = true;
     # $\{env_var.AGAIN_ENABLED}
     # $\{env_var.AGAIN_DYNAMIC_ENABLED}
     settings = {
-      format = ''$shell$jobs$shlvl$character'';
-      # right_format = ''$direnv$directory$git_branch$git_commit$git_state$git_metrics$git_status$package$time'';
-      right_format = ''$direnv$directory$git_branch$git_commit$git_state$git_metrics$git_status$package'';
+      format = lib.concatStrings (
+        map (mod: "\$${mod}") [
+          "localip"
+          "nix_shell"
+          "shell"
+          "jobs"
+          "shlvl"
+          "character"
+        ]
+      );
+      right_format = lib.concatStrings (
+        map (mod: "\$${mod}") [
+          "direnv"
+          "directory"
+          "git_branch"
+          "git_commit"
+          "git_state"
+          "git_metrics"
+          "git_status"
+          "typst"
+          "rust"
+          "julia"
+          "package"
+        ]
+      );
       add_newline = false;
       git_metrics.disabled = true;
       directory.fish_style_pwd_dir_length = 2;
@@ -21,7 +42,8 @@
       };
       localip = {
         disabled = false;
-        format = "@[$localipv4](bold yellow) ";
+        format = "@[$localipv4]($style) ";
+        style = "dimmed yellow";
         ssh_only = false;
       };
       package = {
@@ -47,8 +69,21 @@
       direnv = {
         disabled = false;
         format = "[$symbol$loaded/$allowed]($style) ";
-        style = "bold orange";
+        style = "dimmed orange";
       };
+      nix_shell = {
+        format = "[$symbol $state( \($name\))]($style) ";
+        symbol = "❄️";
+        style = "bold fg:#7E7EFF";
+      };
+      # NOTE: only works with `nix-shell -p <package>`, not `nix shell nixpkgs#<package>`
+      # env_var.IN_NIX_SHELL = {
+      #   variable = "IN_NIX_SHELL";
+      #   default = "";
+      #   style = "bold fg:magenta";
+      #   format = "[<nix-shell>]($style) ";
+      #   description = "Show that you are in a `nix-shell -p ...`";
+      # };
       # env_var = {
       #   AGAIN_ENABLED = {
       #     symbol = "◉";

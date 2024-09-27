@@ -2,7 +2,7 @@
 {
   imports = [
     ./alacritty.nix
-    ./kitty.nix
+    ./kitty
     ./rio.nix
     ./wezterm.nix
     ./foot.nix

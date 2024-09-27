@@ -84,5 +84,6 @@
     };
   };
 
-  programs.jujutsu.enable = true;
+  programs.jujutsu.enable = false;
+  programs.git-credential-oauth.enable = false;
 }

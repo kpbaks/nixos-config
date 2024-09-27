@@ -7,12 +7,14 @@
 {
   imports = [
     inputs.niri.homeModules.niri
+    ./scripts
   ];
 
   # `niri` does not have built-in Xwayland support
   home.packages = with pkgs; [
     cage
     xwayland-run
+    # FIXME: crashes when starting as a systemd service
     xwayland-satellite
   ];
 
@@ -49,8 +51,10 @@
     XDG_SESSION_TYPE = "wayland";
   };
   programs.niri.settings.cursor = {
+    # TODO: figure out if this cursor pack is packaged in nixpkgs, and if it is
+    # then depend on it properly.
     theme = "breeze_cursors";
-    size = 24;
+    size = 32;
   };
   programs.niri.settings.input.workspace-auto-back-and-forth = true;
   programs.niri.settings.input.keyboard.xkb = {
@@ -93,7 +97,19 @@
       # };
     };
   };
+  # FIXME(Mon Sep 23 01:03:38 PM CEST 2024): figure out why all window rules does
+  # work
   programs.niri.settings.window-rules = [
+    {
+      matches = [
+        {
+          app-id = "okular";
+          title = "^New Text Note.*";
+        }
+      ];
+      default-column-width.proportion =
+        1.0 - config.programs.niri.settings.layout.default-column-width.proportion;
+    }
     {
       # TODO: verify it works
       matches = [
@@ -210,16 +226,21 @@
 
   ];
 
-  programs.niri.settings.outputs = with config.monitor; {
-    ${laptop} = {
-      position.y = 1440;
-      position.x = 0;
-      scale = 1.0;
-    };
-    ${acer} = {
+  programs.niri.settings.outputs = {
+    # Laptop screen
+    "eDP-1" = {
+      background-color = config.flavor.surface2.hex;
       scale = 1.0;
       position.x = 0;
       position.y = 0;
+    };
+    "Acer Technologies K272HUL T6AEE0058502" = {
+      background-color = config.flavor.surface1.hex;
+      scale = 1.0;
+      transform.rotation = 0;
+      variable-refresh-rate = "on-demand";
+      position.x = 0;
+      position.y = -1600;
     };
   };
 
@@ -227,60 +248,37 @@
     map (s: { command = pkgs.lib.strings.splitString " " s; })
       [
         "ironbar"
-        "swww-daemon"
+        # "${pkgs.swww}/bin/swww-daemon"
         "${pkgs.copyq}/bin/copyq"
         "${pkgs.eww}/bin/eww daemon"
-        "${pkgs.birdtray}/bin/birdtray"
+        # "${pkgs.birdtray}/bin/birdtray"
         "${pkgs.wluma}/bin/wluma"
-        # "waybar"
-        # "${pkgs.systemd}/bin/systemctl --user reset-failed waybar.service" # recommeded by https://github.com/sodiboo/niri-flake
         # TODO: does not show-up
         # "${pkgs.telegram-desktop}/bin/telegram-desktop -startintray"
         # FIXME: does not work
         # "${pkgs.obs-studio}/bin/obs --minimize-to-tray"
       ];
 
+  programs.niri.settings.animations.screenshot-ui-open = {
+    easing = {
+      curve = "ease-out-quad";
+      duration-ms = 200;
+    };
+  };
+  programs.niri.settings.animations.workspace-switch = {
+    spring = {
+      damping-ratio = 1.0;
+      epsilon = 1.0e-4;
+      stiffness = 1000;
+    };
+  };
+
   # TODO: experiment with this
-  # https://github.com/sodiboo/nix-config/blob/3d25eaf71cc27a0159fd3449c9d20ac4a8a873b5/niri.mod.nix#L196C11-L232C14
-  # animations.shaders.window-resize =
-  #   # glsl
-  #   ''
-  #     vec4 resize_color(vec3 coords_curr_geo, vec3 size_curr_geo) {
-  #         vec3 coords_next_geo = niri_curr_geo_to_next_geo * coords_curr_geo;
-
-  #         vec3 coords_stretch = niri_geo_to_tex_next * coords_curr_geo;
-  #         vec3 coords_crop = niri_geo_to_tex_next * coords_next_geo;
-
-  #         // We can crop if the current window size is smaller than the next window
-  #         // size. One way to tell is by comparing to 1.0 the X and Y scaling
-  #         // coefficients in the current-to-next transformation matrix.
-  #         bool can_crop_by_x = niri_curr_geo_to_next_geo[0][0] <= 1.0;
-  #         bool can_crop_by_y = niri_curr_geo_to_next_geo[1][1] <= 1.0;
-
-  #         vec3 coords = coords_stretch;
-  #         if (can_crop_by_x)
-  #             coords.x = coords_crop.x;
-  #         if (can_crop_by_y)
-  #             coords.y = coords_crop.y;
-
-  #         vec4 color = texture2D(niri_tex_next, coords.st);
-
-  #         // However, when we crop, we also want to crop out anything outside the
-  #         // current geometry. This is because the area of the shader is unspecified
-  #         // and usually bigger than the current geometry, so if we don't fill pixels
-  #         // outside with transparency, the texture will leak out.
-  #         //
-  #         // When stretching, this is not an issue because the area outside will
-  #         // correspond to client-side decoration shadows, which are already supposed
-  #         // to be outside.
-  #         if (can_crop_by_x && (coords_curr_geo.x < 0.0 || 1.0 < coords_curr_geo.x))
-  #             color = vec4(0.0);
-  #         if (can_crop_by_y && (coords_curr_geo.y < 0.0 || 1.0 < coords_curr_geo.y))
-  #             color = vec4(0.0);
-
-  #         return color;
-  #     }
-  #   '';
+  programs.niri.settings.animations.shaders = {
+    window-resize = builtins.readFile ./shaders/window-resize.glsl;
+    window-open = null;
+    window-close = null;
+  };
 
   # https://github.com/sodiboo/niri-flake/blob/main/docs.md#programsnirisettingsbinds
   # TODO: wrap in `swayosd-client`
@@ -394,6 +392,8 @@
       # "Mod+B".action = run-in-terminal (pkgs.lib.getExe scripts.bluetoothctl-startup);
       # "Mod+A".action = run-in-terminal (pkgs.lib.getExe scripts.audio-sink);
 
+      "Mod+A".action = run-in-terminal "${pkgs.alsa-utils}/bin/alsamixer --black-background --mouse --view playback";
+
       # "Mod+P".action = spawn (
       #   pkgs.lib.getExe scripts.search-clipboard-content-with-browser-search-engine
       # );
@@ -422,10 +422,10 @@
       # "Mod+Ctrl+Down".action = move-window-down;
       "Mod+Ctrl+Up".action = move-window-up-or-to-workspace-up;
       "Mod+Ctrl+Down".action = move-window-down-or-to-workspace-down;
-      "Mod+H".action = focus-column-left;
-      "Mod+L".action = focus-column-right;
-      "Mod+K".action = focus-window-up;
-      "Mod+J".action = focus-window-down;
+      # "Mod+H".action = focus-column-left;
+      # "Mod+L".action = focus-column-right;
+      # "Mod+K".action = focus-window-up;
+      # "Mod+J".action = focus-window-down;
       "Mod+Ctrl+H".action = move-column-left;
       "Mod+Ctrl+L".action = move-column-right;
       "Mod+Ctrl+K".action = move-window-up-or-to-workspace-up;
@@ -463,6 +463,8 @@
       "Mod+V".action = spawn "${pkgs.copyq}/bin/copyq" "menu";
       "Mod+M".action = maximize-column;
 
+      "Mod+K".action = spawn "${pkgs.kdePackages.kdeconnect-kde}/bin/kdeconnect-app";
+
       # // There are also commands that consume or expel a single window to the side.
       "Mod+BracketLeft".action = consume-or-expel-window-left;
       "Mod+BracketRight".action = consume-or-expel-window-right;
@@ -478,7 +480,7 @@
 
       # "Mod+Comma".action = run-in-fish-within-kitty "${pkgs.helix}/bin/hx ~/dotfiles/{flake,configuration,home}.nix";
       # TODO: improve by checking if an editor process instance is already running, before spawning another
-      "Mod+Comma".action = run-with-fish-within-terminal "hx ~/dotfiles/{flake,configuration,home}.nix";
+      "Mod+Comma".action = run-with-fish-within-terminal "hx ~/dotfiles/{flake,configuration}.nix";
       # "Mod+Period".action = spawn "${pkgs.swaynotificationcenter}/bin/swaync-client" "--toggle-panel";
       "Mod+Period".action = spawn "${pkgs.plasma-desktop}/bin/plasma-emojier";
       # TODO: color picker keybind
@@ -513,8 +515,9 @@
       # TODO: use for a dashboard like view. Whenever you manage to implement it...
       # "Mod+Return".action = fish "pidof ${pkgs.walker}/bin/walker; and pkill walker; or ${pkgs.walker}/bin/walker";
       # "Mod+Slash".action = fish "pidof ${pkgs.walker}/bin/walker; and pkill walker; or ${pkgs.walker}/bin/walker";
-      "Mod+Return".action = fish "${pkgs.procps}/bin/pkill walker; or ${pkgs.walker}/bin/walker";
-      "Mod+Slash".action = fish "${pkgs.procps}/bin/pkill walker; or ${pkgs.walker}/bin/walker";
+      # "Mod+Return".action = fish "${pkgs.procps}/bin/pkill walker; or ${pkgs.walker}/bin/walker";
+      # "Mod+Slash".action = fish "${pkgs.procps}/bin/pkill walker; or ${pkgs.walker}/bin/walker";
+      "Mod+Slash".action = fish "${pkgs.walker}/bin/walker";
 
       "Mod+Shift+P".action = power-off-monitors;
       # Mod+R { switch-preset-column-width; }
@@ -539,22 +542,22 @@
   # TODO: do we need to load it manually or does `niri-flake` do it?
   # Used for Xwayland integration in `niri`
   # Copied from: https://github.com/Supreeeme/xwayland-satellite/blob/main/resources/xwayland-satellite.service
-  systemd.user.services.xwayland-satellite = {
-    Unit = {
-      Description = "Xwayland outside your Wayland";
-      BindsTo = "graphical-session.target";
-      PartOf = "graphical-session.target";
-      After = "graphical-session.target";
-      Requisite = "graphical-session.target";
-    };
-    Install.WantedBy = [ "graphical-session.target" ];
-    Service = {
-      Type = "notify";
-      NotifyAccess = "all";
-      ExecStart = "${pkgs.xwayland-satellite}/bin/xwayland-satellite";
-      StandardOutput = "journal";
-    };
-  };
+  # systemd.user.services.xwayland-satellite = {
+  #   Unit = {
+  #     Description = "Xwayland outside your Wayland";
+  #     BindsTo = "graphical-session.target";
+  #     PartOf = "graphical-session.target";
+  #     After = "graphical-session.target";
+  #     Requisite = "graphical-session.target";
+  #   };
+  #   Install.WantedBy = [ "graphical-session.target" ];
+  #   Service = {
+  #     Type = "notify";
+  #     NotifyAccess = "all";
+  #     ExecStart = "${pkgs.xwayland-satellite}/bin/xwayland-satellite";
+  #     StandardOutput = "journal";
+  #   };
+  # };
 
   # systemd.user.services.swww-daemon = {
   #   Install.WantedBy = [ "graphical-session.target" ];
@@ -569,12 +572,6 @@
   # systemd.user.services.eww-daemon = {
   #   Install.WantedBy = [ "graphical-session.target" ];
   #   Service.ExecStart = "${pkgs.eww}/bin/eww daemon";
-  # };
-
-  # FIXME: get to work under wayland and nixos
-  # systemd.user.services.birdtray = {
-  #   Install.WantedBy = [ "graphical-session.target" ];
-  #   Service.ExecStart = "${pkgs.birdtray}/bin/birdtray";
   # };
 
   # https://haseebmajid.dev/posts/2023-07-25-nixos-kanshi-and-hyprland/
@@ -596,5 +593,4 @@
       }
     ];
   };
-
 }
