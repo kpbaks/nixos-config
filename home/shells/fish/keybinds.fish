@@ -862,3 +862,14 @@ bind \eo __bind_preview_current_file
 
 # TODO: bind to show `complete <command>`
 # bind \eC
+
+function __bind_alt_h
+    set -l buf (commandline)
+    if string match --regex --quiet '^\s*$' -- $buf
+        return
+    end
+
+    history search --show-time $buf | fish_indent --ansi
+end
+
+bind \eh '__bind_alt_h; commandline --function repaint'

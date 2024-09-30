@@ -10,6 +10,7 @@ let
   inherit (pkgs.lib) filterAttrs pipe;
   topath = s: ./. + "/${s}";
 
+  # FIXME: causes infinite recursion
   readdir =
     dir:
     pipe (readDir dir) [
@@ -20,6 +21,17 @@ let
 in
 
 {
+  imports = [
+    ./fonts.nix
+    ./leds.nix
+    ./xkcd.nix
+    ./displays.nix
+    ./bluetooth-devices.nix
+    ./ocr.nix
+    ./flake-inputs.nix
+    # ./tokei-pie.nix
+    # ./cdtmp.nix
+  ];
   # imports = readdir ./.;
 
   # home.packages = 1;
@@ -293,41 +305,4 @@ in
 #         case '*'
 #       end
 
-#     '';
-
-# # https://github.com/niksingh710/nsearch/blob/master/nsearch
-# # TODO: finish
-# scripts.nixpkgs-search =
-#   pkgs.writers.writeFishBin "nixpkgs-search" { }
-#     # fish
-#     ''
-#       set -l cache_dir ""
-#       set -l db $cache_dir/nixpkgs.json
-#       function update
-#         ${pkgs.gum}/bin/gum spin --
-#         nix search nixpkgs --json "" 2>/dev/null 1>$db
-
-#         set -l fzf_opts \
-#           --ansi \
-#           --border \
-
-#         fzf
-
-#         jaq
-#       end
-#     '';
-
-# scripts.scripts =
-#   let
-#     inherit (builtins) attrNames concatStringsSep;
-#   in
-#   pkgs.writers.writeFishBin "scripts" { }
-#     # fish
-#     ''
-#       set -l scripts ${concatStringsSep " " (attrNames scripts)}
-#       set -l reset (set_color normal)
-#       set -l color (set_color $fish_color_command)
-#       for s in $scripts
-#         printf '%s%s%s\n' $fish_color_command $s $reset
-#       end
 #     '';

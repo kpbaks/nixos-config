@@ -1,4 +1,4 @@
-{ ... }:
+{ config, pkgs, ... }:
 {
 
   # TODO:
@@ -63,6 +63,13 @@
         "hx"
       ];
     };
-    daemon.systemd_socket = true;
+    daemon.enabled = true;
+  };
+
+  # lib.mkIf config.atuin.settings.daemon.enabled
+
+  systemd.user.services.atuin = {
+    Install.WantedBy = [ "graphical-session.target" ];
+    Service.ExecStart = "${pkgs.atuin}/bin/atuin daemon";
   };
 }

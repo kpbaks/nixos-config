@@ -8,6 +8,8 @@
   imports = [
     inputs.niri.homeModules.niri
     ./scripts
+    ./window-rules.nix
+
   ];
 
   # `niri` does not have built-in Xwayland support
@@ -31,7 +33,7 @@
 
   programs.niri.settings.input.focus-follows-mouse = {
     enable = true;
-    max-scroll-amount = "10%";
+    max-scroll-amount = "5%";
   };
 
   programs.niri.settings.input.touchpad.dwt = true; # "disable when typing"
@@ -118,18 +120,6 @@
 
       default-column-width.proportion =
         1.0 - config.programs.niri.settings.layout.default-column-width.proportion;
-    }
-    {
-      matches = [
-        {
-          app-id = "^.?scrcpy(-wrapped)?$";
-          at-startup = true;
-        }
-      ];
-
-      default-column-width.proportion =
-        1.0 - config.programs.niri.settings.layout.default-column-width.proportion;
-      # variable-refresh-rate = true;
     }
     {
       draw-border-with-background = false;
@@ -229,6 +219,7 @@
   programs.niri.settings.outputs = {
     # Laptop screen
     "eDP-1" = {
+      # TODO: open issue or submit pr to `niri` to add `niri msg output <output> background-color <color>` to the cli
       background-color = config.flavor.surface2.hex;
       scale = 1.0;
       position.x = 0;
@@ -247,7 +238,7 @@
   programs.niri.settings.spawn-at-startup =
     map (s: { command = pkgs.lib.strings.splitString " " s; })
       [
-        "ironbar"
+        # "ironbar"
         # "${pkgs.swww}/bin/swww-daemon"
         "${pkgs.copyq}/bin/copyq"
         "${pkgs.eww}/bin/eww daemon"
@@ -517,7 +508,7 @@
       # "Mod+Slash".action = fish "pidof ${pkgs.walker}/bin/walker; and pkill walker; or ${pkgs.walker}/bin/walker";
       # "Mod+Return".action = fish "${pkgs.procps}/bin/pkill walker; or ${pkgs.walker}/bin/walker";
       # "Mod+Slash".action = fish "${pkgs.procps}/bin/pkill walker; or ${pkgs.walker}/bin/walker";
-      "Mod+Slash".action = fish "${pkgs.walker}/bin/walker";
+      "Mod+Slash".action = spawn "${pkgs.walker}/bin/walker";
 
       "Mod+Shift+P".action = power-off-monitors;
       # Mod+R { switch-preset-column-width; }
@@ -593,4 +584,9 @@
       }
     ];
   };
+
+  # systemd.user.services.niri-notify-when-keyboard-layout-changes = {
+  #   Install.WantedBy = [ "graphical-session.target" ];
+  #   Service.ExecStart = "${pkgs.birdtray}/bin/birdtray";
+  # };
 }

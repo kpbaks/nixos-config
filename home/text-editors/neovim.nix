@@ -1,5 +1,6 @@
 { pkgs, ... }:
 {
+  programs.neovide.enable = false;
 
   # programs.neovim = {
   #   enable = false;

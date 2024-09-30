@@ -268,8 +268,6 @@ in
 
       ouch # {,de}compression tool
       # inlyne # markdown viewer
-      # neovide # neovim gui
-      taplo # toml formatter/linter/lsp
       web-ext # helper program to build browser extensions and debug instrument firefox
       # firefox-devedition
 

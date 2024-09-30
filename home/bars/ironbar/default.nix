@@ -1,6 +1,6 @@
 {
   config,
-  osConfig,
+  # osConfig,
   inputs,
   pkgs,
   lib,
@@ -24,15 +24,16 @@
   # Games = "icon:steam"
   # Code = ""
 
+  # FIXME: something causes infinite recursion when enabled
   programs.ironbar = {
-    enable = true;
+    enable = false;
     systemd = true;
     config =
       let
         margin = 0;
       in
       rec {
-        name = "primary";
+        # name = "primary";
         position = "bottom";
         height = 56; # default 42
         margin.top = margin;
@@ -97,9 +98,9 @@
               play = "";
               pause = "";
             };
-            on_mouse_enter = ''${pkgs.ironbar}/bin/ironbar bar ${name} show-popup music'';
-            on_mouse_exit = ''${pkgs.ironbar}/bin/ironbar bar ${name} hide-popup music'';
-            transition_type = "crossfade";
+            # on_mouse_enter = ''${pkgs.ironbar}/bin/ironbar bar ${name} show-popup music'';
+            # on_mouse_exit = ''${pkgs.ironbar}/bin/ironbar bar ${name} hide-popup music'';
+            # transition_type = "crossfade";
           }
           {
             type = "network_manager";
@@ -124,16 +125,16 @@
             format = "%d/%m/%Y %H:%M:%S";
           }
 
-          {
-            # FIXME: not showing up
-            # https://github.com/JakeStanger/ironbar/discussions/724
-            type = "script";
-            cmd = "niri msg --json keyboard-layouts | ${pkgs.jaq}/bin/jaq -r '.names[.current_idx]'";
-            mode = "poll";
-            interval = 5000; # ms
-            # on-click = "";
-            tooltip = "";
-          }
+          # {
+          #   # FIXME: not showing up
+          #   # https://github.com/JakeStanger/ironbar/discussions/724
+          #   type = "script";
+          #   cmd = "niri msg --json keyboard-layouts | ${pkgs.jaq}/bin/jaq -r '.names[.current_idx]'";
+          #   mode = "poll";
+          #   interval = 5000; # ms
+          #   # on-click = "";
+          #   tooltip = "";
+          # }
           # {
           #   type = "sys_info";
           #   interval = {

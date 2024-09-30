@@ -11,4 +11,6 @@
     ./wlsunset.nix
     ./wluma.nix
   ];
+
+  services.trayscale.enable = false;
 }

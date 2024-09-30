@@ -55,7 +55,13 @@ let
           $url | ansi link --text $row.repo
         }
         | update hash {|row| $"(ansi d)($row.hash)(ansi reset)"}
-        | update rev {|row| $"(ansi d)($row.rev)(ansi reset)"}
+        | update rev {|row|
+          let commit = ($row.rev | str substring 0..6)
+          let rest = ($row.rev | str substring 7..)
+          $"(ansi blue)($commit)(ansi reset)(ansi d)($rest)(ansi reset)"
+          # $"(ansi d)($row.rev)(ansi reset)"
+        }
+        | sort-by repo
 
 
         # TODO: add subcommand check to see if a newer commit is available

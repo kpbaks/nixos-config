@@ -10,6 +10,8 @@
   # TODO: find way to validate that all *.desktop files exist for each mime-type
   # https://www.reddit.com/r/linuxquestions/comments/iypx8k/where_does_xdgmime_store_its_actual_default_app/
   # ~/.config/mimeapps.list
+  xdg.mimeApps.enable = true;
+
   xdg.mimeApps.defaultApplications =
     let
       # loupe = "org.gnome.Loupe.desktop";
@@ -40,13 +42,14 @@
 
   xdg.portal.enable = true;
   xdg.portal.xdgOpenUsePortal = true;
-  xdg.portal.config.common.default = "kde";
+  # xdg.portal.config.common.default = "kde";
+  xdg.portal.config.common.default = "cosmic";
   xdg.portal.extraPortals = [
     # pkgs.xdg-desktop-portal-gtk
     pkgs.xdg-desktop-portal-kde
     # pkgs.xdg-desktop-portal-hyprland
     # pkgs.xdg-desktop-portal-wlr
-    # pkgs.xdg-desktop-portal-cosmic
+    pkgs.xdg-desktop-portal-cosmic
   ];
 
 }

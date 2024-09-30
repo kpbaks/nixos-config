@@ -454,7 +454,7 @@
 
   # Enable the KDE Plasma Desktop Environment.
   services.displayManager.sddm = {
-    enable = true;
+    enable = false;
     catppuccin.enable = true;
     wayland.enable = true;
     # autoNumlock = true;
@@ -650,14 +650,16 @@
     # Nix(os) tools
     nix-prefetch-scripts
     nixfmt-rfc-style
-    # alejandra # nix formatter
-    # nixpkgs-fmt
-    # nh # nix helper
     nix-output-monitor # `nom`
     nvd # nix version diff
-    # doas # sudo alternative
     cachix
-
+    nix-du
+    nix-btm
+    nix-derivation
+    nix-doc
+    nix-health
+    nix-inspect
+    nix-janitor
     statix # nix linter
     deadnix # detect unused nix code
     nixd # nix lsp
@@ -771,6 +773,7 @@
 
   services.desktopManager.cosmic.enable = true;
   services.displayManager.cosmic-greeter.enable = true;
+  hardware.system76.power-daemon.enable = true;
   # programs.cosmic.enable = true;
   # programs.niri.package = pkgs.niri-unstable;
 
@@ -852,8 +855,8 @@
   #   excalidraw.enable = true;
   # };
 
-  services.thermald.enable = true;
-  services.auto-cpufreq.enable = true;
+  services.thermald.enable = false;
+  services.auto-cpufreq.enable = false;
   services.auto-cpufreq.settings = {
     battery = {
       governor = "powersave";
@@ -1071,25 +1074,27 @@
   # programs.regreet.enable = config.services.greetd.enable;
   programs.regreet.enable = false;
   # https://github.com/rharish101/ReGreet
-  services.greetd = {
-    enable = !config.services.displayManager.sddm.enable;
-    settings = {
-      # default_session.command = ''${pkgs.greetd.regreet}/bin/regreet'';
-      # default_session.command = ''
-      #   ${pkgs.greetd.tuigreet}/bin/tuigreet \
-      #     --time \
-      #     --remember \
-      #     --asterisks \
-      #     --user-menu \
-      #     --cmd niri-session
-      # '';
-    };
-  };
+
+  # services.greetd = {
+  #   enable = !config.services.displayManager.sddm.enable;
+  #   settings = {
+  #     # default_session.command = ''${pkgs.greetd.regreet}/bin/regreet'';
+  #     # default_session.command = ''
+  #     #   ${pkgs.greetd.tuigreet}/bin/tuigreet \
+  #     #     --time \
+  #     #     --remember \
+  #     #     --asterisks \
+  #     #     --user-menu \
+  #     #     --cmd niri-session
+  #     # '';
+  #   };
+  # };
 
   # niri-session
   environment.etc."greetd/environments".text = '''';
 
-  # services.fwupd.enable = true;
+  services.fwupd.enable = true;
+
   # https://github.com/Shinyzenith/nix-dotfiles/blob/master/host/default.nix
   #   system = {
   #   stateVersion = "23.05";
@@ -1195,4 +1200,7 @@
 
   programs.bandwhich.enable = true;
 
+  services.osquery.enable = true;
+  services.osquery.flags = { };
+  services.osquery.settings = { };
 }

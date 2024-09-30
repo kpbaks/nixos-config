@@ -1,12 +1,14 @@
 { ... }:
 {
   imports = [
+    ./appflowy.nix
     ./atuin.nix
     ./bacon.nix
     ./bat.nix
     ./beeper.nix
     ./bluetoothctl.nix
     ./broot.nix
+    ./carapace.nix
     ./cava.nix
     ./droidcam.nix
     ./eza.nix
@@ -16,6 +18,7 @@
     ./gum.nix
     ./moar.nix
     ./mpv.nix
+    ./noti.nix
     ./obs-studio.nix
     ./pandoc.nix
     ./ripgrep.nix

@@ -5,7 +5,9 @@
   # https://go.dev/wiki/SettingGOPATH
   home.sessionVariables.GOPATH = "${config.xdg.dataHome}/go";
 
-  programs.fish.shellInit = "fish_add_path ${config.home.sessionVariables.GOPATH}";
+  programs.fish.shellInit = "fish_add_path ${config.home.sessionVariables.GOPATH}/bin";
+
+  # programs.go.enable = true;
 
   # TODO: use `programs.go.enable ` instead
   home.packages = with pkgs; [

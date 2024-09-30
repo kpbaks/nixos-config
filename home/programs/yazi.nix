@@ -1,5 +1,6 @@
 # TODO: integrate https://github.com/imsi32/yatline.yazi
 # https://github.com/ndtoan96/ouch.yazi
+# https://github.com/Mellbourn/ls-colors.yazi
 { pkgs, ... }:
 let
   scripts.yazi-downloads =
@@ -168,6 +169,7 @@ in
               (cd "p" "~/Pictures")
               (cd "b" "~/Documents") # b for books, which I mostly keep in my ~/Documents folder
               (cd "v" "~/Videos")
+              (cd "w" "~/work")
               (cd "." "~/dotfiles")
               (cd "r" "/") # r for root
               (cd "/" "/")
@@ -214,7 +216,6 @@ in
   programs.fish.functions.y =
     # fish
     ''
-      function y
         set -l latest_mtime 0
         set -l latest_file
         for f in *
@@ -231,7 +232,6 @@ in
       		builtin cd -- "$cwd"
       	end
       	command rm -f -- "$tmp"
-      end
     '';
 
   programs.nushell.extraConfig =

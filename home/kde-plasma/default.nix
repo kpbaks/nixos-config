@@ -8,34 +8,14 @@
   ...
 }:
 {
-  imports = [ inputs.plasma-manager.homeManagerModules.plasma-manager ];
+  imports = [
+    inputs.plasma-manager.homeManagerModules.plasma-manager
+    ./kate.nix
+    ./konsole.nix
+    ./okular.nix
+  ];
 
   programs.plasma.enable = true;
-  programs.kate.enable = true;
-  programs.kate.editor.brackets = {
-    automaticallyAddClosing = true;
-    flashMatching = true;
-    highlightMatching = true;
-    highlightRangeBetween = true;
-  };
-  programs.kate.editor.font = {
-    family = "JetBrains Mono";
-    pointSize = 14;
-  };
-
-  programs.okular = {
-    enable = true;
-    accessibility.highlightLinks = true;
-    general = {
-      obeyDrm = false;
-      showScrollbars = true;
-      zoomMode = "fitPage";
-      viewMode = "FacingFirstCentered";
-    };
-    performance = {
-      enableTransparencyEffects = false;
-    };
-  };
 
   # programs.plasma.kwin.enable = true;
   # programs.plasma.scripts.polonium.enable = true;

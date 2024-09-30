@@ -70,6 +70,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    agenix = {
+      url = "github:ryantm/agenix";
+      # optional, not necessary for the module
+      inputs.nixpkgs.follows = "nixpkgs";
+      # optionally choose not to download darwin deps (saves some resources on Linux)
+      inputs.darwin.follows = "";
+    };
+
     # TODO: use
     # nur.url = "github:nix-community/NUR";
 
@@ -181,6 +189,11 @@
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nix-melt = {
+      url = "github:nix-community/nix-melt";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -234,8 +247,18 @@
         };
         modules = [
           ./configuration.nix
+
+          {
+            # https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md#default-configuration--who-needs-configuration
+            # NixOS configuration.
+            nix.nixPath = [ "nixpkgs=${inputs.nixpkgs}" ];
+          }
           inputs.stylix.nixosModules.stylix # provide theming for system level programs such as bootloaders, splash screens, and display managers
           inputs.sops-nix.nixosModules.sops
+          {
+            imports = [ inputs.agenix.nixosModules.default ];
+            environment.systemPackages = [ inputs.agenix.packages.${system}.default ];
+          }
           inputs.niri.nixosModules.niri
           inputs.nixos-cli.nixosModules.nixos-cli
           inputs.catppuccin.nixosModules.catppuccin
@@ -256,6 +279,7 @@
               # stylix.targets.console.enable = true; # Linux kernel console
             }
           )
+          { environment.systemPackages = [ inputs.nix-melt.packages.${system}.default ]; }
         ];
       };
 

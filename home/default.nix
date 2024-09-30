@@ -19,7 +19,7 @@
     ./wms
 
     ./packages.nix
-    ./kde-plasma.nix
+    ./kde-plasma
     ./nixvim.nix
     ./packages.nix
     ./git.nix
@@ -28,6 +28,7 @@
     ./calendar.nix
     ./spotify.nix
     ./environment-variables.nix
+    ./fonts.nix
   ];
 
   home.enableDebugInfo = false;

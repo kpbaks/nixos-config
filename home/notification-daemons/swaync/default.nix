@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 {
 
   # ref: https://pastebin.com/xycT4nrk
@@ -170,4 +170,8 @@
       # style = builtins.readFile ./style.css;
       style = builtins.readFile ./macchiato.css;
     };
+
+  programs.niri.settings.binds = with config.lib.niri.actions; {
+    "Mod+N".action = spawn "${pkgs.swaynotificationcenter}/bin/swaync-client" "--toggle-panel";
+  };
 }

@@ -60,7 +60,7 @@ let
         const FOOTER: string = "</svg>"
          let svg_data = $HEADER + $body + $FOOTER
 
-         $svg_data | ${pkgs.resvg}/bin/resvg - | ${pkgs.timg}/bin/timg --center -
+         $svg_data | ${pkgs.resvg}/bin/resvg --resources-dir . - -c | ${pkgs.timg}/bin/timg --center -
 
          # let svg_file = (mktemp --suffix svg)
          # $svg_data | save $svg_file

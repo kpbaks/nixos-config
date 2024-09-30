@@ -210,6 +210,16 @@ with config.flavor;
       action launch --type=os-window --cwd -- $FILE_PATH
     '';
 
+  # pkgs.stdenv.isDarwin 
+  # TODO: only applicable for macOS
+  # https://sw.kovidgoyal.net/kitty/open_actions/#scripting-the-opening-of-files-with-kitty-on-macos
+  xdg.configFile."kitty/launch-actions.conf".text =
+    # kittyconf
+    ''
+
+
+    '';
+
   # https://sw.kovidgoyal.net/kitty/kittens/diff/
   xdg.configFile."kitty/diff.conf".text = # kittyconf
     ''
