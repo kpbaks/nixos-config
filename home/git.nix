@@ -1,7 +1,14 @@
 { config, pkgs, ... }:
 {
 
-  home.packages = with pkgs; [ delta ];
+  home.packages = with pkgs; [
+    delta
+    ghorg
+    # ghostie
+    github-backup
+    github-to-sqlite
+    glab
+  ];
 
   programs.gh = {
     enable = true;
@@ -86,4 +93,8 @@
 
   programs.jujutsu.enable = false;
   programs.git-credential-oauth.enable = false;
+
+  xdg.configFile."ghorg/config.yaml".source = (pkgs.formats.yaml { }).generate "ghorg-config" {
+
+  };
 }

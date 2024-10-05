@@ -6,6 +6,10 @@
   home.sessionVariables.GOPATH = "${config.xdg.dataHome}/go";
 
   programs.fish.shellInit = "fish_add_path ${config.home.sessionVariables.GOPATH}/bin";
+  programs.nushell.extraConfig = # nu
+    ''
+      def "go env" [] {^go env --json | from json }
+    '';
 
   # programs.go.enable = true;
 

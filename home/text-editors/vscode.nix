@@ -12,7 +12,8 @@
       # package = pkgs.vscode;
       # package = pkgs.vscode.fhs;
       # TODO: override pkgs.vscodium to append flag --disable-workspace-trust
-      package = pkgs.vscodium;
+      package = pkgs.vscodium.fhs;
+      # package = pkgs.vscodium;
       enableExtensionUpdateCheck = true;
       enableUpdateCheck = true;
       # extensions = with pkgs.vscode-extensions; [
@@ -46,6 +47,7 @@
         twxs.cmake
         usernamehw.errorlens
         yzhang.markdown-all-in-one
+
         # zxh404.vscode-proto3
         # tabnine.tabnine-vscode
       ];

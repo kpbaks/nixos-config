@@ -1,3 +1,4 @@
+# TODO: package this plugin https://github.com/nvchad/minty
 { inputs, pkgs, ... }:
 {
   imports = [ inputs.nixvim.homeManagerModules.nixvim ];
@@ -307,6 +308,7 @@
   programs.nixvim.plugins.lualine.enable = true;
   programs.nixvim.plugins.mini = {
     enable = true;
+    mockDevIcons = true;
     modules = {
       ai = {
         n_lines = 100;
@@ -317,6 +319,7 @@
       # TODO: map to ctrl-c
       comment = { };
       files = { };
+      icons = { };
       # jump = { };
       # indentscope = { };
       trailspace = { };
@@ -367,4 +370,9 @@
       plugins = true;
     };
   };
+
+  # programs.nixvim.extraConfigLuaPost = # lua
+  #   ''
+  #     local 
+  #   '';
 }

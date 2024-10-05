@@ -7,5 +7,6 @@
     ./odin.nix
     ./python.nix
     ./ocaml.nix
+    ./rust.nix
   ];
 }

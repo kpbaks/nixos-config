@@ -10,6 +10,7 @@
       terminal = package;
     };
   config.default-application = {
-    terminal = pkgs.kitty;
+    # terminal = pkgs.kitty;
+    terminal = pkgs.kdePackages.konsole;
   };
 }

@@ -1,13 +1,10 @@
 {
-  config,
-  osConfig,
-  lib,
+  # config,
+  # osConfig,
+  # lib,
   pkgs,
   ...
 }:
-let
-  inherit (lib) mkIf;
-in
 {
   programs.fish.shellAbbrs = {
     bn = "path basename";
@@ -43,33 +40,38 @@ in
     # fap = "fish_add_path";
     fkr = "fish_key_reader --continuous --verbose";
 
-    kdec = {
-      function = "__abbr_kdeconnect_cli";
-    };
+    kdec.function = "_abbr_kdeconnect_cli";
     # e = "$EDITOR";
-    e = {
-      function = "__abbr_editor";
-    };
+    e.function = "_abbr_editor";
+
+    r = "root";
+    ef.function = "_abbr_exec_fish";
   };
 
   # programs.fish.shellAbbrs.ns = mkIf osConfig.programs.nh.enable "nh search --limit 5 ";
 
   programs.fish.functions = {
-    __abbr_editor =
+    _abbr_editor =
       # fish
       ''
         # TODO: find most recent text file, and append it
         echo \$EDITOR
       '';
-    __abbr_kdeconnect_cli = # fish
+    _abbr_kdeconnect_cli = # fish
       ''
-        set -l devices (kdeconnect-cli --id-only --list-available)
+        set -l devices (${pkgs.kdePackages.kdeconnect-kde}/bin/kdeconnect-cli --id-only --list-available)
         switch (count $devices)
             case 1
                 echo "kdeconnect-cli --device=$devices[1]"
             case '*'
                 echo kdeconnect-cli
         end
+      '';
+
+    _abbr_exec_fish = # fish
+      ''
+        set -l exe (path resolve /proc/$fish_pid/exe)
+        echo "exec $exe"
       '';
   };
 }

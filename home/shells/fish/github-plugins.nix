@@ -79,12 +79,12 @@
     rev = "0b2393b48b55a7f3b200b5a12ac0cf26444b7172";
     hash = "sha256-Nxo6usCI5tqLJ/CZ1YXtCFJ+piy1DGlzFIi9/HSgDIk=";
   }
-  {
-    owner = "kpbaks";
-    repo = "greetings.fish";
-    rev = "45ec585b773e172ca729926461ed9be62473f77d";
-    hash = "sha256-Ezfi5DhCl4l652TvRwlN/cthg7Twmdw0Y2ehrUkYnhk=";
-  }
+  # {
+  #   owner = "kpbaks";
+  #   repo = "greetings.fish";
+  #   rev = "45ec585b773e172ca729926461ed9be62473f77d";
+  #   hash = "sha256-Ezfi5DhCl4l652TvRwlN/cthg7Twmdw0Y2ehrUkYnhk=";
+  # }
   {
     owner = "kpbaks";
     repo = "cmake.fish";
@@ -132,5 +132,12 @@
     repo = "gnuplot.fish";
     rev = "3164d61992daeaf3d58779e5e2b76b9345aad14f";
     hash = "sha256-mLfrDlCSB0Yavj1gyRsQTn1h8Xx1QpAxRxnhzhtUAQQ=";
+  }
+
+  {
+    owner = "kpbaks";
+    repo = "nix.fish";
+    rev = "9ad6884f213bd8463fdb6468f8a16134ee5d77f7";
+    hash = "sha256-uNDDWidE/laUlunX5JH6Fn6pBk6cmWTs3M4Yul3Jy+g=";
   }
 ]

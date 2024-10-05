@@ -1,5 +1,4 @@
 {
-
   # TODO(package):
   # - https://github.com/siddrs/tokyo-night-sddm
 

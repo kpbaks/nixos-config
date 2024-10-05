@@ -5,5 +5,6 @@
     ./fish
     ./ion.nix
     ./nushell
+    ./powershell.nix
   ];
 }

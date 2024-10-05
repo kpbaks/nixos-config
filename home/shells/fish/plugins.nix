@@ -69,6 +69,10 @@ let
         # | par-each {|p| 
         # }
 
+        # http get https://api.github.com/repos/kpbaks/zellij.fish/commits?per_page=1 | get 0.sha
+
+        # TODO: use url build-query
+
         # echo
         # echo "nixpkgs:"
         # '${builtins.toJSON nixpkgs-plugins}' | from json | insert {|row|}

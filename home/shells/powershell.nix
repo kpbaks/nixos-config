@@ -1,0 +1,50 @@
+{
+  config,
+  inputs,
+  pkgs,
+  ...
+}:
+{
+  home.packages = with pkgs; [
+    powershell
+  ];
+
+  programs.vscode.extensions =
+    let
+      extensions = inputs.nix-vscode-extensions.extensions.${pkgs.system};
+    in
+    with extensions.vscode-marketplace;
+    [
+      ms-vscode.powershell
+      # ironmansoftware.powershellprotools
+      # TylerLeonhardt.vscode-inline-values-powershell
+    ];
+
+  xdg.configFile."powershell/Microsoft.PowerShell_profile.ps1".text =
+    (
+      # powershell
+      ''
+        function which($name) {
+          get-command $name | select-object -ExpandProperty Definition
+        }
+
+        import-module -Name PSReadLine -Scope Global
+      '')
+    + (
+      if config.programs.starship.enable then
+        # powershell
+        ''
+          function Invoke-Starship-TransientFunction {
+            &starship module character
+          }
+
+          Invoke-Expression (&starship init powershell)
+
+          Enable-TransientPrompt
+                
+        ''
+      else
+        ""
+    );
+
+}

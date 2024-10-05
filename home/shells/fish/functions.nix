@@ -264,13 +264,16 @@ in
             string match --regex --groups-only "^PPid:\s+(\d+)" </proc/$pid/status
           '';
       };
-      r = # fish
+      root = # fish
         ''
           set -l dir $PWD
-          while $dir != /
+          while test $dir != /
             test -d $dir/.git; and break
-            builtin cd (path dirname $dir)
+            set dir (path dirname $dir)
           end
+
+          test $dir = $PWD; and return
+          builtin cd $dir
         '';
       rfkill = # fish
         ''

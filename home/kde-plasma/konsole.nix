@@ -11,6 +11,8 @@ let
     rev = "3b64040e3f4ae5afb2347e7be8a38bc3cd8c73a8";
     hash = "sha256-d5+ygDrNl2qBxZ5Cn4U7d836+ZHz77m6/yxTIANd9BU=";
   };
+
+  user-defined-stylesheet-path = "konsole/stylesheets/default.css"; # relative to ~/.config/
 in
 {
   programs.konsole.enable = true;
@@ -42,7 +44,15 @@ in
 
       "Terminal Features" = {
         LineNumbers = 1;
+      };
 
+      #       [TabBar]
+      "TabBar" = {
+        CloseTabOnMiddleMouseButton = true;
+        ExpandTabWidth = true;
+        TabBarUseUserStyleSheet = true;
+        # TabBarUserStyleSheetFile = "file:///home/kpbaks/Desktop/foo.css";
+        TabBarUserStyleSheetFile = "file://${config.xdg.configHome}/${user-defined-stylesheet-path}";
       };
     };
   };
@@ -64,4 +74,32 @@ in
         }))
         builtins.listToAttrs
       ];
+
+  # xdg.configFile."konsole/stylesheets/default.css".text = # css
+  # TODO: use catppuccin colors and jetbrains mono font
+  xdg.configFile.${user-defined-stylesheet-path}.text = # css
+    ''
+      QTabBar {
+        background: #EFF0F1;
+        padding-bottom: 10px;
+      }
+
+      QTabBar::tab {
+        background: #ff0000;
+        padding: 8px;
+        border-bottom: 2px solid transparent;
+
+        font-size: 14px;
+        color: #31363B;
+      }
+
+      QTabBar::tab:hover {
+        border-bottom: 2px solid rgba(0, 0, 0, 0.12);
+      }
+
+      QTabBar::tab:selected {
+        border-bottom: 2px solid rgba(0, 0, 0, 1);
+      }
+
+    '';
 }

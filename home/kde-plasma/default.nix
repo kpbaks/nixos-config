@@ -13,6 +13,8 @@
     ./kate.nix
     ./konsole.nix
     ./okular.nix
+    ./kdeconnect.nix
+
   ];
 
   programs.plasma.enable = true;
@@ -81,4 +83,6 @@
     indicator = true;
     package = pkgs.kdePackages.kdeconnect-kde;
   };
+
+  home.packages = with pkgs.kdePackages; [ neochat ];
 }

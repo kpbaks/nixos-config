@@ -5,7 +5,7 @@
   ...
 }:
 let
-  niri = config.programs.niri.package;
+  niri = "${config.programs.niri.package}/bin/niri";
   catppuccin-colors = lib.pipe config.flavor [
     (builtins.mapAttrs (name: v: ''const ${name}: string = "${v.hex}"''))
     builtins.attrValues
@@ -16,7 +16,7 @@ let
     +
       # nu
       ''
-          let outputs = (${niri}/bin/niri msg --json outputs | from json)
+          let outputs = (${niri} msg --json outputs | from json)
 
           mut buf = ""
 
@@ -59,6 +59,8 @@ let
         const HEADER: string = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1">'
         const FOOTER: string = "</svg>"
          let svg_data = $HEADER + $body + $FOOTER
+
+        $svg_data | ${pkgs.bat}/bin/bat -l svg
 
          $svg_data | ${pkgs.resvg}/bin/resvg --resources-dir . - -c | ${pkgs.timg}/bin/timg --center -
 

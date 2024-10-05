@@ -1,3 +1,4 @@
+# TODO: try out https://starship.rs/presets/jetpack
 { lib, ... }:
 {
   programs.starship = {
@@ -39,6 +40,7 @@
         fish_indicator = "fish";
         nu_indicator = "nu";
         bash_indicator = "bash";
+        powershell_indicator = "pwsh";
       };
       localip = {
         disabled = false;

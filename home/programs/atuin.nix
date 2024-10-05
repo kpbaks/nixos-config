@@ -1,4 +1,9 @@
-{ config, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
 
   # TODO:
@@ -50,10 +55,12 @@
         "podman"
         "port"
         "systemctl"
+        "journalctl"
         "tmux"
         "yarn"
       ];
       common_prefix = [
+        "doas"
         "sudo"
         "run0"
       ];
@@ -61,15 +68,18 @@
         "cd"
         "ls"
         "hx"
+        "pwd"
       ];
     };
-    daemon.enabled = true;
+    daemon.enabled = false;
   };
 
   # lib.mkIf config.atuin.settings.daemon.enabled
 
-  systemd.user.services.atuin = {
-    Install.WantedBy = [ "graphical-session.target" ];
-    Service.ExecStart = "${pkgs.atuin}/bin/atuin daemon";
+  systemd.user.services = lib.mkIf config.programs.atuin.settings.daemon.enabled {
+    atuin = {
+      Install.WantedBy = [ "graphical-session.target" ];
+      Service.ExecStart = "${pkgs.atuin}/bin/atuin daemon";
+    };
   };
 }
