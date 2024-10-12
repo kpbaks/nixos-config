@@ -727,7 +727,7 @@ function fish_user_key_bindings
 
     bind \ct __bind_new_tab
     # bind \cn __bind_ctrl_n
-    bind \cp __bind_ctrl_p
+    # bind \cp __bind_ctrl_p
 
     bind \cl 'clear; commandline --function repaint'
 

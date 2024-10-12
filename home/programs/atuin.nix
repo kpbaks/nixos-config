@@ -6,12 +6,12 @@
 }:
 {
 
-  # TODO:
-  # 1. add pr to add a `shell` column to the `history` sqlite table, to differentiate between
+  # TODO: 1. add pr to add a `shell` column to the `history` sqlite table, to differentiate between
   #    commands that are valid in `fish` and not in `nushell` and vice versa.
-  # 2. See if catppuccin has a color theme
-  # 3. Add pr that adds syntax coloring for completion candidates
-  # 4. Add pr to search for specific status code e.g. `$?=139` to search for all segfaults
+  # TODO: 2. See if catppuccin has a color theme
+  # TODO: 3. Add pr that adds syntax coloring for completion candidates
+  # TODO: 4. Add pr to search for specific status code e.g. `$?=139` to search for all segfaults
+  # TODO: 5. Add pr to enable case insensitive search, or see if it already can be configured
   programs.atuin.enable = true;
   programs.atuin.enableFishIntegration = true;
   programs.atuin.flags = [

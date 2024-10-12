@@ -270,6 +270,7 @@
     spacedrive
     typos
     taplo
+    harper
   ];
 
 }

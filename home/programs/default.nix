@@ -32,8 +32,9 @@
     ./wlogout.nix
     ./yt-dlp.nix
     ./zathura.nix
-    ./yazi.nix
+    ./yazi
     ./zellij.nix
     ./zoxide.nix
+    ./lazydocker.nix
   ];
 }

@@ -23,7 +23,7 @@
     ./nixvim.nix
     ./packages.nix
     ./git.nix
-    ./xdg.nix
+    ./xdg
     ./email.nix
     ./calendar.nix
     ./spotify.nix

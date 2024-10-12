@@ -5,32 +5,51 @@
   pkgs,
   ...
 }:
+let
+  setcursor =
+    attrs:
+    builtins.mapAttrs (
+      k: v:
+      if builtins.isAttrs v then
+        v
+      else
+        {
+          setCursor = true;
+          expansion = v;
+        }
+    ) attrs;
+in
 {
-  programs.fish.shellAbbrs = {
+  programs.fish.shellAbbrs = setcursor {
     bn = "path basename";
     dn = "path dirname";
     fcc = "fish_clipboard_copy";
     fcp = "fish_clipboard_paste";
     hm = "home-manager";
     hmg = "home-manager generations";
+    nhhs = "nh home switch";
+    nhos = "nh os switch";
     sys = "systemctl";
     sysu = "systemctl --user";
     dtm = "datamash";
     jpt = "jupyter";
     jptl = "jupyter lab";
-    h = {
-      expansion = "history search '%'";
-      setCursor = true;
-    };
+    # h = {
+    #   expansion = "history search '%'";
+    #   setCursor = true;
+    # };
+
+    h = "history search '%'";
     pk = "pkill -KILL";
     pg = "pgrep";
     upper = "string upper --";
     lower = "string lower --";
     len = "string length --";
-    m = {
-      setCursor = true;
-      expansion = ''string match "*%*"'';
-    };
+    # m = {
+    #   setCursor = true;
+    #   expansion = ''string match "*%*"'';
+    # };
+    m = ''string match "*%*"'';
     re = {
       setCursor = true;
       expansion = ''string match --regex "^%\$"'';
@@ -46,11 +65,21 @@
 
     r = "root";
     ef.function = "_abbr_exec_fish";
+
+    ".." = {
+      setCursor = true;
+      function = "_abbr_dotdot";
+    };
   };
 
   # programs.fish.shellAbbrs.ns = mkIf osConfig.programs.nh.enable "nh search --limit 5 ";
 
   programs.fish.functions = {
+    _abbr_dotdot =
+      # fish
+      ''
+        echo "builtin cd ../"
+      '';
     _abbr_editor =
       # fish
       ''

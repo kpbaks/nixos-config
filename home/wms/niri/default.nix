@@ -18,6 +18,8 @@
     xwayland-run
     # FIXME: crashes when starting as a systemd service
     xwayland-satellite
+    # xwayland-satellite-nixpkgs
+    # xwayland-satellite-unstable
   ];
 
   # TODO: see if this is possible in home-manager

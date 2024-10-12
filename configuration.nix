@@ -12,6 +12,7 @@
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
+    ./steam.nix
     # ./tuxedo-laptop-second-nvme-drive.nix
   ];
 
@@ -281,47 +282,6 @@
       pkgs.ffmpeg
       pkgs.imagemagick
     ];
-  };
-
-  # TODO: get steam to work
-  specialisation.gaming.configuration = {
-    system.nixos.tags = [ "gaming" ];
-    # Nvidia Configuration
-    services.xserver.videoDrivers = [ "nvidia" ];
-    hardware.graphics.enable = true;
-    hardware.nvidia.modesetting.enable = true;
-    hardware.nvidia-container-toolkit.enable = true;
-    hardware.nvidia.open = true;
-    hardware.nvidia.prime =
-      let
-        inherit (pkgs.lib) mkForce;
-      in
-      {
-        sync.enable = mkForce false;
-        offload = rec {
-          enable = mkForce true;
-          enableOffloadCmd = enable;
-        };
-
-        # NOTE: ids found with `lspci | grep VGA`
-        # Bus ID of the NVIDIA GPU. You can find it using lspci, either under 3D or VGA
-        nvidiaBusId = "PCI:01:00:0";
-        # Bus ID of the Intel GPU. You can find it using lspci, either under 3D or VGA
-        intelBusId = "PCI:00:02:0";
-      };
-
-    hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
-    # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
-
-    # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.mkDriver {
-    #   version = "555.52.04";
-    #   sha256_64bit = "sha256-nVOubb7zKulXhux9AruUTVBQwccFFuYGWrU1ZiakRAI=";
-    #   sha256_aarch64 = pkgs.lib.fakeSha256;
-    #   openSha256 = pkgs.lib.fakeSha256;
-    #   settingsSha256 = "sha256-PMh5efbSEq7iqEMBr2+VGQYkBG73TGUh6FuDHZhmwHk=";
-    #   persistencedSha256 = pkgs.lib.fakeSha256;
-    # };
-    # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
   };
 
   # 30 (black)
@@ -599,6 +559,7 @@
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
+    rainfrog
     wayland-utils
     alsa-utils # `alsamixer`
     # fh # flakehub cli
@@ -831,19 +792,6 @@
     #   };
     # };
   };
-
-  programs.gamescope.enable = true;
-  hardware.steam-hardware.enable = true;
-  programs.steam.enable = true;
-  programs.steam.gamescopeSession.enable = false;
-  programs.gamemode.enable = true;
-  # programs.steam = {
-  #   enable = true;
-  #   extraPackages = with pkgs; [
-  #     gamescope
-  #   ];
-  #   # remotePlay.openFirewall = false;
-  # };
 
   # services.spotifyd.enable = true;
   # services.surrealdb.enable = true;
@@ -1161,7 +1109,8 @@
     enable = true;
     clean.enable = true;
     clean.extraArgs = "--keep-since 30d --keep 10";
-    flake = "/home/${username}/dotfiles";
+    flake = "/etc/nixos";
+    # flake = "/home/${username}/dotfiles";
   };
 
   # TODO(ons 18 sep 10:53:21 CEST 2024): figure out how to configure `niri` and logind
@@ -1203,4 +1152,18 @@
   services.osquery.enable = true;
   services.osquery.flags = { };
   services.osquery.settings = { };
+
+  # TODO: check if works in wsl?
+  services.envfs.enable = true; # use fusefs to resolve shebangs like #!/bin/bash that does not work on NixOS because of not being compliant with FHS standard
+
+  services.postgresql = {
+    enable = true;
+    enableJIT = true;
+    # package = pkgs.postgresql;
+    ensureDatabases = [ "testdb" ];
+    authentication = pkgs.lib.mkOverride 10 ''
+      #type database DBuser auth-method
+      local all all trust
+    '';
+  };
 }

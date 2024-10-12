@@ -85,6 +85,20 @@
       # https://github.com/jesseduffield/lazygit/blob/master/docs/Custom_Pagers.md#using-external-diff-commands
       # git.pagint.externalDiffCommand = "difft --color=always --display=inline --syntax-highlight=off";
       git.pagint.externalDiffCommand = "${pkgs.difftastic}/bin/difft --color=always";
+
+      gui = {
+        nerdFontsVersion = "3";
+        filterMode = "fuzzy";
+        windowSize = "half";
+
+        branchColors = with config.flavor; {
+          "feature" = green.hex;
+          "hotfix" = mauve.hex;
+        };
+
+      };
+
+      quitOnTopLevelReturn = false;
       #   gui.theme = {
       #     lightTheme = true;
       #   };
@@ -97,4 +111,6 @@
   xdg.configFile."ghorg/config.yaml".source = (pkgs.formats.yaml { }).generate "ghorg-config" {
 
   };
+
+  home.sessionVariables.GHORG_COLOR = "enabled";
 }

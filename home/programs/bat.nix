@@ -1,23 +1,10 @@
 { pkgs, ... }:
-
-# set --local args
-# for arg in $argv
-#     test -f $arg; or continue
-#     set --local ext (path extension $arg)
-#     test $ext = ".zon"; and set --append args "--language=zig"; and continue
-#     test $arg = "flake.lock"; and set --append args "--language=json"; and continue
-#     test $ext = ".cu"; and set --append args "--language=cpp"; and continue
-#     test $arg = "conanfile.txt"; and set --append args "--language=ini"; and continue
-#     test $arg = justfile -o $arg = Justfile; and set --append args "--language=make"; and continue
-# end
-
-# command bat $args $argv
 {
   programs.bat = {
     enable = true;
     # catppuccin.enable = false;
     extraPackages = with pkgs.bat-extras; [
-      # batdiff
+      batdiff
       batman
       batgrep
       batwatch
@@ -32,6 +19,15 @@
         };
         file = "syntax/gleam.sublime-syntax";
       };
+      # nushell = {
+      #   src = pkgs.fetchFromGitHub {
+      #     owner = "kurokirasama";
+      #     repo = "nushell_sublime_syntax";
+      #     rev = "ad8cd6702b3097b34abd8e8e8ec8137e5a2324c0";
+      #     hash = "sha256-kDdsX/srl9N0NqXG7uEh22YQvYYCGHDHARkncE6tvJA=";
+      #   };
+      #   file = "nushell.sublime-syntax";
+      # };
     };
 
     config = {
@@ -47,6 +43,7 @@
         "justfile:make"
         "Justfile:make"
         "*.msproj:xml"
+        # "*.nu:nushell"
       ];
     };
   };

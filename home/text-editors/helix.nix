@@ -1,26 +1,32 @@
 { inputs, pkgs, ... }:
+let
+  scls = inputs.simple-completion-language-server.defaultPackage.${pkgs.system};
+in
 {
-
   # TODO: convert
-  programs.helix.enable = true;
-  programs.helix.defaultEditor = true;
+  # programs.helix.enable = true;
+  # programs.helix.defaultEditor = true;
   programs.helix = {
+    enable = true;
+    defaultEditor = true;
     catppuccin.enable = false;
     # package = pkgs.helix;
     package = inputs.helix.packages.${pkgs.system}.default;
-    extraPackages = [
-      pkgs.jq-lsp
-      pkgs.marksman
-      pkgs.taplo
-      pkgs.typos
+    extraPackages = with pkgs; [
+      jq-lsp
+      marksman
+      taplo
+      typos
       # pkgs.vscode-langservers-extracted
-      pkgs.dprint
-      pkgs.python3Packages.python-lsp-server
-      pkgs.python3Packages.python-lsp-ruff
-      inputs.simple-completion-language-server.defaultPackage.${pkgs.system}
-      pkgs.lua-language-server
-      pkgs.stylua
-      pkgs.selene
+      dprint
+      python3Packages.python-lsp-server
+      python3Packages.python-lsp-ruff
+
+      lua-language-server
+      stylua
+      selene
+      harper
+      scls
     ];
 
     ignores = [
@@ -51,16 +57,18 @@
         mouse = true;
         preview-completion-insert = true;
         color-modes = true;
+        popup-border = "all";
         gutters = [
-          "diff"
-          "diagnostics"
           "line-numbers"
           "spacer"
+          "diagnostics"
+          "diff"
         ];
         true-color = true;
         bufferline = "always";
         end-of-line-diagnostics = "hint";
         inline-diagnostics.cursor-line = "warning"; # show warnings and errors on the cursorline inline
+        jump-label-alphabet = "fjghdkslaerioqptyuzxcvbnm";
         cursor-shape = {
           insert = "bar";
           normal = "block";
@@ -306,7 +314,7 @@
         args = [ "--lsp-server" ];
       };
       # https://github.com/tekumara/typos-lsp/blob/main/docs/helix-config.md
-      language-server.typos = {
+      language-server.typos-lsp = {
         command = "${pkgs.typos-lsp}/bin/typos-lsp";
         environment.RUST_LOG = "error";
         config.diagnosticSeverity = "Warning";
@@ -318,6 +326,11 @@
           "--inlay-hints"
           "--semantic-tokens"
         ];
+      };
+
+      # TODO(pr): upstream pr to both helix and harper
+      language-server.harper-ls = {
+        command = "${pkgs.harper}/bin/harper-ls";
       };
 
       language-server.nu-lsp = {
@@ -348,9 +361,11 @@
           {
             name = "markdown";
             language-servers = [
-              "typos"
+              "typos-lsp"
               "marksman"
+              "harper-ls"
             ];
+            file-types = [ "qmd" ];
             formatter.command = "${pkgs.mdformat}/bin/mdformat";
           }
           {

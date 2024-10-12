@@ -19,6 +19,11 @@
   programs.fish.enable = true;
   programs.fish.package = pkgs.fish;
 
+  programs.fish.interactiveShellInit = ''
+    ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
+
+    echo "todo checkout \$status_generation"
+  '';
 }
 
 # # Implement keybinds similar to almost all text editors, where e.g.

@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 {
 
   options.default-application =
@@ -11,6 +11,7 @@
     };
   config.default-application = {
     # terminal = pkgs.kitty;
-    terminal = pkgs.kdePackages.konsole;
+    # terminal = pkgs.kdePackages.konsole;
+    terminal = config.programs.foot.package;
   };
 }

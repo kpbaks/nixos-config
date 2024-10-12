@@ -57,7 +57,6 @@ let
         f = "$__fish_config_dir";
         # hx = "~/.config/helix";
         m = "~/Music";
-        n = "/etc/nixos";
         obs = "~/Videos/OBS";
         p = "~/Pictures";
         s = "~/.local/share";
@@ -303,6 +302,12 @@ in
       };
       fish_colors = # fish
         '''';
+
+      cdn = # fish
+        ''
+          builtin cd /etc/nixos
+          $EDITOR flake.nix
+        '';
     };
 }
 

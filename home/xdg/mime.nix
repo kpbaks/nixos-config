@@ -1,11 +1,9 @@
 { pkgs, ... }:
 {
-
-  xdg.enable = true;
-  xdg.userDirs.createDirectories = false;
-  # xdg.dataFile."nix-snowflake-colours.svg".source = ./nix-snowflake-colours.svg;
+  # xdg.mime.addedAssociations = ;
 
   # xdg-mime query default image/svg+xml
+
   # xdg.mimeApps.enable = true;
   # TODO: find way to validate that all *.desktop files exist for each mime-type
   # https://www.reddit.com/r/linuxquestions/comments/iypx8k/where_does_xdgmime_store_its_actual_default_app/
@@ -33,23 +31,14 @@
       "image/jpeg" = [ image-viewer ];
       "image/webp" = [ image-viewer ];
       "inode/directory" = [ "yazi.desktop" ];
+      # TODO: add to `home/flatpak.nix` instead
+      # TODO: create a program that opens the terminal and runs `flatpak install <remote> <flatpak-id>` in it, from parsing the ref
+      # /home/kpbaks/.var/app/io.github.zen_browser.zen/cache/tmp/mozilla_kpbaks0/de.hummdudel.Libellus.flatpakref
+      # "application/vnd.flatpak.ref" =  
       # TODO: create a cool handler
 
       # "application/x-ipynb+json" 
       # TODO: create .desktop for `jnv`
       # "application/json" = [jnv];
     };
-
-  xdg.portal.enable = true;
-  xdg.portal.xdgOpenUsePortal = true;
-  # xdg.portal.config.common.default = "kde";
-  xdg.portal.config.common.default = "cosmic";
-  xdg.portal.extraPortals = [
-    # pkgs.xdg-desktop-portal-gtk
-    pkgs.xdg-desktop-portal-kde
-    # pkgs.xdg-desktop-portal-hyprland
-    # pkgs.xdg-desktop-portal-wlr
-    pkgs.xdg-desktop-portal-cosmic
-  ];
-
 }

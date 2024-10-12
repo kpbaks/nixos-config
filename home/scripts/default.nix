@@ -29,6 +29,7 @@ in
     ./bluetooth-devices.nix
     ./ocr.nix
     ./flake-inputs.nix
+    ./xdg-desktop-portals.nix
     # ./tokei-pie.nix
     # ./cdtmp.nix
   ];

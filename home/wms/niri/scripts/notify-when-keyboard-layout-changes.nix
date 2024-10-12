@@ -28,7 +28,7 @@ let
               set flag 🇺🇸
             case '*'
           end
-          set -l "Changed keyboard layout to <b>$keyboard_layout</b> $flag"
+          set -l body "Changed keyboard layout to <b>$keyboard_layout</b> $flag"
 
           # TODO: use --icon for flag?
           ${pkgs.libnotify}/bin/notify-send --transient $title $body

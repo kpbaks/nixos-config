@@ -30,6 +30,13 @@ let
       '';
 in
 {
+  imports = [
+    ./folder-rules.nix
+    ./file-navigation-wraparound.nix
+    ./linemode.nix
+
+  ];
+
   programs.yazi =
     let
       plugins-repo = pkgs.fetchFromGitHub {
@@ -43,6 +50,13 @@ in
         repo = "kdeconnect.yazi";
         rev = "f6ae6bd007be970ac17fafc0a84d87eeeb1c4494";
         hash = "sha256-sr92pLVzY/f+MnhhAEbdefz99QdlZRN3x+yQFtXUMD8=";
+      };
+
+      starship-yazi = pkgs.fetchFromGitHub {
+        owner = "Rolv-Apneseth";
+        repo = "starship.yazi";
+        rev = "77a65f5a367f833ad5e6687261494044006de9c3";
+        hash = "sha256-sAB0958lLNqqwkpucRsUqLHFV/PJYoJL2lHFtfHDZF8=";
       };
     in
     {
@@ -99,20 +113,43 @@ in
         mime-ext = "${plugins-repo}/mime-ext.yazi";
         smart-filter = "${plugins-repo}/smart-filter.yazi";
         jump-to-char = "${plugins-repo}/jump-to-char.yazi";
+        starship = "${starship-yazi}";
         # kdeconnect = "${kdeconnect-yazi}";
       };
 
       initLua =
         # lua
         ''
-          require("full-border"):setup {
-              -- Available values: ui.Border.PLAIN, ui.Border.ROUNDED
-              type = ui.Border.ROUNDED,
-          }
-          require("git"):setup()
-          require("no-status"):setup()
-          require("kdeconnect"):setup {
-            device = "c439e91904ce0298"
+            require("full-border"):setup {
+                -- Available values: ui.Border.PLAIN, ui.Border.ROUNDED
+                type = ui.Border.ROUNDED,
+            }
+            require("git"):setup()
+            require("no-status"):setup()
+            require("kdeconnect"):setup {
+              device = "c439e91904ce0298"
+            }
+
+            require("starship"):setup()
+            -- starship:setup({ config_file = "/home/rolv/.config/starship_secondary.toml" })
+
+            Status:children_add(function()
+          	local h = cx.active.current.hovered
+          	if h == nil or ya.target_family() ~= "unix" then
+          		return ui.Line {}
+          	end
+
+          	return ui.Line {
+          		ui.Span(ya.user_name(h.cha.uid) or tostring(h.cha.uid)):fg("magenta"),
+          		ui.Span(":"),
+          		ui.Span(ya.group_name(h.cha.gid) or tostring(h.cha.gid)):fg("magenta"),
+          		ui.Span(" "),
+          	}
+          end, 500, Status.RIGHT)
+
+          -- https://yazi-rs.github.io/docs/dds#session.lua
+          require("session"):setup {
+          	sync_yanked = true,
           }
         '';
 
@@ -171,7 +208,8 @@ in
               (cd "v" "~/Videos")
               (cd "w" "~/work")
               (cd "." "~/dotfiles")
-              (cd "r" "/") # r for root
+              (cd "n" "/etc/nixos")
+              # (cd "r" "/") # r for root
               (cd "/" "/")
               (cd "s" "~/Pictures/screenshots")
               (cd "Do" "~/development/own")
@@ -199,6 +237,17 @@ in
                 run = "plugin --sync kdeconnect";
                 desc = "";
               }
+              {
+                on = [
+                  "g"
+                  "r"
+                ];
+                # FIXME: does nothing
+                run = ''
+                  shell 'ya pub dds-cd --str "$(git rev-parse --show-toplevel)"' --confirm
+                '';
+                desc = "cd back to the root of the current git repository";
+              }
             ];
         };
     };
@@ -209,7 +258,6 @@ in
       p7zip # opt dependency of `yazi`
       ueberzugpp # opt dependency of `yazi`
       exiftool # needed for `yazi` functionality
-
     ]);
 
   # https://yazi-rs.github.io/docs/quick-start#shell-wrapper
@@ -246,6 +294,15 @@ in
       	}
       	rm -fp $tmp
       }
+    '';
+
+  # TODO: check if this is already added when enabling `programs.yazi.enableFishIntegration`
+  programs.fish.interactiveShellInit = # fish
+    ''
+      # Change Yazi's CWD to PWD on subshell exit
+      if test -n $YAZI_ID
+      	trap 'ya pub dds-cd --str "$PWD"' EXIT
+      end
     '';
 
   # programs.bash.shellInit = ;

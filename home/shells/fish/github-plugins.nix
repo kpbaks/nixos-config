@@ -1,4 +1,10 @@
 [
+  # {
+  #   owner = "kpbaks";
+  #   repo = "merger.fish";
+  #   rev = "2a4eb9accceac18569b7aef4cb1efefd16d15007";
+  #   hash = "sha256-RG8XJq6MRGiHGKsVBwjdd3oDQmT5Gb+GpYhwg7Q9hdo=";
+  # }
   {
     owner = "kpbaks";
     repo = "private_mode.fish";
