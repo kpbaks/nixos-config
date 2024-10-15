@@ -308,6 +308,14 @@ in
           builtin cd /etc/nixos
           $EDITOR flake.nix
         '';
+      cdtmp = {
+        description = "Create a directory under /tmp/ and cd into it";
+        body = # fish
+          ''
+            set -l suffix (${pkgs.coreutils-full}/bin/date -u +%Y-%m-%dT%H:%M:%S%Z) # iso8601
+            builtin cd (${pkgs.coreutils-full}/bin/mktemp --suffix $suffix)
+          '';
+      };
     };
 }
 
@@ -379,26 +387,6 @@ in
 #             $padding $__bang_gen_base_urls[$i]
 #     end
 # end
-
-# __bang_gen g 'https://www.google.com/search?hl=en&q=' google
-# __bang_gen r 'https://www.wolframalpha.com/input?i=' reddit
-# __bang_gen wa "https://www.wolframalpha.com/input?i=" wolframalpha
-# __bang_gen yt "https://www.youtube.com/results?search_query=" youtube
-# __bang_gen w "https://en.wikipedia.org/wiki/" wikipedia
-# __bang_gen gh "https://github.com/search?utf8=yes&type=repositories&q=" github
-# __bang_gen so "https://stackoverflow.com/search?q=" stackoverflow
-# # __bang_gen rust "https://docs.rs/releases/search?query=" rust
-# __bang_gen rs "https://docs.rs/releases/search?query=" rust
-# # __bang_gen crate "https://crates.io/search?q=" crate
-# __bang_gen c "https://crates.io/search?q=" crates.io
-# __bang_gen std "https://doc.rust-lang.org/std/?search=" rust-std
-# __bang_gen docs "https://docs.rs/" docs.rs
-
-# # !rust -> https://docs.rs/releases/search?query=%s
-# # !!rust -> https://docs.rs/%s
-# # !crate -> https://crates.io/search?q=%s
-# # !!crate -> https://crates.io/crates/%s
-# # !std -> https://doc.rust-lang.org/std/?search=%s
 
 # # TODO: turn into plugin `cdgen.fish`
 # function cd-generator -a char dir -d "Higher order function/macro to generate cd. like functions"

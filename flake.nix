@@ -29,6 +29,8 @@
     ];
   };
 
+  inputs.pre-commit-hooks.url = "github:cachix/git-hooks.nix";
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
@@ -197,7 +199,7 @@
 
   outputs =
     {
-      # self,
+      self,
       nixpkgs,
       home-manager,
       ...
@@ -206,6 +208,9 @@
       hostname = "nixos";
       username = "kpbaks";
       system = "x86_64-linux";
+      used-systems = [ "x86_64-linux" ];
+      for-all-systems = nixpkgs.lib.genAttrs used-systems;
+
       pkgs = import nixpkgs {
         inherit system;
         overlays = [
@@ -225,19 +230,42 @@
     # pkgs = nixpkgs.legacyPackages.${system};
     {
       formatter.${system} = pkgs.nixfmt-rfc-style;
-      # TODO: use flake-checker
-      # checks
+
+      checks = for-all-systems (system: {
+        pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
+          src = ./.;
+          hooks = {
+            # nixpkgs-fmt.enable = true;
+            nixfmt-rfc-style.enable = true;
+            deadnix.enable = true;
+            flake-checker.enable = true;
+            statix.enable = true;
+            check-toml.enable = true;
+            check-json.enable = true;
+            check-yaml.enable = true;
+            lychee.enable = true;
+          };
+        };
+      });
+
+      devShells = for-all-systems (system: {
+        default = nixpkgs.legacyPackages.${system}.mkShell {
+          inherit (self.checks.${system}.pre-commit-check) shellHook;
+          buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
+        };
+
+      });
 
       # TODO: setup raspberrypi
       # TODO: setup nextcloud
-      nixosConfigurations."raspberrypi" = nixpkgs.lib.nixosSystem {
-        specialArgs = {
-          inherit inputs username;
-        };
-        modules = [
-          ./hosts/raspberrypi.nix
-        ];
-      };
+      # nixosConfigurations."raspberrypi" = nixpkgs.lib.nixosSystem {
+      #   specialArgs = {
+      #     inherit inputs username;
+      #   };
+      #   modules = [
+      #     ./hosts/raspberrypi.nix
+      #   ];
+      # };
 
       nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
         inherit system;

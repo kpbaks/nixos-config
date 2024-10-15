@@ -1,13 +1,22 @@
 { config, pkgs, ... }:
 {
-
   home.packages = with pkgs; [
     delta
     ghorg
+    # git-gui
+    tk # needed by `git citool`
     # ghostie
     github-backup
     github-to-sqlite
     glab
+    serie # rich git commit graph terminal
+    # TODO: try out
+    git-interactive-rebase-tool
+    git-branchless
+    git-brunch
+    git-branchstack
+    git-bars
+    gitleaks
   ];
 
   programs.gh = {
@@ -17,15 +26,16 @@
       gh-eco
       gh-markdown-preview
       # gh-notify
-      gh-cal
+      # gh-cal
       # gh-f
       # gh-poi
       gh-actions-cache
       # gh-copilot
-      gh-screensaver
+      # gh-screensaver
     ];
 
-    settings.git_protocol = "https"; # or "ssh"
+    # settings.git_protocol = "https"; # or "ssh"
+    settings.git_protocol = "ssh"; # or "ssh"
     settings.aliases = {
       co = "pr checkout";
       conflicts = "diff --name-only --diff-filter=U --relative";
@@ -89,7 +99,7 @@
       gui = {
         nerdFontsVersion = "3";
         filterMode = "fuzzy";
-        windowSize = "half";
+        # windowSize = "half";
 
         branchColors = with config.flavor; {
           "feature" = green.hex;

@@ -18,6 +18,7 @@
 
   programs.fish.enable = true;
   programs.fish.package = pkgs.fish;
+  programs.fish.preferAbbrs = true;
 
   programs.fish.interactiveShellInit = ''
     ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source

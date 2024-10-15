@@ -1,0 +1,14 @@
+# TODO(pr): submit this example as a pr to https://github.com/nix-community/nixd
+[language-server.nixd]
+command = "nixd"
+args = ["--inlay-hints", "--semantic-tokens"]
+
+[language-server.nixd.config.nixd.options]
+# nixos = { expr = '(builtins.getFlake "/home/kpbaks/dotfiles").nixosConfigurations.nixos.options' }
+# home-manager = { expr = '(builtins.getFlake "/home/kpbaks/dotfiles").homeConfigurations."kpbaks@nixos".options' }
+nixos = { expr = '(builtins.getFlake "/etc/nixos").nixosConfigurations.nixos.options' }
+home-manager = { expr = '(builtins.getFlake "/etc/nixos").homeConfigurations."kpbaks@nixos".options' }
+
+[[language]]
+name = "nix"
+language-servers = ["nixd"]

@@ -30,6 +30,8 @@ in
     ./ocr.nix
     ./flake-inputs.nix
     ./xdg-desktop-portals.nix
+    ./dev-templates.nix
+    ./hx-project-health.nix
     # ./tokei-pie.nix
     # ./cdtmp.nix
   ];

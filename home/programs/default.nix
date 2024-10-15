@@ -36,5 +36,6 @@
     ./zellij.nix
     ./zoxide.nix
     ./lazydocker.nix
+    ./qownnotes.nix
   ];
 }

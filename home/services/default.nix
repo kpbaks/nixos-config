@@ -10,6 +10,7 @@
     ./udiskie.nix
     ./wlsunset.nix
     ./wluma.nix
+    ./pueue.nix
   ];
 
   services.trayscale.enable = false;

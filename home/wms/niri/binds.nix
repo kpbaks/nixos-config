@@ -1,4 +1,9 @@
-{ config, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
 
   # https://github.com/sodiboo/niri-flake/blob/main/docs.md#programsnirisettingsbinds
@@ -25,6 +30,36 @@
       run-with-sh-within-terminal = run-in-terminal "sh" "-c";
       # run-with-fish-within-terminal = run-in-terminal "sh" "-c";
       run-with-fish-within-terminal = spawn terminal "${pkgs.fish}/bin/fish" "--no-config" "-c";
+
+      # Mod+Ctrl+Shift+N { spawn "/home/myname/scripts/niri_win.sh" "goto" "org.wezfurlong.wezterm" "/home/myname/bin/wezterm --config enable_wayland=true"; }
+      # Mod+Ctrl+Shift+E { spawn "/home/myname/scripts/niri_win.sh" "goto" "code-url-handler" "/usr/share/code/code --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform-hint=auto --unity-launch"; }
+      # Mod+Ctrl+Shift+I { spawn "/home/myname/scripts/niri_win.sh" "goto" "vivaldi-stable" "/usr/bin/vivaldi-stable --enable-features=UseOzonePlatform --ozone-platform=wayland"; }
+
+      # TODO: limit to current workspace, or screen by using the output for `niri msg --json workspaces`
+      focus-to-spawn-script =
+        let
+          niri = "${config.programs.niri.package}/bin/niri";
+        in
+        pkgs.writers.writeNuBin "niri-spawn-or-focus" { }
+          # nushell
+          ''
+            def main [app_id: string, program: string] {
+              let windows = ${niri} msg --json windows | from json
+              # let workspaces = ${niri} msg --json workspaces | from json
+
+              let focus = $windows
+              | filter { |window| $window.app_id == $app_id }
+              | length
+              | do { $in > 0 }
+
+              if $focus {
+                ${pkgs.wlrctl}/bin/wlrctl window focus $app_id
+              } else {
+                ${niri} msg action spawn -- $program
+              }
+            }
+          '';
+      focus-or-spawn = spawn (lib.getExe focus-to-spawn-script);
     in
     # run-in-sh-within-kitty = spawn "kitty" "sh" "-c";
     # run-in-fish-within-kitty = spawn "kitty" "${pkgs.fish}/bin/fish" "--no-config" "-c";
@@ -95,24 +130,41 @@
       # inherit (focus-workspace-keybinds) ${builtins.attrNames focus-workspace-keybinds};
 
       # "Mod+?".action = show-hotkey-overlay;
-      "Mod+T".action = spawn terminal;
+      # "Mod+T".action = spawn terminal;
+      "Mod+T".action = focus-or-spawn "foot" "${pkgs.foot}/bin/foot";
+      # "Mod+Y".action = focus-or-spawn "foot" "${pkgs.foot}/bin/foot";
+
       "Mod+Shift+T".action = spawn terminal "${pkgs.fish}/bin/fish" "--private";
       # "Mod+F".action = spawn "firefox";
       # "Mod+Shift+F".action = spawn "firefox" "--private-window";
-      "Mod+F".action = browser;
-      "Mod+Shift+F".action = browser "--private-window";
-      "Mod+G".action = spawn "telegram-desktop";
+      # "Mod+F".action = browser;
+
+      # run-flatpak = spawn "flatpak" "run";
+      # # browser = spawn "${pkgs.firefox}/bin/firefox";
+      # browser = run-flatpak "io.github.zen_browser.zen";
+      # # run-in-terminal = spawn "kitty";
+      "Mod+F".action = focus-or-spawn "zen-alpha" "flatpak run io.github.zen_browser.zen";
+      # "Mod+Shift+F".action = browser "--private-window";
+      # "Mod+G".action = spawn "telegram-desktop";
+      "Mod+G".action = focus-or-spawn "org.telegram.desktop" "${pkgs.telegram-desktop}/bin/telegram-desktop";
       "Mod+S".action = spawn "spotify";
       # "Mod+D".action = spawn "webcord";
-      "Mod+D".action = spawn "vesktop";
+      # "Mod+D".action = spawn "vesktop";
+      # D for discord
+      "Mod+D".action = focus-or-spawn "vesktop" "${pkgs.vesktop}/bin/vesktop";
+      # N for notes
+      "Mod+N".action = focus-or-spawn "Logseq" "${pkgs.logseq}/bin/logseq";
       # "Mod+E".action = run-in-kitty "yazi";
       # TODO: detect the newest file in ~/Downloads and focus it first by doing `yazi $file`
-      "Mod+E".action = run-with-sh-within-terminal "cd ~/Downloads; yazi";
+      "Mod+Y".action = run-with-sh-within-terminal "cd ~/Downloads; yazi";
+      # E is default on other platforms like Windows, for opening the "file explorer" program
+      "Mod+E".action = focus-or-spawn "org.kde.dolphin" "${pkgs.kdePackages.dolphin}/bin/dolphin";
       # "Mod+E".action = spawn "dolphin";
       # "Mod+B".action = spawn "overskride";
       # "Mod+B".action = run-in-terminal (pkgs.lib.getExe scripts.bluetoothctl-startup);
       # "Mod+A".action = run-in-terminal (pkgs.lib.getExe scripts.audio-sink);
 
+      # FIXME: does not work
       "Mod+A".action = run-in-terminal "${pkgs.alsa-utils}/bin/alsamixer --black-background --mouse --view playback";
 
       # "Mod+P".action = spawn (
@@ -129,7 +181,7 @@
       # "Mod+Ctrl+Shift+E".action = quit {skip-confirmation = true;};
 
       # "Mod+Y".action = spawn "${pkgs.firefox}/bin/firefox" "https://youtube.com";
-      "Mod+Y".action = browser "https://youtube.com";
+      # "Mod+Y".action = browser "https://youtube.com";
 
       "Mod+Plus".action = set-column-width "+10%";
       "Mod+Minus".action = set-column-width "-10%";
@@ -182,9 +234,10 @@
       "Mod+Shift+Slash".action = show-hotkey-overlay;
       "Mod+Q".action = close-window;
       "Mod+V".action = spawn "${pkgs.copyq}/bin/copyq" "menu";
-      "Mod+M".action = maximize-column;
+      "Mod+Shift+M".action = maximize-column;
 
-      "Mod+K".action = spawn "${pkgs.kdePackages.kdeconnect-kde}/bin/kdeconnect-app";
+      # "Mod+K".action = spawn "${pkgs.kdePackages.kdeconnect-kde}/bin/kdeconnect-app";
+      "Mod+K".action = focus-or-spawn "org.kde.kdeconnect.app" "${pkgs.kdePackages.kdeconnect-kde}/bin/kdeconnect-app";
 
       # // There are also commands that consume or expel a single window to the side.
       "Mod+BracketLeft".action = consume-or-expel-window-left;
@@ -201,10 +254,12 @@
 
       # "Mod+Comma".action = run-in-fish-within-kitty "${pkgs.helix}/bin/hx ~/dotfiles/{flake,configuration,home}.nix";
       # TODO: improve by checking if an editor process instance is already running, before spawning another
-      "Mod+Comma".action = run-with-fish-within-terminal "hx ~/dotfiles/{flake,configuration}.nix";
+      # "Mod+Comma".action = run-with-fish-within-terminal "hx ~/dotfiles/{flake,configuration}.nix";
       # "Mod+Period".action = spawn "${pkgs.swaynotificationcenter}/bin/swaync-client" "--toggle-panel";
-      "Mod+Period".action = spawn "${pkgs.plasma-desktop}/bin/plasma-emojier";
+      "Mod+Period".action = focus-or-spawn "org.kde.plasma.emojier" "${pkgs.plasma-desktop}/bin/plasma-emojier";
       # TODO: color picker keybind
+
+      "Mod+M".action = focus-or-spawn "thunderbird" "${pkgs.thunderbird}/bin/thunderbird";
 
       # // Actions to switch layouts.
       #    // Note: if you uncomment these, make sure you do NOT have

@@ -1,9 +1,9 @@
-{ inputs, ... }:
+{ inputs, pkgs, ... }:
 {
 
   imports = [ inputs.walker.homManagerModules.default ];
 
-  # home.packages = with pkgs; [ walker ];
+  home.packages = with pkgs; [ walker ];
 
   # home.sessionVariables = {
   #   WALKER_CONFIG_TYPE = "toml";

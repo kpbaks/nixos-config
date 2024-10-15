@@ -1,4 +1,10 @@
 [
+  {
+    owner = "kpbaks";
+    repo = "nix_command_not_found.fish";
+    rev = "d52d0e56b359bbd8d507b6d8650dfe3487d000ff";
+    hash = "sha256-VWQIeKcXyAJrxi797Vir5dnNpwJjjAdHgwFkroNspxU=";
+  }
   # {
   #   owner = "kpbaks";
   #   repo = "merger.fish";

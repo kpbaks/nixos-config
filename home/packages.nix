@@ -9,6 +9,9 @@
   # TODO: checkout https://github.com/azzamsa/zman
   # TODO: checkout https://github.com/6543/batmon/
   home.packages = with pkgs; [
+    # TODO: try out, might be useful for work
+    ripsecrets
+    gitleaks
     cfonts
     zbar # `zbarimg` and `zbarcam`, utilities to work with qr codes
     nodePackages_latest.fkill-cli
@@ -95,7 +98,7 @@
     # helvum # GTK-based patchbay for pipewire
     watchexec
     # rerun # FIXME: does not compile
-    # logseq
+    logseq
     # smassh # TUI based typing test application inspired by MonkeyType
     kondo # cleans dependencies and build artifacts from your projects.
     # TODO: integrate with helix

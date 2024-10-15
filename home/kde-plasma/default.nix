@@ -84,5 +84,8 @@
     package = pkgs.kdePackages.kdeconnect-kde;
   };
 
-  home.packages = with pkgs.kdePackages; [ neochat ];
+  home.packages = with pkgs.kdePackages; [
+    neochat
+    klevernotes
+  ];
 }

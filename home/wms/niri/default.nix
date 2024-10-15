@@ -18,6 +18,10 @@
     xwayland-run
     # FIXME: crashes when starting as a systemd service
     xwayland-satellite
+    wlrctl
+    wlr-which-key
+    wlr-randr
+    wlr-layout-ui
     # xwayland-satellite-nixpkgs
     # xwayland-satellite-unstable
   ];
@@ -86,8 +90,8 @@
       { proportion = 2.0 / 3.0; }
     ];
     # default-column-width = {proportion = 1.0 / 3.0;};
-    # default-column-width.proportion = 1.0 / 2.0;
-    default-column-width.proportion = 2.0 / 3.0;
+    default-column-width.proportion = 1.0 / 2.0;
+    # default-column-width.proportion = 2.0 / 3.0;
     # default-column-width = {proportion = 1.0;};
     focus-ring = with config.flavor; {
       enable = true;

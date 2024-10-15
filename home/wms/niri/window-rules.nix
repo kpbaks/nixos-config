@@ -1,5 +1,4 @@
 { config, pkgs, ... }:
-
 let
   remaining-column-width-proportion =
     1.0 - config.programs.niri.settings.layout.default-column-width.proportion;
@@ -10,6 +9,15 @@ in
   programs.niri.settings.window-rules = [
     {
       draw-border-with-background = false;
+    }
+    {
+      # https://github.com/YaLTeR/niri/wiki/Application-Issues#wezterm
+      matches = [
+        {
+          app-id = ''^org\.wezfurlong\.wezterm$'';
+        }
+      ];
+      default-column-width = { };
     }
 
     {
@@ -79,8 +87,6 @@ in
         }
       ];
       border.active.color = "red";
-
     }
-
   ];
 }

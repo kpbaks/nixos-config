@@ -27,6 +27,7 @@ in
       selene
       harper
       scls
+      nls
     ];
 
     ignores = [
@@ -410,6 +411,7 @@ in
           {
             name = "nickel";
             auto-format = true;
+            # language-servers = [ "nls" ];
             formatter = {
               command = "${pkgs.nickel}/bin/nickel";
               args = [ "format" ];
