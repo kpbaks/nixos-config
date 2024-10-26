@@ -30,9 +30,35 @@
   };
 
   inputs.pre-commit-hooks.url = "github:cachix/git-hooks.nix";
+  inputs.fh.url = "https://flakehub.com/f/DeterminateSystems/fh/*.tar.gz";
+
+  inputs.impermanence.url = "github:nix-community/impermanence";
+  inputs.zen-browser.url = "github:MarceColl/zen-browser-flake";
+  inputs.zen-browser.inputs.nixpkgs.follows = "nixpkgs";
+
+  # TODO: use
+  inputs.sops-nix = {
+    url = "github:Mic92/sops-nix";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+
+  # FIXME: why is no `nixos` binary available?
+  inputs.nixos-cli = {
+    url = "github:water-sucks/nixos";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+
+  inputs.agenix = {
+    url = "github:ryantm/agenix";
+    # optional, not necessary for the module
+    inputs.nixpkgs.follows = "nixpkgs";
+    # optionally choose not to download darwin deps (saves some resources on Linux)
+    inputs.darwin.follows = "";
+  };
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     home-manager = {
       url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -56,28 +82,15 @@
       # inputs.home-manager.follows = "home-manager";
     };
 
-    hyprland = {
-      url = "github:hyprwm/Hyprland";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    # TODO: what do i use this for?
-    hyprgrass = {
-      url = "github:horriblename/hyprgrass";
-      inputs.hyprland.follows = "hyprland"; # IMPORTANT
-    };
-    # TODO: use
-    sops-nix = {
-      url = "github:Mic92/sops-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    agenix = {
-      url = "github:ryantm/agenix";
-      # optional, not necessary for the module
-      inputs.nixpkgs.follows = "nixpkgs";
-      # optionally choose not to download darwin deps (saves some resources on Linux)
-      inputs.darwin.follows = "";
-    };
+    # hyprland = {
+    #   url = "github:hyprwm/Hyprland";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
+    # # TODO: what do i use this for?
+    # hyprgrass = {
+    #   url = "github:horriblename/hyprgrass";
+    #   inputs.hyprland.follows = "hyprland"; # IMPORTANT
+    # };
 
     # TODO: use
     # nur.url = "github:nix-community/NUR";
@@ -107,32 +120,26 @@
     # anyrun-nixos-options.url = "github:n3oney/anyrun-nixos-options";
 
     # TODO: use
-    ags = {
-      url = "github:Aylur/ags";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # ags = {
+    #   url = "github:Aylur/ags";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
     # atdo.url = "github:kpbaks/atdo";
     # atdo.inputs.nixpkgs.follows = "nixpkgs";
     swww = {
       url = "github:LGFae/swww";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    umu = {
-      url = "git+https://github.com/Open-Wine-Components/umu-launcher/?dir=packaging\/nix&submodules=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # umu = {
+    #   url = "git+https://github.com/Open-Wine-Components/umu-launcher/?dir=packaging\/nix&submodules=1";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     # TODO: checkout
     # nix-gaming = {
     #   url = "github:fufexan/nix-gaming";
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
-
-    # FIXME: why is no `nixos` binary available?
-    nixos-cli = {
-      url = "github:water-sucks/nixos";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
 
     spicetify-nix = {
       url = "github:Gerg-L/spicetify-nix";
@@ -146,10 +153,10 @@
 
     # TODO: try out and setup
     # https://github.com/Toqozz/wired-notify
-    wired-notify = {
-      url = "github:Toqozz/wired-notify";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # wired-notify = {
+    #   url = "github:Toqozz/wired-notify";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     # TODO: create a similar implementation that is native to `niri`
     # can use a similar overlay to the print screen feature
@@ -179,17 +186,15 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    fh.url = "https://flakehub.com/f/DeterminateSystems/fh/*.tar.gz";
-
     walker = {
       url = "github:abenz1267/walker";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    rust-overlay = {
-      url = "github:oxalica/rust-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # rust-overlay = {
+    #   url = "github:oxalica/rust-overlay";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     nix-melt = {
       url = "github:nix-community/nix-melt";
@@ -214,8 +219,8 @@
       pkgs = import nixpkgs {
         inherit system;
         overlays = [
-          inputs.rust-overlay.overlays.default
-          inputs.wired-notify.overlays.default
+          # inputs.rust-overlay.overlays.default
+          # inputs.wired-notify.overlays.default
           inputs.niri.overlays.niri
           (final: prev: { woomer = inputs.woomer.packages.${system}.default; })
           inputs.swww.overlays.default
@@ -289,11 +294,7 @@
           inputs.niri.nixosModules.niri
           inputs.nixos-cli.nixosModules.nixos-cli
           inputs.catppuccin.nixosModules.catppuccin
-          {
-            environment.systemPackages = [
-              inputs.fh.packages.${system}.default
-            ];
-          }
+          { environment.systemPackages = [ inputs.fh.packages.${system}.default ]; }
 
           inputs.nixos-cosmic.nixosModules.default
           # inputs.nixos-hardware.nixosModules.tuxedo-infinitybook-pro14-gen7
@@ -331,6 +332,7 @@
               nixpkgs.config.allowUnfree = true;
               nixpkgs.config.permittedInsecurePackages = [
                 "olm-3.2.16"
+                "electron-27.3.11"
                 # "electron-29.4.6"
                 # "electron-28.3.3" # needed for `logseq` 05-07-2024
                 # "electron-27.3.11"
@@ -342,16 +344,12 @@
                 cfg = config.catppuccin;
               in
               {
-                imports = [
-                  inputs.catppuccin.homeManagerModules.catppuccin
-                ];
+                imports = [ inputs.catppuccin.homeManagerModules.catppuccin ];
                 config.catppuccin.enable = true; # Enable for all available programs you're using!
-                config.catppuccin.flavor = "macchiato";
+                config.catppuccin.flavor = "mocha";
                 config.catppuccin.accent = "lavender";
 
-                options.flavor = pkgs.lib.mkOption {
-                  type = pkgs.lib.types.attrs;
-                };
+                options.flavor = pkgs.lib.mkOption { type = pkgs.lib.types.attrs; };
 
                 config.flavor = pkgs.lib.mkIf cfg.enable (
                   (pkgs.lib.importJSON (config.catppuccin.sources.palette + "/palette.json"))
@@ -360,9 +358,7 @@
               }
             )
             {
-              imports = [
-                inputs.stylix.homeManagerModules.stylix
-              ];
+              imports = [ inputs.stylix.homeManagerModules.stylix ];
               stylix.enable = false;
               stylix.polarity = "dark";
               stylix.image = pkgs.fetchurl {
@@ -378,6 +374,7 @@
             inputs.nix-index-database.hmModules.nix-index
             # optional to also wrap and install comma
             { programs.nix-index-database.comma.enable = true; }
+            # { home.packages = [ inputs.zen-browser.packages.${system}.default ]; }
           ];
         };
       };

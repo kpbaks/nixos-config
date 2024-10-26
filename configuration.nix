@@ -4,7 +4,7 @@
 {
   config,
   pkgs,
-  # inputs,
+  inputs,
   username,
   ...
 }:
@@ -70,6 +70,9 @@
 
   # Allow unfree packages e.g. closed-source nvidia drivers
   nixpkgs.config.allowUnfree = true;
+
+  # Needed by `nixd` lsp
+  nix.nixPath = [ "nixpkgs=${inputs.nixpkgs}" ];
 
   # system.autoUpgrade.enable = true;
   # system.autoUpgrade.allowReboot = true;
@@ -413,6 +416,7 @@
   services.displayManager.defaultSession = "niri";
 
   # Enable the KDE Plasma Desktop Environment.
+  # TODO: try out https://github.com/khaneliman/catppuccin-sddm-corners
   services.displayManager.sddm = {
     enable = false;
     catppuccin.enable = true;
@@ -734,7 +738,7 @@
 
   services.desktopManager.cosmic.enable = true;
   services.displayManager.cosmic-greeter.enable = true;
-  hardware.system76.power-daemon.enable = true;
+  # hardware.system76.power-daemon.enable = true;
   # programs.cosmic.enable = true;
   # programs.niri.package = pkgs.niri-unstable;
 
@@ -767,7 +771,7 @@
   #   services.espanso.enable = false;
   services.mullvad-vpn.enable = false;
   services.mozillavpn.enable = false;
-  services.wg-netmanager.enable = true;
+  # services.wg-netmanager.enable = true;
 
   # security.pam.services.gdm.enableGnomeKeyring = false;
   security.pam.services.gdm.enableGnomeKeyring = false;
@@ -1166,4 +1170,7 @@
       local all all trust
     '';
   };
+
+  services.ntfy-sh.enable = true;
+  services.ntfy-sh.settings.base-url = "https://ntfy.sh";
 }

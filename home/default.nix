@@ -17,6 +17,7 @@
     ./terminals
     ./text-editors
     ./wms
+    ./desktop-environments
 
     ./packages.nix
     ./kde-plasma

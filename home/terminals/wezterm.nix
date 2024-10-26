@@ -13,13 +13,20 @@ let
   # `config.catppuccin.flavor` is lowercase, so we have to titlecase it
   # ref: https://github.com/catppuccin/wezterm
   catppuccin_color_scheme = ''"Catppuccin ${title-case-word config.catppuccin.flavor}"'';
+  # catppuccin_colors_lua = lib.pipe config.flavor [
+  #   builtins.attrValues
+  #   (map (v: ''local "${v.hex}"''))
+  # tt
+
 in
+# ]
 {
 
   programs.wezterm = {
     enable = true;
     extraConfig =
       # lua
+
       ''
         local config = wezterm.config_builder()
         -- NOTE: fixes this issue
@@ -46,8 +53,11 @@ in
         config.scrollback_lines = 5000
         config.status_update_interval = 1000
         config.window_decorations = 'RESIZE'
-        local modal = wezterm.plugin.require("https://github.com/MLFlexer/modal.wezterm")
-        modal.apply_to_config(config)
+
+        -- Then, activate with CTRL + ALT + P for presentation mode, or CTRL + ALT + SHIFT + P for fullscreen presentation.
+        wezterm.plugin.require("https://gitlab.com/xarvex/presentation.wez").apply_to_config(config)
+
+        wezterm.plugin.require("https://github.com/MLFlexer/modal.wezterm").apply_to_config(config)
 
         local bar = wezterm.plugin.require("https://github.com/adriankarlen/bar.wezterm")
         bar.apply_to_config(config)
@@ -110,6 +120,16 @@ in
             mods = "",
             action = wezterm.action.ToggleFullScreen,
           },
+          {
+            key = "P",
+            mods = "CTRL",
+            action = wezterm.action.ShowLauncherArgs { flags = "FUZZY|TABS|WORKSPACES" },
+          },
+          # {
+          #   key = "f1",
+          #   mods = "",
+          #   action = wezterm.action.ShowLauncherArgs,
+          # },
         }
 
         config.mouse_bindings = {
@@ -142,7 +162,7 @@ in
 
         config.native_macos_fullscreen_mode = false
 
-        config.command_palette_fg_color = "${config.flavor.teal.hex}"
+        config.command_palette_fg_color = "${config.flavor.lavender.hex}"
         config.command_palette_font_size = 14.0
 
         return config

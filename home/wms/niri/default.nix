@@ -1,7 +1,8 @@
 {
-  pkgs,
-  inputs,
   config,
+  inputs,
+  lib,
+  pkgs,
   ...
 }:
 {
@@ -10,21 +11,44 @@
     ./scripts
     ./window-rules.nix
     ./binds.nix
+    ./outputs.nix
   ];
 
   # `niri` does not have built-in Xwayland support
-  home.packages = with pkgs; [
-    cage
-    xwayland-run
-    # FIXME: crashes when starting as a systemd service
-    xwayland-satellite
-    wlrctl
-    wlr-which-key
-    wlr-randr
-    wlr-layout-ui
-    # xwayland-satellite-nixpkgs
-    # xwayland-satellite-unstable
-  ];
+  home.packages =
+    with pkgs;
+    let
+      title-case-word =
+        word:
+        let
+          inherit (builtins) substring stringLength;
+          firstchar = substring 0 1 word;
+          rest = substring 1 (stringLength word - 1) word;
+        in
+        lib.strings.toUpper firstchar + lib.strings.toLower rest;
+
+      catppuccin-cursor =
+        let
+          variant = "${config.catppuccin.flavor}${title-case-word config.catppuccin.accent}";
+        in
+        catppuccin-cursors.${variant};
+
+    in
+    [
+      cage
+      xwayland-run
+      # FIXME: crashes when starting as a systemd service
+      xwayland-satellite
+      wlrctl
+      wlr-which-key
+      wlr-randr
+      wlr-layout-ui
+      # pkgs.catppuccin-fcitx5
+      catppuccin-cursor
+      # pkgs.catppuccin-cursors.${config.}
+      # xwayland-satellite-nixpkgs
+      # xwayland-satellite-unstable
+    ];
 
   # TODO: see if this is possible in home-manager
   # https://github.com/YaLTeR/niri/wiki/Example-systemd-Setup
@@ -61,7 +85,8 @@
   programs.niri.settings.cursor = {
     # TODO: figure out if this cursor pack is packaged in nixpkgs, and if it is
     # then depend on it properly.
-    theme = "breeze_cursors";
+    # theme = "breeze_cursors";
+    theme = "catppuccin_cursors";
     size = 32;
   };
   programs.niri.settings.input.workspace-auto-back-and-forth = true;
@@ -106,25 +131,6 @@
     };
   };
 
-  programs.niri.settings.outputs = {
-    # Laptop screen
-    "eDP-1" = {
-      # TODO: open issue or submit pr to `niri` to add `niri msg output <output> background-color <color>` to the cli
-      background-color = config.flavor.surface2.hex;
-      scale = 1.0;
-      position.x = 0;
-      position.y = 0;
-    };
-    "Acer Technologies K272HUL T6AEE0058502" = {
-      background-color = config.flavor.surface1.hex;
-      scale = 1.0;
-      transform.rotation = 0;
-      variable-refresh-rate = "on-demand";
-      position.x = 0;
-      position.y = -1600;
-    };
-  };
-
   programs.niri.settings.spawn-at-startup =
     map (s: { command = pkgs.lib.strings.splitString " " s; })
       [
@@ -155,11 +161,11 @@
   };
 
   # TODO: experiment with this
-  programs.niri.settings.animations.shaders = {
-    window-resize = builtins.readFile ./shaders/window-resize.glsl;
-    window-open = null;
-    window-close = null;
-  };
+  # programs.niri.settings.animations.shaders = {
+  #   window-resize = builtins.readFile ./shaders/window-resize.glsl;
+  #   window-open = null;
+  #   window-close = null;
+  # };
 
   # FIXME: does not load correctly
   # TODO: check it works correctly

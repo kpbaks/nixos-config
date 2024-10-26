@@ -632,8 +632,8 @@ function fish_user_key_bindings
     # bind \cX beginning-of-buffer begin-selection end-of-buffer kill-selection
 
     bind \ca beginning-of-buffer begin-selection end-of-buffer
-    bind --key sr up-or-search # `sr` is shift+up
-    bind --key sf down-or-search # `sf` is shift+down
+    # bind --key sr up-or-search # `sr` is shift+up
+    # bind --key sf down-or-search # `sf` is shift+down
 
     bind \e end-selection or cancel repaint-mode # `\e` is escape
     bind \e __bind_escape
@@ -647,6 +647,9 @@ function fish_user_key_bindings
     bind --preset --key sright begin-selection forward-word
     bind --preset --key shome begin-selection beginning-of-line
     bind --preset --key send begin-selection end-of-line
+
+    bind --preset \cj down-or-search
+    bind --preset \ck up-or-search
 
     # bind --preset \cc cancel-commandline and repaint
 

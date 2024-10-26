@@ -7,16 +7,10 @@ in
 {
 
   programs.niri.settings.window-rules = [
-    {
-      draw-border-with-background = false;
-    }
+    { draw-border-with-background = false; }
     {
       # https://github.com/YaLTeR/niri/wiki/Application-Issues#wezterm
-      matches = [
-        {
-          app-id = ''^org\.wezfurlong\.wezterm$'';
-        }
-      ];
+      matches = [ { app-id = ''^org\.wezfurlong\.wezterm$''; } ];
       default-column-width = { };
     }
 

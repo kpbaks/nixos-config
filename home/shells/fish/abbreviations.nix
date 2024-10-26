@@ -45,15 +45,13 @@ in
     upper = "string upper --";
     lower = "string lower --";
     len = "string length --";
+    brs = ''br --trim-root --cmd 'cr/%/i:open_preview'';
     # m = {
     #   setCursor = true;
     #   expansion = ''string match "*%*"'';
     # };
     m = ''string match "*%*"'';
-    re = {
-      setCursor = true;
-      expansion = ''string match --regex "^%\$"'';
-    };
+    re = ''string match --regex "^%\$"'';
 
     fi = "fish_indent --ansi";
     # fap = "fish_add_path";

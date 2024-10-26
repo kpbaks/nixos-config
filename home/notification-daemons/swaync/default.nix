@@ -172,6 +172,6 @@
     };
 
   programs.niri.settings.binds = with config.lib.niri.actions; {
-    "Mod+N".action = spawn "${pkgs.swaynotificationcenter}/bin/swaync-client" "--toggle-panel";
+    "Mod+Shift+N".action = spawn "${pkgs.swaynotificationcenter}/bin/swaync-client" "--toggle-panel";
   };
 }

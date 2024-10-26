@@ -35,7 +35,7 @@ in
   home.packages =
     builtins.attrValues scripts
     ++ (with pkgs; [
-      spotify-tray
+      # spotify-tray
       spotify-cli-linux
     ]);
 

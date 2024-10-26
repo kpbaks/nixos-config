@@ -67,7 +67,7 @@ in
   # TODO: use https://github.com/raffaem/waybar-mediaplayer
   # https://github.com/raffaem/waybar-screenrecorder
   programs.waybar = {
-    enable = false;
+    enable = true;
     # catppuccin.enable = false;
     catppuccin.mode = "prependImport";
     # FIXME: does not start with `niri`
@@ -304,7 +304,7 @@ in
             tooltip-format-connected = "{controller_alias}\t{controller_address}\n\n{num_connections} connected\n\n{device_enumerate}";
             tooltip-format-enumerate-connected = "{device_alias}\t{device_address}";
             tooltip-format-enumerate-connected-battery = "{device_alias}\t{device_address}\t{device_battery_percentage}%";
-            on-click = pkgs.lib.getExe scripts.bluetoothctl-startup;
+            # on-click = pkgs.lib.getExe scripts.bluetoothctl-startup;
             # on-click = "${pkgs.bluez}/bin/bluetoothctl "
           };
 
@@ -359,7 +359,7 @@ in
             format-ok = "✓";
             system = true;
             user = true;
-            on-click = "${pkgs.lib.getExe scripts.systemd-failed-units}";
+            # on-click = "${pkgs.lib.getExe scripts.systemd-failed-units}";
 
             # on-click 
           };
@@ -584,15 +584,15 @@ in
           };
 
           # FIXME: still not work
-          "image/spotify-cover-art" = {
-            # TODO
-            exec = pkgs.lib.getExe scripts.spotify-cover-art;
-            # exec = "spotify-cover-art";
-            # "exec"= "bash -c 'spotify-cover-art'";
-            # // "exec"="~/.config/waybar/custom/spotify/album_art.sh";
-            size = height;
-            interval = 30;
-          };
+          # "image/spotify-cover-art" = {
+          #   # TODO
+          #   exec = pkgs.lib.getExe scripts.spotify-cover-art;
+          #   # exec = "spotify-cover-art";
+          #   # "exec"= "bash -c 'spotify-cover-art'";
+          #   # // "exec"="~/.config/waybar/custom/spotify/album_art.sh";
+          #   size = height;
+          #   interval = 30;
+          # };
 
           "custom/notification" = {
             tooltip = false;

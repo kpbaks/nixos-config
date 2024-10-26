@@ -32,6 +32,8 @@ in
     ./xdg-desktop-portals.nix
     ./dev-templates.nix
     ./hx-project-health.nix
+    ./ros2-repos.nix
+    # ./lg.nix
     # ./tokei-pie.nix
     # ./cdtmp.nix
   ];

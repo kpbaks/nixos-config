@@ -1,3 +1,4 @@
+# TODO: try out https://www.reddit.com/r/KittyTerminal/comments/1g7vkwt/neovide_like_cursor_animation_in_kitty_terminal/
 {
   config,
   pkgs,

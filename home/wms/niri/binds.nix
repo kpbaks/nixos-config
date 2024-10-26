@@ -54,8 +54,10 @@
 
               if $focus {
                 ${pkgs.wlrctl}/bin/wlrctl window focus $app_id
+                ${niri} msg action center-column
               } else {
-                ${niri} msg action spawn -- $program
+                # FIXME: does not work
+                ${niri} msg action spawn -- ...($program | split words)
               }
             }
           '';
@@ -159,6 +161,7 @@
       "Mod+Y".action = run-with-sh-within-terminal "cd ~/Downloads; yazi";
       # E is default on other platforms like Windows, for opening the "file explorer" program
       "Mod+E".action = focus-or-spawn "org.kde.dolphin" "${pkgs.kdePackages.dolphin}/bin/dolphin";
+      "Mod+Z".action = focus-or-spawn "dev.zed.Zed" "${lib.getExe config.programs.zed-editor.package}";
       # "Mod+E".action = spawn "dolphin";
       # "Mod+B".action = spawn "overskride";
       # "Mod+B".action = run-in-terminal (pkgs.lib.getExe scripts.bluetoothctl-startup);
@@ -293,7 +296,8 @@
       # "Mod+Slash".action = fish "pidof ${pkgs.walker}/bin/walker; and pkill walker; or ${pkgs.walker}/bin/walker";
       # "Mod+Return".action = fish "${pkgs.procps}/bin/pkill walker; or ${pkgs.walker}/bin/walker";
       # "Mod+Slash".action = fish "${pkgs.procps}/bin/pkill walker; or ${pkgs.walker}/bin/walker";
-      "Mod+Slash".action = spawn "${pkgs.walker}/bin/walker";
+      # "Mod+Slash".action = spawn "${pkgs.walker}/bin/walker";
+      "Mod+Slash".action = spawn "${config.programs.fuzzel.package}/bin/fuzzel";
 
       "Mod+Shift+P".action = power-off-monitors;
       # Mod+R { switch-preset-column-width; }
@@ -304,7 +308,8 @@
       # "Mod+Shift+R".action = reset-window-height;
       "Mod+C".action = center-column;
       # "Mod+Z".action = center-column; # kinda like `zz` in helix
-      "Mod+Z".action = spawn (pkgs.lib.getExe pkgs.woomer);
+      # "Mod+Z".action = spawn (pkgs.lib.getExe pkgs.woomer);
+      # "Mod+Z".action
 
       # TODO: implement
       # "Mod+BackSpace".action = focus-last-window;

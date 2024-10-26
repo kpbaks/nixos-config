@@ -1,3 +1,5 @@
+# TODO: checkout https://github.com/tieum/atuin-graph
+# TODO: checkout https://github.com/YiNNx/cmd-wrapped
 {
   config,
   lib,

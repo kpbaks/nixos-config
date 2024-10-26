@@ -1,3 +1,6 @@
+# Cool julia packages:
+# - https://github.com/JuliaPlots/UnicodePlots.jl
+
 { pkgs, ... }:
 
 {
@@ -8,9 +11,9 @@
         precompile = true;
       })
       [
-        "Plots"
-        "Pluto"
-        "Revise"
+        # "Plots"
+        # "Pluto"
+        # "Revise"
         "OhMyREPL"
       ]
     )
@@ -23,7 +26,7 @@
   home.file.".julia/config/startup.jl".text =
     let
       startup-packages = [
-        "Revise"
+        # "Revise"
         "LinearAlgebra" # builtin
         "Statistics" # builtin
         "Random" # builtin

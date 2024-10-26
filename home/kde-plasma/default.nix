@@ -84,8 +84,13 @@
     package = pkgs.kdePackages.kdeconnect-kde;
   };
 
-  home.packages = with pkgs.kdePackages; [
-    neochat
-    klevernotes
-  ];
+  home.packages =
+    with pkgs.kdePackages;
+    [
+      neochat
+      klevernotes
+    ]
+    ++ (with pkgs; [
+      plasma-panel-colorizer
+    ]);
 }

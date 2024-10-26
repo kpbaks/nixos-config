@@ -9,12 +9,19 @@
   # TODO: checkout https://github.com/azzamsa/zman
   # TODO: checkout https://github.com/6543/batmon/
   home.packages = with pkgs; [
+    markdownlint-cli
+    markdown-anki-decks
+    markdown-link-check
+    markdown-oxide
+    dive
     # TODO: try out, might be useful for work
+    logstash
+    logstash-contrib
     ripsecrets
     gitleaks
     cfonts
-    zbar # `zbarimg` and `zbarcam`, utilities to work with qr codes
-    nodePackages_latest.fkill-cli
+    # zbar # `zbarimg` and `zbarcam`, utilities to work with qr codes
+    # nodePackages_latest.fkill-cli
     tparse
     rich-cli
     plocate # Much faster `locate`
@@ -236,10 +243,10 @@
     zip
     unzip
     file
-    anki # flashcard app
+    # anki # flashcard app
     mpv # media player
-    bitwarden # password manager
-    bitwarden-cli # bitwarden cli
+    # bitwarden # password manager
+    # bitwarden-cli # bitwarden cli
     pass # password manager
     pre-commit # git hook manager
     glow # terminal markdown viewer
@@ -264,7 +271,7 @@
     web-ext # helper program to build browser extensions and debug instrument firefox
     # firefox-devedition
 
-    xurls # Extract urls from text
+    # xurls # Extract urls from text
 
     # TODO: try out
     zulip

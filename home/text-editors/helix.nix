@@ -170,14 +170,15 @@ in
           "make_search_word_bounded"
           "search_next"
         ];
-        "#" = [
-          "move_char_right"
-          "move_prev_word_start"
-          "move_next_word_end"
-          "search_selection"
-          "make_search_word_bounded"
-          "search_prev"
-        ];
+        "#" = [ "toggle_comments"];
+        # "#" = [
+        #   "move_char_right"
+        #   "move_prev_word_start"
+        #   "move_next_word_end"
+        #   "search_selection"
+        #   "make_search_word_bounded"
+        #   "search_prev"
+        # ];
         A-down = [
           "extend_to_line_bounds"
           "yank"
@@ -431,9 +432,12 @@ in
             name = "nu";
             auto-format = true;
             language-servers = [
-              "pyright"
-              "ruff-lsp"
+              "nu-lsp"
             ];
+            # FIXME: fucks up the text
+            # formatter.command = "${pkgs.nufmt}/bin/nufmt";
+            # formatter.args = [ "--stdin" ];
+            inherit indent;
           }
           {
             name = "toml";

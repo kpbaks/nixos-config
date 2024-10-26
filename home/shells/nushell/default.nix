@@ -1,34 +1,48 @@
+# TODO: add this to work laptop https://github.com/nushell/nu_scripts/blob/main/custom-completions/winget/winget-completions.nu
 {
   config,
-  lib,
   pkgs,
   ...
 }:
-let
-  plugin_names = [
-    "formats"
-    "polars"
-    "gstat"
-    "net"
-    "query"
-  ];
-  # plugin_binaries = map (p: "nu_plugin_${p}") plugin_names;
-  nu_plugin_add_statements = map (
-    p: "plugin add ${lib.getExe pkgs.nushellPlugins.${p}}"
-  ) plugin_names;
-in
 {
+
+  imports = [
+    # ./plugins.nix
+  ];
+
+  # TODO: add to helix
+  home.packages = with pkgs; [ nufmt ];
+
+  programs.nushell.configFile.text =
+    # nushell
+    ''
+      $env.config = {
+      edit_mode: vi,
+      use_ls_colors: true,
+      table_mode: rounded,
+
+      history: {
+        max_size: 10000,
+      }
+
+      keybindings: [
+        
+      ]
+        
+        
+      }
+        
+    '';
   programs.nushell = {
     enable = true;
     extraConfig =
       # nushell
       ''
-        use std
+        # use std
 
-        ${lib.concatLines nu_plugin_add_statements}
 
         # TODO: implement
-        def modified [] { ${pkgs.git}/bin/git ls-files --others --exclude-standard }
+        def modified [] { ${pkgs.git}/bin/git ls-files --others --exclude-standard | lines }
 
         def "config diff" [] {
           if $env.KITTY_PID? != null {
@@ -40,10 +54,10 @@ in
             config nu --default | ${pkgs.lib.getExe config.programs.vscode.package} --diff - $nu.config-path
           }
         }
+
+        def cdn [] { cd /etc/nixos; ${config.programs.helix.package}/bin/hx flake.nix }
       '';
   };
-
-  home.packages = map (p: pkgs.nushellPlugins.${p}) plugin_names;
 
   # # FIXME: how to add these to nushell config?
   # home.packages = with pkgs.nushellPlugins; [

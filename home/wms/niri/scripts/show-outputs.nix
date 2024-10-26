@@ -11,11 +11,12 @@ let
     builtins.attrValues
     lib.concatLines
   ];
-  script = pkgs.writers.writeNuBin "niri.show-outputs" { } (
+  script = pkgs.writers.writeNuBin "niri-show-outputs" { } (
     catppuccin-colors
     +
       # nu
       ''
+          # TODO: handle case where `niri` is not the active compositor
           let outputs = (${niri} msg --json outputs | from json)
 
           mut buf = ""

@@ -181,7 +181,7 @@
   programs.nixvim.plugins.lsp = {
     enable = true;
     servers = {
-      lua-ls.enable = true;
+      lua_ls.enable = true;
       nixd.enable = true;
     };
   };
@@ -229,6 +229,9 @@
   };
   programs.nixvim.plugins.oil.enable = true;
   programs.nixvim.plugins.gitsigns.enable = true;
+  programs.nixvim.plugins.neogit = {
+    enable = true;
+  };
   programs.nixvim.plugins.treesitter = {
     enable = true;
     settings = {

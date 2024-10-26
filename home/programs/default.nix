@@ -21,6 +21,7 @@
     ./noti.nix
     ./obs-studio.nix
     ./pandoc.nix
+    ./pls.nix
     ./ripgrep.nix
     ./sioyek.nix
     ./spicetify.nix
@@ -36,6 +37,6 @@
     ./zellij.nix
     ./zoxide.nix
     ./lazydocker.nix
-    ./qownnotes.nix
+    # ./qownnotes.nix
   ];
 }

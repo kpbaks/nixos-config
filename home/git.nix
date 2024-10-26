@@ -3,8 +3,9 @@
   home.packages = with pkgs; [
     delta
     ghorg
+    gitflow
     # git-gui
-    tk # needed by `git citool`
+    # tk # needed by `git citool`
     # ghostie
     github-backup
     github-to-sqlite
@@ -12,11 +13,12 @@
     serie # rich git commit graph terminal
     # TODO: try out
     git-interactive-rebase-tool
-    git-branchless
+    # git-branchless
     git-brunch
     git-branchstack
     git-bars
     gitleaks
+    commitizen
   ];
 
   programs.gh = {
@@ -83,18 +85,17 @@
   programs.git-cliff.enable = true;
   programs.gitui = {
     enable = true;
-    # catppuccin.enable = false;
   };
   programs.lazygit = {
     enable = true;
-    # catppuccin.enable = false;
     # git:
     #   paging:
     #     externalDiffCommand: difft --color=always --display=inline --syntax-highlight=off
     settings = {
       # https://github.com/jesseduffield/lazygit/blob/master/docs/Custom_Pagers.md#using-external-diff-commands
       # git.pagint.externalDiffCommand = "difft --color=always --display=inline --syntax-highlight=off";
-      git.pagint.externalDiffCommand = "${pkgs.difftastic}/bin/difft --color=always";
+      git.paging.externalDiffCommand = "${pkgs.difftastic}/bin/difft --color=always --display=inline";
+      notARepository = "quit";
 
       gui = {
         nerdFontsVersion = "3";
@@ -103,7 +104,10 @@
 
         branchColors = with config.flavor; {
           "feature" = green.hex;
-          "hotfix" = mauve.hex;
+          "hotfix" = maroon.hex;
+          "release" = lavender.hex;
+          "bugfix" = peach.hex;
+          "doc" = yellow.hex;
         };
 
       };
@@ -112,10 +116,26 @@
       #   gui.theme = {
       #     lightTheme = true;
       #   };
+
+      customCommands = [
+        # {
+        #   key = "v";
+        #   context = "localBranches";
+        # }
+        {
+          # https://github.com/jesseduffield/lazygit/wiki/Custom-Commands-Compendium#committing-via-commitizen-cz-c
+          key = "C";
+          command = "${pkgs.git}/bin/git cz c";
+          description = "commit with commitizen";
+          context = "files";
+          loadingText = "opening commitizen commit tool";
+          subProcess = true;
+        }
+      ];
     };
   };
 
-  programs.jujutsu.enable = false;
+  programs.jujutsu.enable = true;
   programs.git-credential-oauth.enable = false;
 
   xdg.configFile."ghorg/config.yaml".source = (pkgs.formats.yaml { }).generate "ghorg-config" {

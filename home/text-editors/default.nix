@@ -6,5 +6,6 @@
     ./neovim.nix
     ./kakoune.nix
     ./micro.nix
+    ./zed.nix
   ];
 }
