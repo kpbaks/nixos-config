@@ -1,13 +1,11 @@
 # TODO: add this to work laptop https://github.com/nushell/nu_scripts/blob/main/custom-completions/winget/winget-completions.nu
-{
-  config,
-  pkgs,
-  ...
-}:
+# TODO: integrate this: https://github.com/sigoden/argc-completions
+{ config, pkgs, ... }:
 {
 
   imports = [
     # ./plugins.nix
+    ./functions
   ];
 
   # TODO: add to helix
@@ -17,19 +15,23 @@
     # nushell
     ''
       $env.config = {
-      edit_mode: vi,
-      use_ls_colors: true,
-      table_mode: rounded,
-
-      history: {
-        max_size: 10000,
-      }
-
-      keybindings: [
-        
-      ]
-        
-        
+        color_config: {
+          search_result: blue_reverse
+        }
+        ls: { use_ls_colors: true }
+        table: {
+          mode: rounded
+        }
+        use_kitty_protocol: true
+        highlight_resolved_externals: true
+        display_errors: {
+          exit_code: true
+        }
+        render_right_prompt_on_last_line: true
+        completions: {
+          algorithm: fuzzy
+        }
+      # edit_mode: vi
       }
         
     '';
@@ -56,6 +58,7 @@
         }
 
         def cdn [] { cd /etc/nixos; ${config.programs.helix.package}/bin/hx flake.nix }
+
       '';
   };
 

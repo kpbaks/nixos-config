@@ -7,5 +7,6 @@
     ./python.nix
     ./ocaml.nix
     ./rust.nix
+    ./zig.nix
   ];
 }

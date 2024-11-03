@@ -17,12 +17,12 @@
     rev = "ac8066b19c3946d75def8b1405f270f3c0d4ef94";
     hash = "sha256-MLHFZ6DzdnX7Ipy9+J8598OFiZZw08wKythtz7+1c+M=";
   }
-  {
-    owner = "kpbaks";
-    repo = "border.fish"; # TODO: change to borderline.fish
-    rev = "a16e8e611420b24a2c06d71ffe80c0f8f03514ef";
-    hash = "sha256-X4Viw9JcLDDTFepaTE2jq09hQCJlo0Nlqa5ga/ygwdA=";
-  }
+  # {
+  #   owner = "kpbaks";
+  #   repo = "border.fish"; # TODO: change to borderline.fish
+  #   rev = "a16e8e611420b24a2c06d71ffe80c0f8f03514ef";
+  #   hash = "sha256-X4Viw9JcLDDTFepaTE2jq09hQCJlo0Nlqa5ga/ygwdA=";
+  # }
   {
     owner = "kpbaks";
     repo = "git.fish";
@@ -85,12 +85,12 @@
     rev = "fb818507c2b95e498495fb73206eb101566d71ee";
     hash = "sha256-x6B1qm1sEODBus6Dd30iifcOMj/q+8DA3pKzKQ7zzlc=";
   }
-  {
-    owner = "kpbaks";
-    repo = "zellij.fish";
-    rev = "0b2393b48b55a7f3b200b5a12ac0cf26444b7172";
-    hash = "sha256-Nxo6usCI5tqLJ/CZ1YXtCFJ+piy1DGlzFIi9/HSgDIk=";
-  }
+  # {
+  #   owner = "kpbaks";
+  #   repo = "zellij.fish";
+  #   rev = "0b2393b48b55a7f3b200b5a12ac0cf26444b7172";
+  #   hash = "sha256-Nxo6usCI5tqLJ/CZ1YXtCFJ+piy1DGlzFIi9/HSgDIk=";
+  # }
   # {
   #   owner = "kpbaks";
   #   repo = "greetings.fish";

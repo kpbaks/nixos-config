@@ -22,7 +22,7 @@ in
     command = "${pkgs.fish}/bin/fish";
     colorScheme = "catppuccin-${config.catppuccin.flavor}";
     font = {
-      name = "JetBrains Nerd Font Mono";
+      name = "JetBrainsMono Nerd Font Mono";
       size = 14;
     };
     extraConfig = {
@@ -86,7 +86,7 @@ in
 
       QTabBar::tab {
         background: #ff0000;
-        padding: 8px;
+        padding: 18px;
         border-bottom: 2px solid transparent;
 
         font-size: 14px;

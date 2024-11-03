@@ -4,5 +4,6 @@
     ./firefox
     ./chromium.nix
     ./zen-browser.nix
+    ./mullvad-browser.nix
   ];
 }

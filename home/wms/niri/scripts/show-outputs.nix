@@ -82,7 +82,5 @@ let
   );
 in
 {
-  home.packages = [
-    script
-  ];
+  home.packages = [ script ];
 }

@@ -235,9 +235,7 @@
   # hardware.tuxedo-keyboard.enable = true;
 
   # https://lavafroth.is-a.dev/post/android-phone-for-webcam-nixos/
-  boot.extraModulePackages = with pkgs; [
-    linuxPackages_latest.v4l2loopback
-  ];
+  boot.extraModulePackages = with pkgs; [ linuxPackages_latest.v4l2loopback ];
   boot.extraModprobeConfig = ''
     options v4l2loopback exclusive_caps=1 card_label="Virtual Webcam"
   '';
@@ -413,12 +411,12 @@
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
-  services.displayManager.defaultSession = "niri";
+  # services.displayManager.defaultSession = "niri";
 
   # Enable the KDE Plasma Desktop Environment.
   # TODO: try out https://github.com/khaneliman/catppuccin-sddm-corners
   services.displayManager.sddm = {
-    enable = false;
+    enable = true;
     catppuccin.enable = true;
     wayland.enable = true;
     # autoNumlock = true;
@@ -511,7 +509,8 @@
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   programs.fish.enable = true;
-  users.defaultUserShell = pkgs.fish;
+  # users.defaultUserShell = pkgs.fish;
+  users.defaultUserShell = pkgs.nushell;
   # users.defaultUserShell = pkgs.bash;
   users.users.kpbaks = {
     isNormalUser = true;
@@ -563,6 +562,7 @@
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
+    mullvad-closest
     rainfrog
     wayland-utils
     alsa-utils # `alsamixer`
@@ -576,7 +576,7 @@
     # inputs.nixos-cli.packages.${system}.default
     scrcpy
 
-    distrobox
+    # distrobox
     libinput
     qemu
     quickemu
@@ -731,13 +731,15 @@
   programs.hyprland = {
     enable = false;
     xwayland.enable = true;
+    # package = pkgs.hyprland;
+    package = inputs.hyprland.packages.${pkgs.stdenv.system}.default;
   };
 
   programs.niri.enable = true;
   programs.niri.package = pkgs.niri;
 
-  services.desktopManager.cosmic.enable = true;
-  services.displayManager.cosmic-greeter.enable = true;
+  # services.desktopManager.cosmic.enable = true;
+  # services.displayManager.cosmic-greeter.enable = true;
   # hardware.system76.power-daemon.enable = true;
   # programs.cosmic.enable = true;
   # programs.niri.package = pkgs.niri-unstable;
@@ -769,7 +771,7 @@
   };
   # FIXME: get to work
   #   services.espanso.enable = false;
-  services.mullvad-vpn.enable = false;
+  services.mullvad-vpn.enable = true;
   services.mozillavpn.enable = false;
   # services.wg-netmanager.enable = true;
 

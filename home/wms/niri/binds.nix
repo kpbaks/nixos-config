@@ -36,11 +36,11 @@
       # Mod+Ctrl+Shift+I { spawn "/home/myname/scripts/niri_win.sh" "goto" "vivaldi-stable" "/usr/bin/vivaldi-stable --enable-features=UseOzonePlatform --ozone-platform=wayland"; }
 
       # TODO: limit to current workspace, or screen by using the output for `niri msg --json workspaces`
-      focus-to-spawn-script =
+      focus-or-spawn-script =
         let
           niri = "${config.programs.niri.package}/bin/niri";
         in
-        pkgs.writers.writeNuBin "niri-spawn-or-focus" { }
+        pkgs.writers.writeNuBin "niri-focus-or-spawn" { }
           # nushell
           ''
             def main [app_id: string, program: string] {
@@ -54,15 +54,17 @@
 
               if $focus {
                 ${pkgs.wlrctl}/bin/wlrctl window focus $app_id
+                sleep 0.5sec
                 ${niri} msg action center-column
               } else {
                 # FIXME: does not work
-                ${niri} msg action spawn -- ...($program | split words)
+                ${niri} msg action spawn -- ...($program | split row (char space))
               }
             }
           '';
-      focus-or-spawn = spawn (lib.getExe focus-to-spawn-script);
+      focus-or-spawn = spawn (lib.getExe focus-or-spawn-script);
     in
+    # home.packages = [focus-or-spawn-script];
     # run-in-sh-within-kitty = spawn "kitty" "sh" "-c";
     # run-in-fish-within-kitty = spawn "kitty" "${pkgs.fish}/bin/fish" "--no-config" "-c";
     # focus-workspace-keybinds = builtins.listToAttrs (map:
@@ -129,29 +131,14 @@
       "Mod+8".action = focus-workspace 8;
       "Mod+9".action = focus-workspace 9;
 
-      # inherit (focus-workspace-keybinds) ${builtins.attrNames focus-workspace-keybinds};
-
-      # "Mod+?".action = show-hotkey-overlay;
-      # "Mod+T".action = spawn terminal;
       "Mod+T".action = focus-or-spawn "foot" "${pkgs.foot}/bin/foot";
       # "Mod+Y".action = focus-or-spawn "foot" "${pkgs.foot}/bin/foot";
 
       "Mod+Shift+T".action = spawn terminal "${pkgs.fish}/bin/fish" "--private";
-      # "Mod+F".action = spawn "firefox";
-      # "Mod+Shift+F".action = spawn "firefox" "--private-window";
-      # "Mod+F".action = browser;
-
-      # run-flatpak = spawn "flatpak" "run";
-      # # browser = spawn "${pkgs.firefox}/bin/firefox";
-      # browser = run-flatpak "io.github.zen_browser.zen";
-      # # run-in-terminal = spawn "kitty";
       "Mod+F".action = focus-or-spawn "zen-alpha" "flatpak run io.github.zen_browser.zen";
-      # "Mod+Shift+F".action = browser "--private-window";
-      # "Mod+G".action = spawn "telegram-desktop";
       "Mod+G".action = focus-or-spawn "org.telegram.desktop" "${pkgs.telegram-desktop}/bin/telegram-desktop";
+      # S for spotify
       "Mod+S".action = spawn "spotify";
-      # "Mod+D".action = spawn "webcord";
-      # "Mod+D".action = spawn "vesktop";
       # D for discord
       "Mod+D".action = focus-or-spawn "vesktop" "${pkgs.vesktop}/bin/vesktop";
       # N for notes
@@ -161,11 +148,9 @@
       "Mod+Y".action = run-with-sh-within-terminal "cd ~/Downloads; yazi";
       # E is default on other platforms like Windows, for opening the "file explorer" program
       "Mod+E".action = focus-or-spawn "org.kde.dolphin" "${pkgs.kdePackages.dolphin}/bin/dolphin";
+      # P for pdf
+      "Mod+P".action = focus-or-spawn "org.kde.okular" "${pkgs.kdePackages.okular}/bin/okular";
       "Mod+Z".action = focus-or-spawn "dev.zed.Zed" "${lib.getExe config.programs.zed-editor.package}";
-      # "Mod+E".action = spawn "dolphin";
-      # "Mod+B".action = spawn "overskride";
-      # "Mod+B".action = run-in-terminal (pkgs.lib.getExe scripts.bluetoothctl-startup);
-      # "Mod+A".action = run-in-terminal (pkgs.lib.getExe scripts.audio-sink);
 
       # FIXME: does not work
       "Mod+A".action = run-in-terminal "${pkgs.alsa-utils}/bin/alsamixer --black-background --mouse --view playback";
@@ -314,7 +299,6 @@
       # TODO: implement
       # "Mod+BackSpace".action = focus-last-window;
 
-      # TODO: keybind to switch the windows between two outputs/monitors
+      # TODO: keybind to switch all windows between two outputs/monitors. Use `niri msg windows` to figure out which output windows are on
     };
-  # // focus-workspace-keybinds;}
 }

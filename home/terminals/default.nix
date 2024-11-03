@@ -1,4 +1,4 @@
-{ ... }:
+# { ... }:
 {
   imports = [
     ./alacritty.nix
@@ -7,5 +7,6 @@
     ./wezterm.nix
     ./foot.nix
     ./gnome-terminal.nix
+    ./ghostty.nix
   ];
 }

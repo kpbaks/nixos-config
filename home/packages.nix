@@ -9,6 +9,8 @@
   # TODO: checkout https://github.com/azzamsa/zman
   # TODO: checkout https://github.com/6543/batmon/
   home.packages = with pkgs; [
+    flameshot
+    affine
     markdownlint-cli
     markdown-anki-decks
     markdown-link-check
@@ -174,7 +176,7 @@
     libwebp # why do 'r/wallpaper' upload all its images in `webp`
     # tabnine
     # grit
-    # d2
+    d2
     graphviz
     aria
     # wofi
@@ -274,13 +276,12 @@
     # xurls # Extract urls from text
 
     # TODO: try out
-    zulip
-    zulip-term
+    # zulip
+    # zulip-term
 
     spacedrive
     typos
     taplo
     harper
   ];
-
 }

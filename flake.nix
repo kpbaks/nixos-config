@@ -36,6 +36,14 @@
   inputs.zen-browser.url = "github:MarceColl/zen-browser-flake";
   inputs.zen-browser.inputs.nixpkgs.follows = "nixpkgs";
 
+  inputs.ghostty = {
+    url = "git+ssh://git@github.com/ghostty-org/ghostty";
+    # inputs.nixpkgs-stable.follows = "nixpkgs-unstable";
+    # inputs.nixpkgs-unstable.follows = "nixpkgs-unstable";
+    inputs.nixpkgs-stable.follows = "nixpkgs";
+    inputs.nixpkgs-unstable.follows = "nixpkgs";
+  };
+
   # TODO: use
   inputs.sops-nix = {
     url = "github:Mic92/sops-nix";
@@ -86,6 +94,25 @@
     #   url = "github:hyprwm/Hyprland";
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
+
+    hyprland = {
+      type = "git";
+      url = "https://github.com/hyprwm/Hyprland";
+      submodules = true;
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    hyprland-plugins = {
+      url = "github:hyprwm/hyprland-plugins";
+      inputs.hyprland.follows = "hyprland";
+    };
+
+    hyprspace = {
+      url = "github:KZDKM/Hyprspace";
+
+      # Hyprspace uses latest Hyprland. We declare this to keep them in sync.
+      inputs.hyprland.follows = "hyprland";
+    };
+
     # # TODO: what do i use this for?
     # hyprgrass = {
     #   url = "github:horriblename/hyprgrass";
@@ -201,6 +228,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
+  inputs.hyprpanel.url = "github:Jas-SinghFSU/HyprPanel";
 
   outputs =
     {
@@ -219,6 +247,7 @@
       pkgs = import nixpkgs {
         inherit system;
         overlays = [
+          inputs.hyprpanel.overlay
           # inputs.rust-overlay.overlays.default
           # inputs.wired-notify.overlays.default
           inputs.niri.overlays.niri

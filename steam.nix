@@ -3,7 +3,7 @@
   # TODO: get steam to work
   # specialisation.gaming.configuration = {
   environment.systemPackages = with pkgs; [
-    steamPackages.steamcmd
+    steamcmd
     steam-tui
     gamescope
   ];
@@ -15,14 +15,14 @@
     # remotePlay.openFirewall = false;
   };
 
-  programs.steam.extest.enable = true;
+  # programs.steam.extest.enable = true;
   programs.steam.enable = true;
 
   programs.gamescope.enable = true;
   hardware.steam-hardware.enable = true;
   programs.gamemode.enable = true;
 
-  system.nixos.tags = [ "gaming" ];
+  # system.nixos.tags = [ "gaming" ];
   # Nvidia Configuration
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.graphics.enable = true;
@@ -48,6 +48,9 @@
     };
 
   hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
+  # Enable the Nvidia settings menu,
+  # accessible via `nvidia-settings`.
+  hardware.nvidia.nvidiaSettings = true;
   # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
 
   # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.mkDriver {

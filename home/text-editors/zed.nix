@@ -15,6 +15,8 @@
     "html"
     "catppuccin"
     "sql"
+    "pest"
+    "d2"
   ];
   programs.zed-editor.userSettings = {
     theme = "Catppuccin Mocha";
@@ -23,7 +25,7 @@
     ui_font_size = 16;
     buffer_font_size = 14;
     buffer_font_family = "JetBrainsMono Nerd Font Mono";
-    vim_mode = true;
+    vim_mode = false;
     auto_save = "on_window_change";
     load_direnv = "direct";
     inlay_hints.enabled = true;

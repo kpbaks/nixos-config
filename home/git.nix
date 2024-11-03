@@ -1,11 +1,16 @@
-{ config, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   home.packages = with pkgs; [
     delta
     ghorg
     gitflow
     # git-gui
-    # tk # needed by `git citool`
+    tk # needed by `git citool`
     # ghostie
     github-backup
     github-to-sqlite
@@ -19,6 +24,7 @@
     git-bars
     gitleaks
     commitizen
+    lighttpd # needed by `git instaweb`
   ];
 
   programs.gh = {
@@ -54,6 +60,7 @@
     userName = config.home.username;
     userEmail = config.personal.email;
     extraConfig = {
+      sequence.editor = "${lib.getExe pkgs.git-interactive-rebase-tool}";
       init.defaultBranch = "main";
       push.autoSetupRemote = true;
       # pull.ff = "only";
@@ -63,6 +70,9 @@
       commit.verbose = true;
       merge.tool = "nvimdiff";
       rebase.autosquash = true;
+
+      # TODO: try out
+      rerere.enabled = true;
     };
 
     aliases = {

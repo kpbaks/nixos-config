@@ -31,10 +31,9 @@ let
 in
 {
   imports = [
-    ./folder-rules.nix
-    ./file-navigation-wraparound.nix
-    ./linemode.nix
-
+    # ./folder-rules.nix
+    # ./file-navigation-wraparound.nix
+    # ./linemode.nix
   ];
 
   programs.yazi =
@@ -120,37 +119,37 @@ in
       initLua =
         # lua
         ''
-            require("full-border"):setup {
-                -- Available values: ui.Border.PLAIN, ui.Border.ROUNDED
-                type = ui.Border.ROUNDED,
-            }
-            require("git"):setup()
-            require("no-status"):setup()
-            require("kdeconnect"):setup {
-              device = "c439e91904ce0298"
-            }
+                      require("full-border"):setup {
+                          -- Available values: ui.Border.PLAIN, ui.Border.ROUNDED
+                          type = ui.Border.ROUNDED,
+                      }
+                      require("git"):setup()
+                      require("no-status"):setup()
+                      require("kdeconnect"):setup {
+                        device = "c439e91904ce0298"
+                      }
 
-            require("starship"):setup()
-            -- starship:setup({ config_file = "/home/rolv/.config/starship_secondary.toml" })
+                      require("starship"):setup()
+                      -- starship:setup({ config_file = "/home/rolv/.config/starship_secondary.toml" })
 
-            Status:children_add(function()
-          	local h = cx.active.current.hovered
-          	if h == nil or ya.target_family() ~= "unix" then
-          		return ui.Line {}
-          	end
-
-          	return ui.Line {
-          		ui.Span(ya.user_name(h.cha.uid) or tostring(h.cha.uid)):fg("magenta"),
-          		ui.Span(":"),
-          		ui.Span(ya.group_name(h.cha.gid) or tostring(h.cha.gid)):fg("magenta"),
-          		ui.Span(" "),
-          	}
-          end, 500, Status.RIGHT)
-
-          -- https://yazi-rs.github.io/docs/dds#session.lua
-          require("session"):setup {
-          	sync_yanked = true,
-          }
+          --            Status:children_add(function()
+          --          	local h = cx.active.current.hovered
+          --          	if h == nil or ya.target_family() ~= "unix" then
+          --          		return ui.Line {}
+          --          	end
+          --
+          --          	return ui.Line {
+          --          		ui.Span(ya.user_name(h.cha.uid) or tostring(h.cha.uid)):fg("magenta"),
+          --          		ui.Span(":"),
+          --          		ui.Span(ya.group_name(h.cha.gid) or tostring(h.cha.gid)):fg("magenta"),
+          --          		ui.Span(" "),
+          --          	}
+          --          end, 500, Status.RIGHT)
+          --
+          --          -- https://yazi-rs.github.io/docs/dds#session.lua
+          --          require("session"):setup {
+          --          	sync_yanked = true,
+          --          }
         '';
 
       keymap =
@@ -282,19 +281,19 @@ in
       	command rm -f -- "$tmp"
     '';
 
-  programs.nushell.extraConfig =
-    # nu
-    ''
-      def --env y [...args] {
-      	let tmp = (mktemp -t "yazi-cwd.XXXXXX")
-      	${pkgs.yazi}/bin/yazi ...$args --cwd-file $tmp
-      	let cwd = (open $tmp)
-      	if $cwd != "" and $cwd != $env.PWD {
-      		cd $cwd
-      	}
-      	rm -fp $tmp
-      }
-    '';
+  # programs.nushell.extraConfig =
+  #   # nu
+  #   ''
+  #     def --env y [...args] {
+  #     	let tmp = (mktemp -t "yazi-cwd.XXXXXX")
+  #     	${pkgs.yazi}/bin/yazi ...$args --cwd-file $tmp
+  #     	let cwd = (open $tmp)
+  #     	if $cwd != "" and $cwd != $env.PWD {
+  #     		cd $cwd
+  #     	}
+  #     	rm -fp $tmp
+  #     }
+  #   '';
 
   # TODO: check if this is already added when enabling `programs.yazi.enableFishIntegration`
   programs.fish.interactiveShellInit = # fish

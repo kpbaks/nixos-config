@@ -316,6 +316,45 @@ in
             builtin cd (${pkgs.coreutils-full}/bin/mktemp --suffix $suffix)
           '';
       };
+      pyenv = {
+        description = "start a nix-shell with the given python packages";
+        body = # fish
+          ''
+            argparse --min-args 1 -- $argv
+            or return 2
+
+            set -l python_version 3.13
+            set -l python_packages
+
+            if string match --quiet --regex '\d+(\.\d+)*' $argv[1]
+              set python_version (string replace . "" $argv[1])
+              set python_packages $argv[2..]
+            else
+              set python_packages $argv
+            end
+
+            set -l ppkgs
+            for el in $python_packages
+              set -a ppkgs "nixpkgs#python"$python_version"Packages.$el"
+            end
+
+            echo "nix shell $ppkgs" | ${pkgs.fish}/bin/fish_indent --ansi
+
+            ${pkgs.nix}/bin/nix shell $ppkgs
+
+          '';
+      };
+      rgw = {
+        description = "search for a word with `rg`, i.e. matches can not be substrings";
+        body = # fish
+          ''
+            argparse --min-args=1 $options -- $argv; or return 2
+
+            set -l pattern "\b$(string join '|' -- $argv)\b"
+
+            ${pkgs.ripgrep}/bin/rg --no-config --pcre2 --json "$pattern" | ${pkgs.delta}/bin/delta
+          '';
+      };
     };
 }
 

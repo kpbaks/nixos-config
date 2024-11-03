@@ -31,7 +31,7 @@ let
           set -l body "Changed keyboard layout to <b>$keyboard_layout</b> $flag"
 
           # TODO: use --icon for flag?
-          ${pkgs.libnotify}/bin/notify-send --transient $title $body
+          ${pkgs.libnotify}/bin/notify-send --expire-time 1000 --transient $title $body
         end
       '';
 in

@@ -1,4 +1,11 @@
-{ pkgs, ... }:
+{
+  config,
+  inputs,
+  lib,
+  pkgs,
+  ...
+}:
+
 let
   range = from: to: builtins.genList (i: from + i) (to - from);
 in
@@ -10,30 +17,19 @@ in
     # xwayland.enable = osConfig.programs.hyprland.xwayland.enable;
     xwayland.enable = false;
     systemd.enable = true;
-    plugins = [ ];
+    plugins = [
+      # inputs.hyprspace.packages.${pkgs.system}.Hyprspace
+      # inputs.hyprland-plugins.packages.${pkgs.system}.hyprbars
+      # inputs.hyprland-plugins.packages.${pkgs.system}.hyprexpo
+    ];
+    settings.exec-once = [
+      "${pkgs.hyprpanel}/bin/hyprpanel"
+    ];
     extraConfig =
       # hyprconf
       ''
-        # exec-once = wl-paste --type text --watch cliphist store #Stores only text data
-        # exec-once = wl-paste --type image --watch cliphist store #Stores only image data
-        # exec-once = krunner --daemon
-        # exec-once = swaync
         exec-once = dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP &
         exec-once = systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP &
-        exec-once = swww init &
-        exec-once = clipse -listen
-        # pkgs.networkmanagerapplet
-        # exec-once = nm-applet --indicator &
-        exec-once = dunst &
-        exec-once = waybar &
-
-        exec-once = hypridle
-        # exec-once = copyq
-        exec-once = eww daemon &
-        exec-once = udiskie &
-        exec-once = wlsunset -t 4000 -T 6500 -S 06:30 -s 18:30
-        exec-once = wluma &
-        # exec-once = ianny &
 
         windowrule = animation slide left,kitty
         windowrule = animation popin,dolphin
@@ -91,45 +87,47 @@ in
           "SUPER, c, movetoworkspace, special"
           "SUPER, q, killactive"
 
-          "SUPERSHIFT, a, exec, anki"
-          "SUPER, a, exec, ~/.config/hypr/bin/hyprland-arise --class anki"
-          "SUPERSHIFT, f, exec, firefox"
-          "SUPER, f, exec, ~/.config/hypr/bin/hyprland-arise --class firefox"
+          "SUPER, a, exec, anki"
+          # "SUPER, a, exec, ~/.config/hypr/bin/hyprland-arise --class anki"
+          "SUPER, f, exec, flatpak run io.github.zen_browser.zen"
+
+          # "SUPER, f, exec, ~/.config/hypr/bin/hyprland-arise --class firefox"
 
           # "$super, K, exec, wezterm-gui start"
           # "SUPER, k, exec, kitty"
           # "SUPER, k, exec, wezterm-gui start"
           # "SUPER, k, exec, alacritty"
-          "SUPER, k, exec, ~/.config/hypr/bin/hyprland-arise --class kitty"
-          "SUPERSHIFT, k, exec, kitty"
+          # "SUPER, k, exec, ~/.config/hypr/bin/hyprland-arise --class kitty"
+          "SUPER, t, exec, ${lib.getExe config.default-application.terminal}"
 
-          "SUPERSHIFT, s, exec, spotify"
-          "SUPER, s, exec, ~/.config/hypr/bin/hyprland-arise --class spotify"
+          "SUPER, s, exec, spotify"
+          # "SUPER, s, exec, ~/.config/hypr/bin/hyprland-arise --class spotify"
           # "SUPER, d, exec, discord"
-          "SUPERSHIFT, d, exec, webcord"
-          "SUPER, d, exec, ~/.config/hypr/bin/hyprland-arise --class webcord"
+          "SUPER, d, exec, vesktop"
+          # "SUPER, d, exec, ~/.config/hypr/bin/hyprland-arise --class webcord"
 
-          "SUPERSHIFT, m, exec, thunderbird # mail"
-          "SUPER, m, exec, ~/.config/hypr/bin/hyprland-arise --class thunderbird"
+          "SUPER, m, exec, thunderbird # mail"
+          # "SUPER, m, exec, ~/.config/hypr/bin/hyprland-arise --class thunderbird"
 
-          "SUPERSHIFT, t, exec, telegram-desktop"
-          "SUPER, t, exec, ~/.config/hypr/bin/hyprland-arise --class org.telegram.desktop --exec telegram-desktop"
+          "SUPER, g, exec, telegram-desktop"
+          # "SUPER, t, exec, ~/.config/hypr/bin/hyprland-arise --class org.telegram.desktop --exec telegram-desktop"
 
-          "SUPERSHIFT, o, exec, obs # obs-studio"
-          "SUPER, o, exec, ~/.config/hypr/bin/hyprland-arise --class com.obsproject.Studio --exec obs"
-          "SUPERSHIFT, e, exec, ~/.config/hypr/bind/hyprland-arise --class dolphin"
+          # "SUPERSHIFT, o, exec, obs # obs-studio"
+          # "SUPER, o, exec, ~/.config/hypr/bin/hyprland-arise --class com.obsproject.Studio --exec obs"
+          # "SUPERSHIFT, e, exec, ~/.config/hypr/bind/hyprland-arise --class dolphin"
           "SUPER, e, exec, dolphin"
 
-          "SUPER, p, exec, ~/.config/hypr/bind/hyprland-arise --class okular"
-          "SUPERSHIFT, p, exec, okular # pdf"
+          # "SUPER, p, exec, ~/.config/hypr/bind/hyprland-arise --class okular"
+          # "SUPERSHIFT, p, exec, okular # pdf"
 
-          "SUPER, z, exec, ~/.config/hypr/bind/hyprland-arise --class Zotero"
-          "SUPERSHIFT, z, exec, zotero"
+          # "SUPER, z, exec, ~/.config/hypr/bind/hyprland-arise --class Zotero"
+          # "SUPERSHIFT, z, exec, zotero"
 
           # bind = SUPER, V, exec,  <terminal name> --class floating -e <shell-env>  -c 'clipse $PPID' # bind the open clipboard operation to a nice key.
           # "ALT, space, exec, krunner"
           # "ALT, space, exec, wofi --show drun"
-          "ALT, space, exec, rofi -show drun -show-icons"
+          # "ALT, space, exec, rofi -show drun -show-icons"
+          "SUPER, slash, exec, ${lib.getExe config.programs.fuzzel.package}"
 
           "SUPER, mouse_down, workspace, e-1"
           "SUPER, mouse_up, workspace, e+1"
@@ -271,9 +269,9 @@ in
         };
       };
 
-      master = {
-        new_is_master = true;
-      };
+      # master = {
+      #   new_is_master = true;
+      # };
 
       misc = {
         disable_hyprland_logo = false;
@@ -301,6 +299,7 @@ in
   home.packages = with pkgs; [
     hyprlock # wayland screen lock
     hypridle # hyprlands idle daemon
+    hyprpanel
   ];
 
   xdg.configFile."hypr/hypridle.conf".text =
@@ -328,5 +327,4 @@ in
   #   name = "Adwaita";
   #   size = 16;
   # };
-
 }

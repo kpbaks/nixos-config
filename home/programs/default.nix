@@ -1,6 +1,6 @@
-{ ... }:
 {
   imports = [
+    ./anki.nix
     ./appflowy.nix
     ./atuin.nix
     ./bacon.nix
@@ -37,6 +37,7 @@
     ./zellij.nix
     ./zoxide.nix
     ./lazydocker.nix
+    ./imhex.nix
     # ./qownnotes.nix
   ];
 }

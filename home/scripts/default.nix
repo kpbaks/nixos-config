@@ -21,6 +21,7 @@ let
 in
 
 {
+
   imports = [
     ./fonts.nix
     ./leds.nix
@@ -33,6 +34,8 @@ in
     ./dev-templates.nix
     ./hx-project-health.nix
     ./ros2-repos.nix
+    ./my-forks.nix
+
     # ./lg.nix
     # ./tokei-pie.nix
     # ./cdtmp.nix

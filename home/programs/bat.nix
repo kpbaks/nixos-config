@@ -2,7 +2,6 @@
 {
   programs.bat = {
     enable = true;
-    # catppuccin.enable = false;
     extraPackages = with pkgs.bat-extras; [
       batdiff
       batman
@@ -19,6 +18,7 @@
         };
         file = "syntax/gleam.sublime-syntax";
       };
+      # FIXME: figure out how to apply a text substitution on the downloaded file
       # nushell = {
       #   src = pkgs.fetchFromGitHub {
       #     owner = "kurokirasama";
@@ -43,7 +43,7 @@
         "justfile:make"
         "Justfile:make"
         "*.msproj:xml"
-        # "*.nu:nushell"
+        "*.nu:nushell"
       ];
     };
   };

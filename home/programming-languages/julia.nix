@@ -6,17 +6,12 @@
 {
   home.packages = with pkgs; [
     # https://github.com/NixOS/nixpkgs/blob/1e99a1a49dcade284081fd3349e294e9badc9ba1/doc/languages-frameworks/julia.section.md#juliawithpackages-julia-withpackage
-    (
-      (julia.withPackages.override {
-        precompile = true;
-      })
-      [
-        # "Plots"
-        # "Pluto"
-        # "Revise"
-        "OhMyREPL"
-      ]
-    )
+    ((julia.withPackages.override { precompile = true; }) [
+      # "Plots"
+      # "Pluto"
+      # "Revise"
+      "OhMyREPL"
+    ])
     # julia
     # julia-lts
     # julia-stable

@@ -28,9 +28,7 @@ let
 in
 
 {
-  imports = [
-    inputs.spicetify-nix.homeManagerModules.default
-  ];
+  imports = [ inputs.spicetify-nix.homeManagerModules.default ];
 
   home.packages =
     builtins.attrValues scripts

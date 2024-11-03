@@ -3,6 +3,10 @@ let
   scls = inputs.simple-completion-language-server.defaultPackage.${pkgs.system};
 in
 {
+
+  imports = [
+    ./yazi-picker.nix
+  ];
   # TODO: convert
   # programs.helix.enable = true;
   # programs.helix.defaultEditor = true;
@@ -41,7 +45,8 @@ in
       # theme = "catppuccin_mocha";
       # theme = "ao";
       # theme = "pop-dark";
-      theme = "tokyonight";
+      # theme = "tokyonight";
+      theme = "gruvbox_dark_hard";
       editor = {
         cursorline = true;
         line-number = "relative";
@@ -170,7 +175,7 @@ in
           "make_search_word_bounded"
           "search_next"
         ];
-        "#" = [ "toggle_comments"];
+        "#" = [ "toggle_comments" ];
         # "#" = [
         #   "move_char_right"
         #   "move_prev_word_start"
@@ -399,6 +404,7 @@ in
           {
             name = "json";
             auto-format = true;
+            file-types = [ ".spacedrive" ];
             formatter = {
               command = "${pkgs.jaq}/bin/jaq";
               args = [ "." ];
@@ -431,9 +437,7 @@ in
           {
             name = "nu";
             auto-format = true;
-            language-servers = [
-              "nu-lsp"
-            ];
+            language-servers = [ "nu-lsp" ];
             # FIXME: fucks up the text
             # formatter.command = "${pkgs.nufmt}/bin/nufmt";
             # formatter.args = [ "--stdin" ];
@@ -459,6 +463,12 @@ in
               ".clang-format"
             ];
           }
+          # {
+          #   name = "d2";
+          #   file-types = [ "d2" ];
+          #   source.git = "https://git.pleshevski.ru/pleshevskiy/tree-sitter-d2";
+          #   source.rev = "main";
+          # }
           # {
           #   name = "kitty-conf";
           #   source.git = "https://github.com/clo4/tree-sitter-kitty-conf";

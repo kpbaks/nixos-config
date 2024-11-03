@@ -26,8 +26,8 @@ in
       preserve_clipboard = true;
       undo_backspace = true;
       toggle_key = "ALT";
-      # search_shortcut = "ALT+SHIFT+ENTER";
-      search_shortcut = "ALT+SPACE"; # default
+      search_shortcut = "ALT+SHIFT+ENTER";
+      # search_shortcut = "ALT+SPACE"; # default
     };
     matches.base.matches = with config.personal; [
       (match "tuta" tutamail)

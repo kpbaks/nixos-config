@@ -1,8 +1,4 @@
-{
-  config,
-  pkgs,
-  ...
-}:
+{ config, pkgs, ... }:
 let
 
   # TODO: present more nicely maybe with the `tabulate` package
@@ -67,7 +63,7 @@ in
   # TODO: use https://github.com/raffaem/waybar-mediaplayer
   # https://github.com/raffaem/waybar-screenrecorder
   programs.waybar = {
-    enable = true;
+    enable = false;
     # catppuccin.enable = false;
     catppuccin.mode = "prependImport";
     # FIXME: does not start with `niri`

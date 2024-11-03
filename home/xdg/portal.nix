@@ -6,9 +6,9 @@
   xdg.portal.xdgOpenUsePortal = true;
   # xdg.portal.config.common.default = "kde";
   xdg.portal.extraPortals = [
+    pkgs.xdg-desktop-portal-kde
     pkgs.xdg-desktop-portal-cosmic
     pkgs.xdg-desktop-portal-gtk
-    pkgs.xdg-desktop-portal-kde
     pkgs.xdg-desktop-portal-gnome
     pkgs.gnome-keyring
     # pkgs.kdePackages.kwalletmanager

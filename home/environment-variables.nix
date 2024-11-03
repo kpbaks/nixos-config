@@ -22,6 +22,7 @@
       LESS_TERMCAP_us = ""; # begin underline
 
       # NOTE: file generated with `vivid generate <theme>`
+      # TODO: generate from this https://musca.github.io/github-lang-colors/
       LS_COLORS = builtins.readFile ./LS_COLORS;
     };
 

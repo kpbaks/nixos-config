@@ -90,7 +90,19 @@
       neochat
       klevernotes
     ]
-    ++ (with pkgs; [
-      plasma-panel-colorizer
-    ]);
+    ++ (with pkgs; [ plasma-panel-colorizer ]);
+
+  # TODO: verify if this make the browser integration work with zen-browser
+  # https://github.com/zen-browser/desktop/issues/349
+  home.file.".mozilla/native-messaging-hosts/org.kde.plasma.browser_integration.json".source =
+    (pkgs.formats.json { }).generate "plasma_browser_integration_json"
+      {
+        allowed_extensions = [ "plasma-browser-integration@kde.org" ];
+        description = "Native connector for KDE Plasma";
+        name = "org.kde.plasma.browser_integration";
+        path = "${pkgs.kdePackages.plasma-browser-integration}/bin/plasma-browser-integration-host";
+        type = "stdio";
+
+      };
+
 }
