@@ -1,13 +1,13 @@
 {
   imports = [
     ./anki.nix
-    ./appflowy.nix
+    # ./appflowy.nix
     ./atuin.nix
     ./bacon.nix
     ./bat.nix
     ./beeper.nix
     ./bluetoothctl.nix
-    ./broot.nix
+    ./broot
     ./carapace.nix
     ./cava.nix
     ./droidcam.nix
@@ -33,11 +33,13 @@
     ./wlogout.nix
     ./yt-dlp.nix
     ./zathura.nix
-    ./yazi
+    # ./yazi
     ./zellij.nix
     ./zoxide.nix
     ./lazydocker.nix
     ./imhex.nix
+    ./signal.nix
+    ./television.nix
     # ./qownnotes.nix
   ];
 }

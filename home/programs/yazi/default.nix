@@ -59,9 +59,9 @@ in
       };
     in
     {
-      enable = true;
+      enable = false;
       # https://yazi-rs.github.io/docs/quick-start#shell-wrapper
-      enableFishIntegration = true;
+      # enableFishIntegration = true;
       shellWrapperName = "y";
       # catppuccin.enable = false;
       # TODO: add to overlay

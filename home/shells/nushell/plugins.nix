@@ -11,8 +11,8 @@ let
   plugin_names = [
     "formats"
     "polars"
-    "gstat"
-    "net"
+    # "gstat"
+    # "net"
     "query"
   ];
   # plugin_binaries = map (p: "nu_plugin_${p}") plugin_names;

@@ -46,7 +46,8 @@ in
       # theme = "ao";
       # theme = "pop-dark";
       # theme = "tokyonight";
-      theme = "gruvbox_dark_hard";
+      # theme = "gruvbox_dark_hard";
+      theme = "gruber-darker";
       editor = {
         cursorline = true;
         line-number = "relative";
@@ -225,7 +226,7 @@ in
         space.Q = ":buffer-close-others";
         C-q = ":q";
         space.p = "paste_clipboard_before"; # I like <space>P more as the default
-        space.n = ":set-option line-number absolue";
+        # space.n = ":set-option line-number absolute";
         space.N = ":set-option line-number relative";
         space.t.i = ":toggle-option lsp.display-inlay-hints";
         space.t.w = ":toggle-option soft-wrap.enable";
@@ -234,6 +235,11 @@ in
           s = ":lsp-stop";
           w = ":lsp-workspace-command";
         };
+        # space.n = [
+
+        #   "select_register"
+        #   "/"
+        # ];
         backspace = ":buffer-previous";
         a = [
           "append_mode"

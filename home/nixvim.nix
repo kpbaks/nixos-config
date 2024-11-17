@@ -3,7 +3,7 @@
 {
   imports = [ inputs.nixvim.homeManagerModules.nixvim ];
 
-  programs.nixvim.enable = true;
+  programs.nixvim.enable = false;
   programs.nixvim.package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
   programs.nixvim.extraPackages = with pkgs; [
     gnumake

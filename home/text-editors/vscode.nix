@@ -39,7 +39,7 @@
         ms-toolsai.jupyter
         # ms-vscode.cpptools
         # ms-vsliveshare.vsliveshare
-        nvarner.typst-lsp
+        # nvarner.typst-lsp
         rust-lang.rust-analyzer
         supermaven.supermaven
         tamasfe.even-better-toml

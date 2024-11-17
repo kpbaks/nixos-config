@@ -13,6 +13,8 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./steam.nix
+    # ./hdmi-cec.nix
+
     # ./tuxedo-laptop-second-nvme-drive.nix
   ];
 
@@ -242,6 +244,7 @@
 
   # FIXME: 'evdi' not found
   boot.kernelModules = [
+    "hid-playstation" # needed for bluetooth connectivity to playstation 4 and 5 dualshock controllers, ref: https://www.phoronix.com/news/Sony-DualShock4-PlayStation-Drv
     "evdi"
     "snd-aloop" # needed for `droidcam`
     "v4l2loopback"
@@ -1175,4 +1178,5 @@
 
   services.ntfy-sh.enable = true;
   services.ntfy-sh.settings.base-url = "https://ntfy.sh";
+
 }

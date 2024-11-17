@@ -1,7 +1,6 @@
-{ ... }:
 {
   programs.swaylock = {
-    enable = true;
+    enable = false;
     # catppuccin.enable = false;
     settings = {
       show-failed-attempts = true;

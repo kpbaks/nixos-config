@@ -43,7 +43,7 @@
         "justfile:make"
         "Justfile:make"
         "*.msproj:xml"
-        "*.nu:nushell"
+        # "*.nu:nushell"
       ];
     };
   };

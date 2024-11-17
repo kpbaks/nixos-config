@@ -24,7 +24,10 @@
     git-bars
     gitleaks
     commitizen
+    git-workspace
+    git-absorb
     lighttpd # needed by `git instaweb`
+    dependabot-cli
   ];
 
   programs.gh = {

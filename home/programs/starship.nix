@@ -75,7 +75,8 @@
       line_break.disabled = false;
       localip = {
         disabled = false;
-        format = "@[$localipv4]($style) ";
+        # format = "@[$localipv4]($style) ";
+        format = " ip:[$localipv4]($style) ";
         style = "dimmed yellow";
         ssh_only = false;
       };
@@ -86,7 +87,7 @@
         not_found_symbol = "not found";
         not_executable_symbol = "not executable";
         sigint_symbol = "SIGINT";
-        format = " [$symbol$status]($style) ";
+        format = " [$symbol $status]($style) ";
 
       };
       package = {

@@ -36,6 +36,9 @@
   inputs.zen-browser.url = "github:MarceColl/zen-browser-flake";
   inputs.zen-browser.inputs.nixpkgs.follows = "nixpkgs";
 
+  inputs.television.url = "github:alexpasmantier/television";
+  inputs.television.inputs.nixpkgs.follows = "nixpkgs";
+
   inputs.ghostty = {
     url = "git+ssh://git@github.com/ghostty-org/ghostty";
     # inputs.nixpkgs-stable.follows = "nixpkgs-unstable";
@@ -256,6 +259,7 @@
           # (final: prev: { swww = inputs.swww.packages.${prev.system}.swww; })
           (final: prev: { zjstatus = inputs.zjstatus.packages.${prev.system}.default; })
           (final: prev: { yazi = inputs.yazi.packages.${prev.system}.default; })
+          (final: prev: { television = inputs.television.packages.${prev.system}.default; })
           # inputs.neovim-nightly-overlay.overlay         
         ];
         config.allowUnfree = true;

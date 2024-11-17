@@ -90,7 +90,7 @@
             (bind [ shift ] "Escape" "ToggleViMode")
           ];
         live_config_reload = true;
-        ipc_socket = true;
+        general.ipc_socket = true;
         scrolling = {
           history = 10000;
           multiplier = 3;
