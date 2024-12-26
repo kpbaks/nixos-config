@@ -1,6 +1,19 @@
-{ inputs, pkgs, ... }:
+# TODO: deduplicate keys to work in normal and select mode like in: https://github.com/NikitaRevenco/dotfiles/blob/main/helix.nix
+{
+  config,
+  inputs,
+  lib,
+  pkgs,
+  ...
+}:
 let
   scls = inputs.simple-completion-language-server.defaultPackage.${pkgs.system};
+  tree-sitter-roc = pkgs.fetchFromGitHub {
+    owner = "faldor20";
+    repo = "tree-sitter-roc";
+    rev = "ef46edd0c03ea30a22f7e92bc68628fb7231dc8a";
+    hash = "sha256-H76cnMlBT1Z/9WXAdoVslImkyy38uCqum9qEnH+Ics8=";
+  };
 in
 {
 
@@ -10,11 +23,12 @@ in
   # TODO: convert
   # programs.helix.enable = true;
   # programs.helix.defaultEditor = true;
+  catppuccin.helix.enable = false;
   programs.helix = {
     enable = true;
     defaultEditor = true;
-    catppuccin.enable = false;
     # package = pkgs.helix;
+    # TODO: add as overlay to use as `pkgs.helix`
     package = inputs.helix.packages.${pkgs.system}.default;
     extraPackages = with pkgs; [
       jq-lsp
@@ -46,8 +60,8 @@ in
       # theme = "ao";
       # theme = "pop-dark";
       # theme = "tokyonight";
-      # theme = "gruvbox_dark_hard";
-      theme = "gruber-darker";
+      theme = "gruvbox_dark_hard";
+      # theme = "gruber-darker";
       editor = {
         cursorline = true;
         line-number = "relative";
@@ -135,6 +149,11 @@ in
       };
       keys.normal = {
         # y.d = [ ":yank-diagnostic" ];
+        #
+        up = "select_textobject_inner";
+        down = "select_textobject_around";
+        left = "@[";
+        right = "@]";
         ret = [
           "open_below"
           "normal_mode"
@@ -395,11 +414,18 @@ in
           }
           {
             name = "css";
-            formatter = {
-              command = "${pkgs.dprint}/bin/dprint";
-              args = [ "fmt" ];
-            };
-            language-servers = [ "dprint" ];
+            # formatter = {
+            #   command = "${pkgs.dprint}/bin/dprint";
+            #   args = [
+            #     "fmt"
+            #     "--stdin"
+            #     "css"
+            #   ];
+            # };
+            language-servers = [
+              "vscode-css-language-server"
+              "dprint"
+            ];
           }
           {
             name = "fish";
@@ -483,4 +509,19 @@ in
         ];
     };
   };
+
+  home.activation.fetch-and-build-grammars =
+    let
+      hx = "${config.programs.helix.package}/bin/hx";
+    in
+    lib.hm.dag.entryAfter [ "writeBoundary" ]
+      # bash
+      ''
+        verboseEcho "Fetching tree-sitter grammars"
+        run ${hx} --grammar fetch
+        verboseEcho "Building tree-sitter grammars"
+        run ${hx} --grammar build
+      '';
+
+  xdg.configFile."helix/runtime/queries/roc".source = "${tree-sitter-roc}/queries";
 }

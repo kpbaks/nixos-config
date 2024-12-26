@@ -11,8 +11,11 @@ let
     "eng"
   ];
   script =
+    let
+      gum = "${pkgs.gum}/bin/gum";
+    in
     pkgs.writers.writeFishBin "ocr" { }
-      # fish 
+      # fish
       ''
         set -l selection (${pkgs.slurp}/bin/slurp)
         or exit
@@ -24,7 +27,7 @@ let
         # set -l title (status filename | path basename | string upper)
         set -l title "OCR"
         set -l notification_id (${pkgs.libnotify}/bin/notify-send --print-id --transient $title "Extracting text from screen selection using OCR. Please wait ...")
-        ${pkgs.tesseract}/bin/tesseract -l ${lib.concatStringsSep "+" langs} $screenshotf $textf 
+        ${gum} spin --title "Doing OCR on screenshot ..." ${pkgs.tesseract}/bin/tesseract -l ${lib.concatStringsSep "+" langs} $screenshotf $textf 
         set textf "$textf.txt" # tesseract adds a `.txt` postfix to the output file
         set -l text (${pkgs.coreutils}/bin/cat $textf)
 

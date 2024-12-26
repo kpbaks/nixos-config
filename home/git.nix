@@ -60,10 +60,15 @@
   # https://sw.kovidgoyal.net/kitty/kittens/diff/#integrating-with-git
   programs.git = {
     enable = true;
+    # package = pkgs.git.override { guiSupport = true; };
+    package = pkgs.git;
     userName = config.home.username;
     userEmail = config.personal.email;
     extraConfig = {
-      sequence.editor = "${lib.getExe pkgs.git-interactive-rebase-tool}";
+      help.format = "man";
+      help.autoCorrect = "prompt";
+      push.gpgSign = "if-signed"; # "if-signed"
+      # sequence.editor = "${lib.getExe pkgs.git-interactive-rebase-tool}";
       init.defaultBranch = "main";
       push.autoSetupRemote = true;
       # pull.ff = "only";
@@ -73,13 +78,23 @@
       commit.verbose = true;
       merge.tool = "nvimdiff";
       rebase.autosquash = true;
-
+      rebase.stat = true;
+      rebase.updateRefs = true;
+      stash.showStat = true;
+      status.branch = true;
+      status.aheadBehind = true;
+      status.showStash = true;
+      status.submoduleSummary = true;
+      tag.forceSignAnnotated = true;
       # TODO: try out
       rerere.enabled = true;
     };
 
     aliases = {
       unstage = "reset HEAD --";
+      # fixup = "!git log -n 50 --pretty=format:'%h %s' --no-merges | fzf | cut -c -7 | xargs -o git commit --fixup"
+      # https://jordanelver.co.uk/blog/2020/06/04/fixing-commits-with-git-commit-fixup-and-git-rebase-autosquash/
+      # fixup = "!${config.programs.git.package}/bin/git log -n 50 --pretty=format:'%h %s' --no-merges | ${config.programs.fzf.package}/bin/fzf --ansi";
     };
     attributes = [ "*.pdf diff=pdf" ];
     delta.enable = false;

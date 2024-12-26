@@ -1,3 +1,4 @@
+# TODO: install this for helix https://github.com/PowerShell/PowerShellEditorServices
 {
   config,
   inputs,
@@ -28,19 +29,23 @@
           get-command $name | select-object -ExpandProperty Definition
         }
 
+        function follow($file) {
+          get-content $file -wait
+        }
+
         import-module -Name PSReadLine -Scope Global
       '')
     + (
       if config.programs.starship.enable then
         # powershell
         ''
-          function Invoke-Starship-TransientFunction {
-            &starship module character
-          }
+          # function Invoke-Starship-TransientFunction {
+          #   &starship module character
+          # }
 
-          Invoke-Expression (&starship init powershell)
+          # Invoke-Expression (&starship init powershell)
 
-          Enable-TransientPrompt
+          # Enable-TransientPrompt
                 
         ''
       else

@@ -1,6 +1,4 @@
-{ ... }:
 {
-
   programs.fd = {
     enable = true;
     ignores = [
@@ -8,6 +6,8 @@
       "*.bak"
     ];
     hidden = true;
-    extraOptions = [ "--absolute-path" ];
+    extraOptions = [
+      # "--absolute-path"
+    ];
   };
 }

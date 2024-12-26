@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 let
   inherit (builtins)
     map
@@ -18,11 +18,9 @@ let
       attrNames
       topath
     ];
-in
-
-{
 
   imports = [
+
     ./fonts.nix
     ./leds.nix
     ./xkcd.nix
@@ -35,14 +33,34 @@ in
     ./hx-project-health.nix
     ./ros2-repos.nix
     ./my-forks.nix
+    ./just-a-chill-guy.nix
     # ./sync-fork.nix
     # ./lg.nix
     # ./tokei-pie.nix
     # ./cdtmp.nix
   ];
-  # imports = readdir ./.;
 
-  # home.packages = 1;
+  scriptNames = map (
+    filename:
+    lib.pipe filename [
+      builtins.toString
+      builtins.baseNameOf
+      (builtins.split "\\.")
+      builtins.head
+    ]
+  ) imports;
+
+  listScripts =
+    pkgs.writers.writeNuBin "scripts" { }
+      # nu
+      ''
+        [${lib.concatStringsSep ", " scriptNames}] | each { which $in } | flatten
+      '';
+in
+
+{
+  inherit imports;
+  home.packages = [ listScripts ];
 
   # imports = builtins.map (n: toString ./. + "/${n}") (builtins.attrNames (builtins.removeAttrs (builtins.readDir ./.) [(builtins.unsafeGetAttrPos "_" {_ = null;}).file]));
 

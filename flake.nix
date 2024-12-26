@@ -36,8 +36,14 @@
   inputs.zen-browser.url = "github:MarceColl/zen-browser-flake";
   inputs.zen-browser.inputs.nixpkgs.follows = "nixpkgs";
 
+  inputs.darkly.url = "github:Bali10050/Darkly";
+  inputs.darkly.inputs.nixpkgs.follows = "nixpkgs";
+
   inputs.television.url = "github:alexpasmantier/television";
   inputs.television.inputs.nixpkgs.follows = "nixpkgs";
+
+  inputs.nix-weather.url = "github:cafkafk/nix-weather";
+  inputs.nix-weather.inputs.nixpkgs.follows = "nixpkgs";
 
   inputs.ghostty = {
     url = "git+ssh://git@github.com/ghostty-org/ghostty";
@@ -45,6 +51,11 @@
     # inputs.nixpkgs-unstable.follows = "nixpkgs-unstable";
     inputs.nixpkgs-stable.follows = "nixpkgs";
     inputs.nixpkgs-unstable.follows = "nixpkgs";
+  };
+
+  inputs.rust-overlay = {
+    url = "github:oxalica/rust-overlay";
+    inputs.nixpkgs.follows = "nixpkgs";
   };
 
   # TODO: use
@@ -250,7 +261,9 @@
       pkgs = import nixpkgs {
         inherit system;
         overlays = [
+          inputs.rust-overlay.overlays.default
           inputs.hyprpanel.overlay
+          (final: prev: { ghostty = inputs.ghostty.packages.${system}.default; })
           # inputs.rust-overlay.overlays.default
           # inputs.wired-notify.overlays.default
           inputs.niri.overlays.niri
@@ -258,9 +271,9 @@
           inputs.swww.overlays.default
           # (final: prev: { swww = inputs.swww.packages.${prev.system}.swww; })
           (final: prev: { zjstatus = inputs.zjstatus.packages.${prev.system}.default; })
-          (final: prev: { yazi = inputs.yazi.packages.${prev.system}.default; })
+          inputs.yazi.overlays.default
           (final: prev: { television = inputs.television.packages.${prev.system}.default; })
-          # inputs.neovim-nightly-overlay.overlay         
+          # inputs.neovim-nightly-overlay.overlay
         ];
         config.allowUnfree = true;
       };
@@ -275,7 +288,7 @@
           hooks = {
             # nixpkgs-fmt.enable = true;
             nixfmt-rfc-style.enable = true;
-            deadnix.enable = true;
+            # deadnix.enable = true;
             flake-checker.enable = true;
             statix.enable = true;
             check-toml.enable = true;
@@ -296,14 +309,22 @@
 
       # TODO: setup raspberrypi
       # TODO: setup nextcloud
-      # nixosConfigurations."raspberrypi" = nixpkgs.lib.nixosSystem {
-      #   specialArgs = {
-      #     inherit inputs username;
-      #   };
-      #   modules = [
-      #     ./hosts/raspberrypi.nix
-      #   ];
-      # };
+      nixosConfigurations."raspberry-pi" = nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          inherit inputs username;
+        };
+        system = "aarch64-linux";
+        modules = [
+          ./hosts/raspberry-pi.nix
+          inputs.nixos-hardware.nixosModules.raspberry-pi-4
+          (
+            { modulesPath, ... }:
+            {
+              imports = [ (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix") ];
+            }
+          )
+        ];
+      };
 
       nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
         inherit system;
@@ -318,29 +339,34 @@
             # NixOS configuration.
             nix.nixPath = [ "nixpkgs=${inputs.nixpkgs}" ];
           }
-          inputs.stylix.nixosModules.stylix # provide theming for system level programs such as bootloaders, splash screens, and display managers
-          inputs.sops-nix.nixosModules.sops
-          {
-            imports = [ inputs.agenix.nixosModules.default ];
-            environment.systemPackages = [ inputs.agenix.packages.${system}.default ];
-          }
+          # inputs.stylix.nixosModules.stylix # provide theming for system level programs such as bootloaders, splash screens, and display managers
+          # inputs.sops-nix.nixosModules.sops
+          # {
+          #   imports = [ inputs.agenix.nixosModules.default ];
+          #   environment.systemPackages = [ inputs.agenix.packages.${system}.default ];
+          # }
           inputs.niri.nixosModules.niri
           inputs.nixos-cli.nixosModules.nixos-cli
           inputs.catppuccin.nixosModules.catppuccin
-          { environment.systemPackages = [ inputs.fh.packages.${system}.default ]; }
+          { environment.systemPackages = [ inputs.nix-weather.packages.${system}.nix-weather ]; }
+          # { environment.systemPackages = [ inputs.fh.packages.${system}.default ]; }
 
           inputs.nixos-cosmic.nixosModules.default
+          {
+            services.desktopManager.cosmic.enable = true;
+            # services.displayManager.cosmic-greeter.enable = true;
+          }
           # inputs.nixos-hardware.nixosModules.tuxedo-infinitybook-pro14-gen7
           # inputs.sops-nix.nixosModules.sops
-          (
-            { ... }:
-            {
-              # stylix.enable = true;
+          # (
+          #   { ... }:
+          #   {
+          #     # stylix.enable = true;
 
-              # stylix.targets.console.enable = true; # Linux kernel console
-            }
-          )
-          { environment.systemPackages = [ inputs.nix-melt.packages.${system}.default ]; }
+          #     # stylix.targets.console.enable = true; # Linux kernel console
+          #   }
+          # )
+          # { environment.systemPackages = [ inputs.nix-melt.packages.${system}.default ]; }
         ];
       };
 
@@ -390,19 +416,19 @@
                 );
               }
             )
-            {
-              imports = [ inputs.stylix.homeManagerModules.stylix ];
-              stylix.enable = false;
-              stylix.polarity = "dark";
-              stylix.image = pkgs.fetchurl {
-                # url = "https://github.com/NixOS/nixos-artwork/blob/master/wallpapers/nixos-wallpaper-catppuccin-macchiato.png";
-                url = "https://github.com/NixOS/nixos-artwork/blob/master/wallpapers/nixos-wallpaper-catppuccin-macchiato.png?raw=true";
-                sha256 = "SkXrLbHvBOItJ7+8vW+6iXV+2g0f8bUJf9KcCXYOZF0=";
+            # {
+            #   imports = [ inputs.stylix.homeManagerModules.stylix ];
+            #   stylix.enable = false;
+            #   stylix.polarity = "dark";
+            #   stylix.image = pkgs.fetchurl {
+            #     # url = "https://github.com/NixOS/nixos-artwork/blob/master/wallpapers/nixos-wallpaper-catppuccin-macchiato.png";
+            #     url = "https://github.com/NixOS/nixos-artwork/blob/master/wallpapers/nixos-wallpaper-catppuccin-macchiato.png?raw=true";
+            #     sha256 = "SkXrLbHvBOItJ7+8vW+6iXV+2g0f8bUJf9KcCXYOZF0=";
 
-                # url = "https://www.pixelstalk.net/wp-content/uploads/2016/05/Epic-Anime-Awesome-Wallpapers.jpg";
-                # sha256 = "enQo3wqhgf0FEPHj2coOCvo7DuZv+x5rL/WIo4qPI50=";
-              };
-            }
+            #     # url = "https://www.pixelstalk.net/wp-content/uploads/2016/05/Epic-Anime-Awesome-Wallpapers.jpg";
+            #     # sha256 = "enQo3wqhgf0FEPHj2coOCvo7DuZv+x5rL/WIo4qPI50=";
+            #   };
+            # }
 
             inputs.nix-index-database.hmModules.nix-index
             # optional to also wrap and install comma

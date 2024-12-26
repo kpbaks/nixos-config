@@ -2,7 +2,7 @@
 {
   # FIXME: does not do anything
   services.darkman = {
-    enable = true;
+    enable = false;
     settings = {
       # lat = 56.15; # Aarhus
       # lon = 10.2; # Aarhus

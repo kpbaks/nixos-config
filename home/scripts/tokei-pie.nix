@@ -37,8 +37,10 @@ let
 
 
         if os.isatty(sys.stdin.fileno()):
+            # Script is run as `__file__`
             input = subprocess.run(["${pkgs.tokei}/bin/tokei", "--output", "json"])
         else:
+            # Script is run as `tokei -o json | __file__` ... hopefully
             try:
               input = json.load(sys.stdin)
             except:
@@ -46,7 +48,7 @@ let
                 f"Stdin is not json, please pass tokei's json output to tokei-pie, like this: tokei -o json | {sys.argv[0]}",
                 file=sys.stderr,
               )
-              sys.exit(128)
+              sys.exit(128) # TODO: find out if 128 is the right exit code for this
 
         if __name__ == "__main__":
           main()

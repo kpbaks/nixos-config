@@ -10,7 +10,7 @@ in
 
   # TODO: figure out how to install packages from espansohub
   services.espanso = {
-    enable = true;
+    enable = false;
     package = pkgs.espanso-wayland;
 
     configs.vscode = {

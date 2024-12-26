@@ -49,7 +49,7 @@
       }
     '';
   services.swayosd = {
-    enable = true;
+    enable = false;
     topMargin = 0.5; # center
     # display = monitors.laptop;
     display = "eDP-1";

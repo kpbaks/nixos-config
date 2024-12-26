@@ -169,7 +169,7 @@ in
       '';
   };
 
-  programs.nushell.extraConfig = # nushell
+  programs.nushell.extraConfig = # nu
     ''
       # def "wezterm cli list-clients" [--format: string = "json"] {
       def "wezterm cli list-clients" [] {

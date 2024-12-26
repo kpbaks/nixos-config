@@ -12,7 +12,7 @@
   # home.packages = with pkgs; [ walker ];
   # TODO: improve style
   programs.walker = {
-    enable = true;
+    enable = false;
     runAsService = true;
     config = { };
     # theme = "catppuccin";

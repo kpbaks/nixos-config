@@ -9,9 +9,11 @@
   # TODO: checkout https://github.com/azzamsa/zman
   # TODO: checkout https://github.com/6543/batmon/
   home.packages = with pkgs; [
+    # yazi
+    # serial-studio
     net-snmp
     flameshot
-    affine
+    # affine
     markdownlint-cli
     markdown-anki-decks
     markdown-link-check
@@ -120,12 +122,11 @@
     # element
     # element-desktop
     gping
-    # fuzzel
     resvg
     miller
     csview
     # pympress
-    mission-center
+    # mission-center
     # mkchromecast
     samply
     sad
@@ -135,7 +136,7 @@
     asciigraph
     imagemagick
     # c3c
-    lychee
+    # lychee
     # tutanota-desktop
     localsend # open source alternative to Apple Airdrop
     # inkscape
@@ -157,8 +158,8 @@
     # FIXME: no wayland support
     # daktilo # turn your keyboard into a typewriter!
     # lemmyknow # identify anything
-    the-way # termial snippet-manager
-    appflowy # open source alternative to notion
+    # the-way # termial snippet-manager
+    # appflowy # open source alternative to notion
     # macchina # neofetch like program
     # neovim-remote # TODO: create `darkman` script to toggle light/dark mode with `set background=dark`
     lurk # like `strace` but with colors
@@ -257,10 +258,7 @@
     hyperfine # powerful cli benchmark tool
     # nickel # configuration language
     # nls # nickel language server
-    gcc
-    gdb
-    mold # modern linker
-    rustup # rust toolchain manager
+    # gcc
     # rclone # rsync for cloud storage
     # croc # easily and securely transfer files and folders from one computer to another
     # sshx

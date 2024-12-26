@@ -14,7 +14,7 @@
         layer = "overlay";
         # terminal = "${pkgs.kitty}/bin/kitty";
         terminal = "${lib.getExe config.default-application.terminal}";
-        font = "JetBrainsMono Nerd Font";
+        font = "JetBrainsMono Nerd Font Mono";
         dpi-aware = "yes";
         use-bold = true;
         icons-enabled = true;
@@ -33,7 +33,8 @@
       };
       border.width = 2; # px
       border.radius = 10; # px
-
+      # All colors are in RGBA format
+      colors.background-color = lib.mkForce "000000ff";
       # colors =
       #   let
       #     hex2fuzzel-color = hex: "${builtins.substring 1 6 hex}ff";

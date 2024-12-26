@@ -14,6 +14,7 @@
     # terminal = pkgs.kdePackages.konsole;
     # terminal = config.programs.wezterm.package;
     # terminal = config.programs.foot.package;
-    terminal = config.programs.alacritty.package;
+    # terminal = config.programs.alacritty.package;
+    terminal = pkgs.ghostty;
   };
 }

@@ -876,3 +876,19 @@ function __bind_alt_h
 end
 
 bind \eh '__bind_alt_h; commandline --function repaint'
+
+function toggle-comment
+    set -l buf (commandline)
+    set -l cursor (commandline --cursor)
+    if string match --regex --quiet '^\s*#' -- $buf
+        commandline --replace (string replace --regex '^\s*# ?' '' -- $buf)
+    else
+        # TODO: restore cursor position
+        # TODO: handle multiline commandline
+        # TODO: handle selection
+        commandline --replace "# $(string join '\n' $buf)"
+    end
+end
+
+bind \c_ toggle-comment
+# bind \c_ 'toggle-comment; commandline -f repaint'

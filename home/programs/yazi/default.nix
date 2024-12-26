@@ -44,12 +44,12 @@ in
         rev = "a8421d98bbea11bee242883f2f7420e5ca498b3f";
         hash = "sha256-0RZHBF2J2jMbCHcM71lHdn99diDr0zrMiorFgtVL5pI=";
       };
-      kdeconnect-yazi = pkgs.fetchFromGitHub {
-        owner = "kpbaks";
-        repo = "kdeconnect.yazi";
-        rev = "f6ae6bd007be970ac17fafc0a84d87eeeb1c4494";
-        hash = "sha256-sr92pLVzY/f+MnhhAEbdefz99QdlZRN3x+yQFtXUMD8=";
-      };
+      # kdeconnect-yazi = pkgs.fetchFromGitHub {
+      #   owner = "kpbaks";
+      #   repo = "kdeconnect.yazi";
+      #   rev = "f6ae6bd007be970ac17fafc0a84d87eeeb1c4494";
+      #   hash = "sha256-sr92pLVzY/f+MnhhAEbdefz99QdlZRN3x+yQFtXUMD8=";
+      # };
 
       starship-yazi = pkgs.fetchFromGitHub {
         owner = "Rolv-Apneseth";

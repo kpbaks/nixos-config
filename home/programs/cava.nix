@@ -1,7 +1,7 @@
 { ... }:
 {
   programs.cava = {
-    enable = true;
+    enable = false;
     # catppuccin.enable = false;
     catppuccin.transparent = true;
     settings = {

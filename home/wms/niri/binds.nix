@@ -41,7 +41,7 @@
           niri = "${config.programs.niri.package}/bin/niri";
         in
         pkgs.writers.writeNuBin "niri-focus-or-spawn" { }
-          # nushell
+          # nu
           ''
             def main [app_id: string, program: string] {
               let windows = ${niri} msg --json windows | from json
@@ -131,7 +131,8 @@
       "Mod+8".action = focus-workspace 8;
       "Mod+9".action = focus-workspace 9;
 
-      "Mod+T".action = focus-or-spawn "foot" "${pkgs.foot}/bin/foot";
+      # "Mod+T".action = focus-or-spawn "foot" "${pkgs.foot}/bin/foot";
+      "Mod+T".action = focus-or-spawn "foot" "${terminal}";
       # "Mod+Y".action = focus-or-spawn "foot" "${pkgs.foot}/bin/foot";
 
       "Mod+Shift+T".action = spawn terminal "${pkgs.fish}/bin/fish" "--private";

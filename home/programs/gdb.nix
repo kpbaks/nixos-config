@@ -1,4 +1,3 @@
-{ ... }:
 {
   # TODO: create a `treesiter-gdb` parser
   home.file.".gdbinit".text =

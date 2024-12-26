@@ -1,7 +1,7 @@
 { pkgs, ... }:
 {
   programs.nushell.extraConfig =
-    # nushell
+    # nu
     ''
       # lsmod
       ${pkgs.kmod}/bin/lsmod

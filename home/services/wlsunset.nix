@@ -1,4 +1,3 @@
-{ ... }:
 {
   # TODO: configure
   # set screen gamma (aka. night light) based on time of day
@@ -12,7 +11,8 @@
     # gamma = 0.6;
     temperature.night = 4000;
     temperature.day = 6500;
-    systemdTarget = "graphical-session.target";
+    # systemdTarget = "graphical-session.target";
+    systemdTarget = "xdg-desktop-autostart.target";
     # "wlsunset -t 4000 -T 6500 -S 06:30 -s 18:30"
   };
 }

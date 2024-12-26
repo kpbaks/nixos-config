@@ -12,7 +12,8 @@
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ./steam.nix
+    ./networking.nix
+    # ./steam.nix
     # ./hdmi-cec.nix
 
     # ./tuxedo-laptop-second-nvme-drive.nix
@@ -23,6 +24,12 @@
   nix.settings.experimental-features = [
     "nix-command"
     "flakes"
+    # "auto-allocate-uids"
+    # "ca-derivations"
+    # "cgroups"
+    # "no-url-literals"
+    # "parse-toml-timestamps"
+    # "repl-flake"
   ];
   # TODO: remove keys and caches here as they are specified in `./flake.nix`
   nix.settings.builders-use-substitutes = true;
@@ -46,7 +53,7 @@
   nix.settings.trusted-substituters = [ "https://cache.nixos.org" ];
 
   nix.settings.trusted-users = [
-    "root"
+    # "root"
     username
   ];
 
@@ -72,9 +79,17 @@
 
   # Allow unfree packages e.g. closed-source nvidia drivers
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.allowBroken = true;
 
   # Needed by `nixd` lsp
   nix.nixPath = [ "nixpkgs=${inputs.nixpkgs}" ];
+
+  programs.nh = {
+    enable = true;
+    clean.enable = true;
+    clean.extraArgs = "--keep-since 30d --keep 10";
+    flake = "/etc/nixos";
+  };
 
   # system.autoUpgrade.enable = true;
   # system.autoUpgrade.allowReboot = true;
@@ -125,15 +140,17 @@
     # btrfs = true;
   };
 
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  # boot.kernelPackages = pkgs.linuxPackages_latest;
   # boot.kernelPackages = pkgs.linuxPackages_zen;
+  boot.kernelPackages = pkgs.linuxPackages_6_12;
+
   boot.plymouth =
     let
       # theme = "rings";
       theme = "glitch";
     in
     {
-      enable = true;
+      enable = false;
       inherit theme;
       # TODO: make jetbrains mono available instead
       # font = "${pkgs.dejavu_fonts.minimal}/share/fonts/truetype/DejaVuSans.ttf";
@@ -150,18 +167,17 @@
       ];
     };
 
-  # Enable "Silent Boot"
-  boot.consoleLogLevel = 0;
-  boot.initrd.verbose = false;
+  # https://www.kernel.org/doc/html/latest/core-api/printk-basics.html
+  boot.consoleLogLevel = 5;
+  # boot.initrd.verbose = false;
   boot.kernelParams = [
     "tuxedo_keyboard.mode=0"
     "tuxedo_keyboard.brightness=255"
-
-    "quiet"
+    # "quiet"
     "splash"
     "boot.shell_on_fail"
     "loglevel=3"
-    "rd.systemd.show_status=false"
+    "rd.systemd.show_status=true"
     "rd.udev.log_level=3"
     "udev.log_priority=3"
   ];
@@ -229,12 +245,11 @@
 
   hardware.i2c.enable = true;
 
-  # hardware.tuxedo-rs = {
-  #   enable = true;
-  #   tailor-gui.enable = true;
-  # };
-
-  # hardware.tuxedo-keyboard.enable = true;
+  hardware.tuxedo-drivers.enable = true;
+  hardware.tuxedo-rs = {
+    enable = true;
+    tailor-gui.enable = true;
+  };
 
   # https://lavafroth.is-a.dev/post/android-phone-for-webcam-nixos/
   boot.extraModulePackages = with pkgs; [ linuxPackages_latest.v4l2loopback ];
@@ -287,93 +302,14 @@
       pkgs.imagemagick
     ];
   };
-
-  # 30 (black)
-  # 31 (red)
-  # 32 (green)
-  # 33 (yellow)
-  # 34 (blue)
-  # 35 (magenta)
-  # 36 (cyan)
-  # 37 (white)
-
-  # 1 (bright)
-  # 2 (dim)
-  # 4 (underscore)
-  # 5 (blink)
-  # 7 (reverse)
-  # 8 (hidden)
-
-  # color for null
-  # color for false
-  # color for true
-  # color for numbers
-  # color for strings
-  # color for arrays
-  # color for objects
-  # color for object keys
-
-  # JQ_COLORS="0;90:0;37:0;37:0;37:0;32:1;37:1;37:1;34"
-
-  environment.variables =
-    let
-      jq_colors =
-        colors:
-        let
-          default = "0;90:0;37:0;37:0;37:0;32:1;37:1;37:1;34";
-          names = [
-            "null"
-            "false"
-            "true"
-            "numbers"
-            "strings"
-            "arrays"
-            "objects"
-            "keys"
-          ];
-          colors = [
-            "black"
-            "red"
-            "green"
-            "yellow"
-            "blue"
-            "magenta"
-            "cyan"
-            "white"
-          ];
-          markup = [
-            "bright"
-            "dim"
-            "underscore"
-            "blink"
-            "reverse"
-            "hidden"
-          ];
-        in
-        # builtins.mapAttrs (name: value: if builtins.isString value then 1 else 2);
-        default;
-    in
-    {
-      DIRENV_LOG_FORMAT = ""; # silence `direnv` msgs
-      # EDITOR = "hx";
-      EDITOR = pkgs.lib.getExe pkgs.helix;
-      NIXPKGS_ALLOW_UNFREE = "1";
-      LIBVA_DRIVER_NAME = "iHD";
-      # https://jqlang.github.io/jq/manual/#colors
-      JQ_COLORS = jq_colors {
-        null = "0;90";
-        false.color = "red";
-        true = {
-          bold = true;
-          color = "green";
-        };
-        numbers.color = "blue";
-        strings.color = "green";
-        arrays.color = "yellow";
-        objects.color = "magenta";
-        keys.color = "cyan";
-      };
-    };
+  environment.variables = {
+    DIRENV_LOG_FORMAT = ""; # silence `direnv` msgs
+    # EDITOR = "hx";
+    EDITOR = pkgs.lib.getExe pkgs.helix;
+    NIXPKGS_ALLOW_UNFREE = "1";
+    LIBVA_DRIVER_NAME = "iHD";
+    # https://jqlang.github.io/jq/manual/#colors
+  };
 
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -386,31 +322,26 @@
   time.timeZone = "Europe/Copenhagen";
   i18n.defaultLocale = "en_US.UTF-8";
 
-  i18n.extraLocaleSettings =
-    let
-      # locale = "da_DK.UTF-8";
-      locale = "en_US.UTF-8";
-    in
-    {
-      # LC_ADDRESS = "da_DK.UTF-8";
-      # LC_IDENTIFICATION = "da_DK.UTF-8";
-      # LC_MEASUREMENT = "da_DK.UTF-8";
-      # LC_MONETARY = "da_DK.UTF-8";
-      # LC_NAME = "da_DK.UTF-8";
-      # LC_NUMERIC = "da_DK.UTF-8";
-      # LC_PAPER = "da_DK.UTF-8";
-      # LC_TELEPHONE = "da_DK.UTF-8";
-      # LC_TIME = "da_DK.UTF-8";
-      LC_ADDRESS = config.i18n.defaultLocale;
-      LC_IDENTIFICATION = config.i18n.defaultLocale;
-      LC_MEASUREMENT = config.i18n.defaultLocale;
-      LC_MONETARY = config.i18n.defaultLocale;
-      LC_NAME = config.i18n.defaultLocale;
-      LC_NUMERIC = config.i18n.defaultLocale;
-      LC_PAPER = config.i18n.defaultLocale;
-      LC_TELEPHONE = config.i18n.defaultLocale;
-      LC_TIME = config.i18n.defaultLocale;
-    };
+  i18n.extraLocaleSettings = {
+    # LC_ADDRESS = "da_DK.UTF-8";
+    # LC_IDENTIFICATION = "da_DK.UTF-8";
+    # LC_MEASUREMENT = "da_DK.UTF-8";
+    # LC_MONETARY = "da_DK.UTF-8";
+    # LC_NAME = "da_DK.UTF-8";
+    # LC_NUMERIC = "da_DK.UTF-8";
+    # LC_PAPER = "da_DK.UTF-8";
+    # LC_TELEPHONE = "da_DK.UTF-8";
+    # LC_TIME = "da_DK.UTF-8";
+    LC_ADDRESS = config.i18n.defaultLocale;
+    LC_IDENTIFICATION = config.i18n.defaultLocale;
+    LC_MEASUREMENT = config.i18n.defaultLocale;
+    LC_MONETARY = config.i18n.defaultLocale;
+    LC_NAME = config.i18n.defaultLocale;
+    LC_NUMERIC = config.i18n.defaultLocale;
+    LC_PAPER = config.i18n.defaultLocale;
+    LC_TELEPHONE = config.i18n.defaultLocale;
+    LC_TIME = config.i18n.defaultLocale;
+  };
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
@@ -420,7 +351,7 @@
   # TODO: try out https://github.com/khaneliman/catppuccin-sddm-corners
   services.displayManager.sddm = {
     enable = true;
-    catppuccin.enable = true;
+    # catppuccin.enable = true;
     wayland.enable = true;
     # autoNumlock = true;
     # https://man.archlinux.org/man/sddm.conf.5
@@ -452,7 +383,7 @@
 
   # TODO: change to en_US
   # Configure keymap in X11
-  services.xserver.xkb.layout = "dk";
+  services.xserver.xkb.layout = "us,dk";
   services.xserver.xkb.variant = "";
 
   # services.xserver.videoDrivers = ["displaylink" "modesetting" "nvidia"];
@@ -478,8 +409,9 @@
   };
 
   # Configure console keymap
-  # TODO: change to en-us
-  console.keyMap = "dk-latin1";
+  # console.keyMap = "dk-latin1";
+  console.keyMap = "us";
+  # console.font = "JetBrainsMono Nerd Font Mono"; # FIXME: not found
 
   # Enable CUPS to print documents.
   services.printing.enable = false;
@@ -496,19 +428,12 @@
   security.polkit.enable = true;
   services.pipewire = {
     enable = true;
+    package = pkgs.pipewire.override { x11Support = false; };
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
+    jack.enable = true;
   };
-
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   programs.fish.enable = true;
@@ -544,19 +469,13 @@
   users.groups.input.members = [ username ];
 
   fonts.packages = with pkgs; [
-    (nerdfonts.override {
-      # https://github.com/NixOS/nixpkgs/blob/65798d5f42e530714419bc17cae83cfe1d3b0dca/pkgs/data/fonts/nerdfonts/shas.nix
-      fonts = [
-        "JetBrainsMono"
-        "FiraCode"
-        "Iosevka"
-        "VictorMono"
-        "CommitMono"
-        "SourceCodePro"
-        "ZedMono"
-        # "NotoSans"
-      ];
-    })
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.zed-mono
+    nerd-fonts.victor-mono
+    nerd-fonts.ubuntu-mono
+    nerd-fonts.sauce-code-pro
+    nerd-fonts.commit-mono
+    nerd-fonts.iosevka
     cantarell-fonts
     # line-awesome
     font-awesome
@@ -565,8 +484,12 @@
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
-    mullvad-closest
-    rainfrog
+    cyme # a fancier `lsusb`
+    psmisc
+    busybox
+    gnumake
+    # mullvad-closest
+    # rainfrog
     wayland-utils
     alsa-utils # `alsamixer`
     # fh # flakehub cli
@@ -742,16 +665,12 @@
   programs.niri.package = pkgs.niri;
 
   # services.desktopManager.cosmic.enable = true;
-  # services.displayManager.cosmic-greeter.enable = true;
+  # # services.displayManager.cosmic-greeter.enable = true;
   # hardware.system76.power-daemon.enable = true;
   # programs.cosmic.enable = true;
   # programs.niri.package = pkgs.niri-unstable;
 
   programs.river.enable = false;
-
-  # qt.enable = true;
-  # qt.style = "breeze";
-  # qt.platformTheme = "kde";
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -774,7 +693,7 @@
   };
   # FIXME: get to work
   #   services.espanso.enable = false;
-  services.mullvad-vpn.enable = true;
+  services.mullvad-vpn.enable = false;
   services.mozillavpn.enable = false;
   # services.wg-netmanager.enable = true;
 
@@ -785,7 +704,7 @@
   programs.ssh.askPassword = "${pkgs.x11_ssh_askpass}/libexec/x11-ssh-askpass";
 
   programs.firejail = {
-    enable = true;
+    enable = false;
     # wrappedBinaries = {
     #   librewolf = {
     #     executable = "${pkgs.librewolf}/bin/librewolf";
@@ -812,7 +731,7 @@
   #   excalidraw.enable = true;
   # };
 
-  services.thermald.enable = false;
+  services.thermald.enable = true;
   services.auto-cpufreq.enable = false;
   services.auto-cpufreq.settings = {
     battery = {
@@ -826,29 +745,31 @@
   };
 
   services.power-profiles-daemon.enable = false;
+  powerManagement.enable = true;
+  powerManagement.powertop.enable = true;
 
   # services.tlp.enable = true;
 
   # # TODO: check out services.auto-cpufreq
-  # services.tlp = {
-  #   enable = true;
-  #   settings = {
-  #     CPU_SCALING_GOVERNOR_ON_AC = "performance";
-  #     CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
+  services.tlp = {
+    enable = true;
+    settings = {
+      CPU_SCALING_GOVERNOR_ON_AC = "performance";
+      CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
 
-  #     CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
-  #     CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
+      CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
+      CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
 
-  #     CPU_MIN_PERF_ON_AC = 0;
-  #     CPU_MAX_PERF_ON_AC = 100;
-  #     CPU_MIN_PERF_ON_BAT = 0;
-  #     CPU_MAX_PERF_ON_BAT = 20;
+      CPU_MIN_PERF_ON_AC = 0;
+      CPU_MAX_PERF_ON_AC = 100;
+      CPU_MIN_PERF_ON_BAT = 0;
+      CPU_MAX_PERF_ON_BAT = 20;
 
-  #     # Optional helps save long term battery health
-  #     START_CHARGE_THRESH_BAT0 = 20; # 20 and bellow it starts to charge
-  #     STOP_CHARGE_THRESH_BAT0 = 80; # 80 and above it stops charging
-  #   };
-  # };
+      # Optional helps save long term battery health
+      START_CHARGE_THRESH_BAT0 = 20; # 20 and bellow it starts to charge
+      STOP_CHARGE_THRESH_BAT0 = 80; # 80 and above it stops charging
+    };
+  };
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
@@ -931,7 +852,7 @@
   # };
 
   # needed for `darkman`
-  services.geoclue2.enable = true;
+  services.geoclue2.enable = false;
   # NOTE: temporary fix reported by: https://github.com/NixOS/nixpkgs/issues/327464
   environment.etc."geoclue/conf.d/.valid".text = ''created the directory.'';
 
@@ -984,7 +905,7 @@
 
   # FIXME: make work
   services.blocky = {
-    enable = true;
+    enable = false;
     settings = {
       ports.dns = 53; # Port for incoming DNS Queries.
       upstreams.groups.default = [
@@ -1064,9 +985,9 @@
   # };
 
   programs.kdeconnect.enable = true;
-  programs.localsend.enable = true;
-  programs.nm-applet.enable = true;
-  programs.usbtop.enable = true;
+  programs.localsend.enable = false;
+  programs.nm-applet.enable = false;
+  programs.usbtop.enable = false;
 
   services.keyd = {
     enable = true;
@@ -1093,7 +1014,7 @@
   # *** Android ***
   # sudo waydroid upgrade
   # TODO: get this working
-  virtualisation.waydroid.enable = true;
+  virtualisation.waydroid.enable = false;
   programs.adb.enable = true;
 
   # TODO: `systemctl status avahi-daemon.service` prints this, fix it (tir 10 sep 17:35:56 CEST 2024)
@@ -1104,7 +1025,7 @@
   # TODO: enable if you ever get a device that has this sensor
   # hardware.sensor.iio.enable = false;
 
-  services.vnstat.enable = true;
+  services.vnstat.enable = false;
 
   # TODO: try this service
   # services.netdata.enable = true;
@@ -1113,14 +1034,6 @@
   systemd.oomd.enableUserSlices = true;
   systemd.oomd.extraConfig = { };
   # services.earlyoom.enable = true;
-
-  programs.nh = {
-    enable = true;
-    clean.enable = true;
-    clean.extraArgs = "--keep-since 30d --keep 10";
-    flake = "/etc/nixos";
-    # flake = "/home/${username}/dotfiles";
-  };
 
   # TODO(ons 18 sep 10:53:21 CEST 2024): figure out how to configure `niri` and logind
   # to power off the laptop monitor, when the lid is closed and it is
@@ -1158,7 +1071,7 @@
 
   programs.bandwhich.enable = true;
 
-  services.osquery.enable = true;
+  services.osquery.enable = false;
   services.osquery.flags = { };
   services.osquery.settings = { };
 
@@ -1166,7 +1079,7 @@
   services.envfs.enable = true; # use fusefs to resolve shebangs like #!/bin/bash that does not work on NixOS because of not being compliant with FHS standard
 
   services.postgresql = {
-    enable = true;
+    enable = false;
     enableJIT = true;
     # package = pkgs.postgresql;
     ensureDatabases = [ "testdb" ];
@@ -1176,7 +1089,13 @@
     '';
   };
 
-  services.ntfy-sh.enable = true;
+  services.ntfy-sh.enable = false;
   services.ntfy-sh.settings.base-url = "https://ntfy.sh";
 
+  services.cpupower-gui.enable = true;
+  programs.coolercontrol.enable = true;
+
+  # echo '1' > '/sys/module/snd_hda_intel/parameters/power_save'
+  # echo 'enabled' > '/sys/class/net/wlan0/device/power/wakeup'
+  # echo 'enabled' > '/sys/bus/usb/devices/4-4.1/power/wakeup'
 }

@@ -23,7 +23,7 @@
   config.personal = rec {
     name = "Kristoffer Sørensen";
     full-name = "Kristoffer Plagborg Bak Sørensen";
-    age = 25;
+    age = 25; # TODO: compute this from my birthday
     gmail = "kristoffer.pbs@gmail.com";
     aumail = "201908140@post.au.dk";
     tutamail = "kristoffer.pbs@tuta.io";

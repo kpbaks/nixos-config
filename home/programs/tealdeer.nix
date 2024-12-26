@@ -8,7 +8,7 @@
       };
       updates = {
         auto_update = true;
-        auto_update_interval_hours = 24;
+        auto_update_interval_hours = 24 * 7;
       };
       # TODO: make pr to tealdeer to support a dim flag, similar to `set_color --dim` in fish
       style = {

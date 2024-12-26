@@ -403,7 +403,7 @@ in
   # TODO: create dns alias
   # TODO: make more personal
   # use lighter colors: e.g. use catppuccin latte
-  services.glance.enable = true;
+  services.glance.enable = false;
   services.glance.settings = {
     # TODO: have zen browser read this variable when its hm module is ready
     server.port = 5678;
