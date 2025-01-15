@@ -1,4 +1,3 @@
-{ ... }:
 {
 
   # TODO: check if this is the right place to generate the global project file

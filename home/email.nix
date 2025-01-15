@@ -2,6 +2,11 @@
 {
   programs.aerc.enable = false;
 
+  home.packages = with pkgs; [
+    birdtray
+    thunderbird # email client
+  ];
+
   # programs.thunderbird.enable = true;
   # programs.thunderbird.package = pkgs.thunderbird;
   # programs.thunderbird.settings = {
@@ -33,8 +38,16 @@
   # };
 
   programs.himalaya = {
-    enable = false;
-    settings = { };
+    enable = true;
+    settings = {
+      notify_cmd =
+        pkgs.writeScript "mail-notifier" # sh
+          ''
+            SENDER="$1"
+            SUBJECT="$2"
+            ${pkgs.libnotify}/bin/notify-send -c himalaya "$(printf 'Received email from %s\n\n%s' "$SENDER" "$SUBJECT")"
+          '';
+    };
   };
   services.himalaya-watch.enable = config.programs.himalaya.enable;
 

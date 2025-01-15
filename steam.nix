@@ -10,6 +10,7 @@
     steamcmd
     # steam-tui
     gamescope
+    adwsteamgtk # TODO: how to apply?
   ];
 
   programs.steam = {

@@ -11,14 +11,49 @@
   imports = [
     ./plugins.nix
     ./functions
+    # ./hooks
   ];
 
   # TODO: add to helix
-  home.packages = with pkgs; [ nufmt ];
+  home.packages = with pkgs; [
+    nufmt
+    nu_scripts # TODO: use
+  ];
+
+  programs.starship.enableNushellIntegration = false;
 
   programs.nushell.configFile.text =
     # nu
     ''
+
+            $env.config = {
+              color_config: {
+                separator: gray
+                search_result: blue_reverse
+                header: green_bold
+                # header: {fg: bold_black bg: cyan}
+                row_index: header
+                bool: { if $in { "green" } else { "red" } }
+                int: blue
+                float: yellow
+                nothing: dark_red
+                # detect anything that looks like a hex color and display that color
+                string: {|| if $in =~ '^#[a-fA-F\d]+' { $in } else { 'default' } }
+              }
+              use_kitty_protocol: true
+              highlight_resolved_externals: true
+              display_errors: {
+                exit_code: true
+              }
+              render_right_prompt_on_last_line: false
+              completions: {
+                algorithm: fuzzy
+              }
+
+            # edit_mode: vi
+            }
+
+
       let mime_to_lang = {
           application/json: json,
           application/xml: xml,
@@ -29,50 +64,36 @@
           text/markdown: markdown,
       }
 
-      $env.config = {
-        color_config: {
-          separator: gray
-          search_result: blue_reverse
-          header: green_bold
-          # header: {fg: bold_black bg: cyan}
-          row_index: header
-          bool: { if $in { "green" } else { "red" } }
-          int: blue
-          float: yellow
-          nothing: dark_red
-          # detect anything that looks like a hex color and display that color
-          string: {|| if $in =~ '^#[a-fA-F\d]+' { $in } else { 'default' } }
-        }
-        ls: { use_ls_colors: true }
-        table: {
-          mode: rounded
-          header_on_separator: true
-        }
-        use_kitty_protocol: true
-        highlight_resolved_externals: true
-        display_errors: {
-          exit_code: true
-        }
-        render_right_prompt_on_last_line: false
-        completions: {
-          algorithm: fuzzy
-        }
       # https://github.com/nushell/nushell/issues/13444#issuecomment-2552671868
-      # $env.config.hooks.display_output = {
-      hooks.display_output = {
-        metadata access {|meta| match $meta.content.type? {
-          null => {}
-          "application/x-nuscript" | "application/x-nuon" | "text/x-nushell" => { nu-highlight },
-          $mimetype if $mimetype in $mime_to_lang => { ${lib.getExe config.programs.bat.package} --plain --paging=never f --language=($mime_to_lang | get $mimetype) },
-          _ => {}
-        }}
-        | if (term.size).columns >= 100 { table --expand } else { table }
+      $env.config.hooks.display_output = {
+          metadata access {|meta| match $meta.content_type? {
+              null => {}
+              "application/x-nuscript" | "application/x-nuon" | "text/x-nushell" => { nu-highlight },
+              $mimetype if $mimetype in $mime_to_lang => { ^bat -Ppf --language=($mime_to_lang | get $mimetype) },
+              _ => {},
+          }}
+          | if (term size).columns >= 100 { table -e } else { table }
       }
 
-      # edit_mode: vi
+      $env.config.show_banner = false
+      $env.config.filesize.metric = true
+      $env.config.color_config.int = { if $in > 0 { "green" } else if $in == 0 { "white" } else { "red" } }
+      $env.config.ls = {
+        clickable_links: true
+        use_ls_colors: true
       }
 
-        
+      $env.config.table = {
+        mode: rounded
+        header_on_separator: true
+      }
+      # TODO: finish this
+      $env.config.hooks.command_not_found = [
+        {|cmd_name|
+        # if you type a git url, then suggest to clone it
+        # git@codeberg.org:kpbaks/permalink-ls.git
+        }
+      ]
     '';
   programs.nushell = {
     enable = true;
@@ -112,8 +133,6 @@
         def --env cdsh [] { cd ~/Pictures/screenshots };
         def --env cddev [] { cd ~/development/own }
 
-        alias lg = ${config.programs.lazygit.package}/bin/lazygit
-
         # https://www.nushell.sh/blog/2024-05-15-bashisms.html
         print "!! - Repeat the last command."
         print "!n - Repeat the nth command from your nushell history."
@@ -123,5 +142,4 @@
       '';
   };
 
-  programs.starship.enableNushellIntegration = false;
 }

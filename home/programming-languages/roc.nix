@@ -1,4 +1,3 @@
-{ pkgs, ... }:
 {
 
   # https://www.nushell.sh/book/externs.html

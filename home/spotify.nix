@@ -34,7 +34,7 @@ in
     builtins.attrValues scripts
     ++ (with pkgs; [
       # spotify-tray
-      spotify-cli-linux
+      # spotify-cli-linux
     ]);
 
   programs.spotify-player.enable = false;
@@ -46,7 +46,7 @@ in
       spicetify-pkgs = inputs.spicetify-nix.legacyPackages.${pkgs.system};
     in
     {
-      enable = true;
+      enable = false;
       enabledExtensions = with spicetify-pkgs.extensions; [
         adblock
         hidePodcasts

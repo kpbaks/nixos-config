@@ -5,6 +5,9 @@
     ./kcms.nix
     ./lsmod.nix
     ./lspath.nix
+    ./iana-media-types.nix
+    ./schemastore.nix
+    ./gcl.nix
     # ./from-mode.nix
   ];
 
@@ -17,6 +20,51 @@
         | parse "{key}: {value}"
         | update value { into int }
         | transpose --as-record --header-row  
+      }
+
+      def "nix config show" [] {
+        # This also shows the default value, and a description of the option
+        # ^nix --extra-experimental-features "nix-command flakes" config show --json | from json
+
+        ^nix --extra-experimental-features "nix-command flakes" config show
+        | lines
+        | parse "{option} = {value}"
+        | update value {
+          match $in {
+            "true" => true,
+            "false" => false,
+            _ => {
+              if $in like '^\d+$' {
+                $in | into int
+              } else if ($in | str contains (char space)) {
+                $in | split row (char space)
+              } else {
+                $in
+              }
+            }
+          }
+        }
+        | transpose --as-record --header-row
+      }
+
+      def "nix registry list" []: nothing -> table<name: string, registry: string, type:string, flakeref: string> {
+        # TODO: add flags to enable experimental features
+        # registry ::= "system" | "global" | "user"
+        ^nix --extra-experimental-features "nix-command flakes" registry list
+        | lines
+        | parse "{registry} flake:{name} {type}:{flakeref}"
+        | move name --before registry
+        | update flakeref {|row| $"($row.type):($row.flakeref)"}
+        | update flakeref { |row|
+          match $row.type {
+            "github" => {
+              let parsed = $row.flakeref | parse "github:{owner}/{repo}"
+              let url = $"https://github.com/($parsed.owner)/($parsed.repo)" 
+              $url | ansi link --text $row.flakeref
+            }
+            _ => $row.flakeref
+          }
+        }
       }
     '';
 }

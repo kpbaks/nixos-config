@@ -65,6 +65,7 @@
   nix.settings.cores = 10; # number of cores per build, think `make -j N`
   nix.settings.max-jobs = 6; # number of builds that can be ran in parallel
   nix.settings.auto-optimise-store = true; # automatically detects files in the store that have identical contents, and replaces them with hard links to a single copy
+  # nix.settings.access-tokens = [ "github.com=" ];
 
   nix.optimise.automatic = true;
   nix.optimise.dates = [ "22:30" ];
@@ -305,9 +306,9 @@
   environment.variables = {
     DIRENV_LOG_FORMAT = ""; # silence `direnv` msgs
     # EDITOR = "hx";
-    EDITOR = pkgs.lib.getExe pkgs.helix;
+    # EDITOR = pkgs.lib.getExe pkgs.helix;
     NIXPKGS_ALLOW_UNFREE = "1";
-    LIBVA_DRIVER_NAME = "iHD";
+    # LIBVA_DRIVER_NAME = "iHD"; # Force intel-media-driver
     # https://jqlang.github.io/jq/manual/#colors
   };
 
@@ -350,7 +351,7 @@
   # Enable the KDE Plasma Desktop Environment.
   # TODO: try out https://github.com/khaneliman/catppuccin-sddm-corners
   services.displayManager.sddm = {
-    enable = true;
+    enable = false;
     # catppuccin.enable = true;
     wayland.enable = true;
     # autoNumlock = true;
@@ -395,14 +396,16 @@
 
   nixpkgs.config.packageOverrides = pkgs: {
     # Needed for `wl-screenrec`
-    intel-vaapi-driver = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
+    # https://github.com/intel/intel-hybrid-driver
+    # `intel-hybrid-driver` is deprecated
+    # intel-vaapi-driver = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
   };
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
     extraPackages = with pkgs; [
       # Needed for `wl-screenrec`
-      intel-media-driver # For Broadwell (2014) or newer processors. LIBVA_DRIVER_NAME=iHD
+      # intel-media-driver # For Broadwell (2014) or newer processors. LIBVA_DRIVER_NAME=iHD
       vpl-gpu-rt
       # intel-vaapi-driver # For older processors. LIBVA_DRIVER_NAME=i965
     ];
@@ -419,10 +422,10 @@
 
   # Enable sound with pipewire.
   # sound.enable = true;
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   nixpkgs.config.pulseaudio = true;
-  hardware.pulseaudio.extraModules = [ pkgs.pulseaudio-modules-bt ];
-  hardware.pulseaudio.package = pkgs.puleaudioFull;
+  services.pulseaudio.extraModules = [ pkgs.pulseaudio-modules-bt ];
+  services.pulseaudio.package = pkgs.puleaudioFull;
 
   security.rtkit.enable = true;
   security.polkit.enable = true;
@@ -504,8 +507,8 @@
 
     # distrobox
     libinput
-    qemu
-    quickemu
+    # qemu
+    # quickemu
     v4l-utils
     edid-decode
     keyd
@@ -664,11 +667,12 @@
   programs.niri.enable = true;
   programs.niri.package = pkgs.niri;
 
-  # services.desktopManager.cosmic.enable = true;
-  # # services.displayManager.cosmic-greeter.enable = true;
+  services.desktopManager.cosmic.enable = true;
+  services.displayManager.cosmic-greeter.enable = true;
   # hardware.system76.power-daemon.enable = true;
   # programs.cosmic.enable = true;
   # programs.niri.package = pkgs.niri-unstable;
+  services.system76-scheduler.enable = true;
 
   programs.river.enable = false;
 
@@ -746,7 +750,9 @@
 
   services.power-profiles-daemon.enable = false;
   powerManagement.enable = true;
-  powerManagement.powertop.enable = true;
+  # Disabled because I used it infrequently, and because it slows down boot time with about 3 seconds.
+  # Use `systemd-analyse` to get start timings of services
+  powerManagement.powertop.enable = false;
 
   # services.tlp.enable = true;
 
@@ -852,7 +858,7 @@
   # };
 
   # needed for `darkman`
-  services.geoclue2.enable = false;
+  # services.geoclue2.enable = false;
   # NOTE: temporary fix reported by: https://github.com/NixOS/nixpkgs/issues/327464
   environment.etc."geoclue/conf.d/.valid".text = ''created the directory.'';
 
@@ -947,7 +953,7 @@
   };
 
   # KDE partition manager
-  programs.partition-manager.enable = true;
+  programs.partition-manager.enable = false;
 
   # programs.regreet.enable = config.services.greetd.enable;
   programs.regreet.enable = false;
@@ -1014,8 +1020,8 @@
   # *** Android ***
   # sudo waydroid upgrade
   # TODO: get this working
-  virtualisation.waydroid.enable = false;
-  programs.adb.enable = true;
+  # virtualisation.waydroid.enable = false;
+  # programs.adb.enable = true;
 
   # TODO: `systemctl status avahi-daemon.service` prints this, fix it (tir 10 sep 17:35:56 CEST 2024)
   # WARNING: No NSS support for mDNS detected, consider installing nss-mdns!
@@ -1025,7 +1031,7 @@
   # TODO: enable if you ever get a device that has this sensor
   # hardware.sensor.iio.enable = false;
 
-  services.vnstat.enable = false;
+  # services.vnstat.enable = false;
 
   # TODO: try this service
   # services.netdata.enable = true;
@@ -1043,33 +1049,33 @@
   # (closed, disconnect-external) => suspend|hibernate
 
   # The lid state of a laptop monitor can be read from the file /proc/acpi/button/lid/*/state
-  services.logind = rec {
-    killUserProcesses = true;
-    powerKey = "hybrid-sleep";
-    powerKeyLongPress = "poweroff";
-    lidSwitchDocked = "ignore";
-    lidSwitch = "suspend";
-    lidSwitchExternalPower = lidSwitch;
+  # services.logind = rec {
+  #   killUserProcesses = true;
+  #   powerKey = "hybrid-sleep";
+  #   powerKeyLongPress = "poweroff";
+  #   lidSwitchDocked = "ignore";
+  #   lidSwitch = "suspend";
+  #   lidSwitchExternalPower = lidSwitch;
 
-    extraConfig = "";
-  };
+  #   extraConfig = "";
+  # };
 
-  services.acpid = {
-    enable = true;
-    logEvents = false;
-    lidEventCommands = '''';
-    # powerEventCommands = ;
-  };
+  # services.acpid = {
+  #   enable = true;
+  #   logEvents = false;
+  #   lidEventCommands = '''';
+  #   # powerEventCommands = ;
+  # };
 
-  services.upower = {
-    enable = true;
-    percentageLow = 10;
-    percentageCritical = 5;
-    criticalPowerAction = "HybridSleep";
-    # ignoreLid = false;
-  };
+  # services.upower = {
+  #   enable = true;
+  #   percentageLow = 10;
+  #   percentageCritical = 5;
+  #   criticalPowerAction = "HybridSleep";
+  #   # ignoreLid = false;
+  # };
 
-  programs.bandwhich.enable = true;
+  programs.bandwhich.enable = false;
 
   services.osquery.enable = false;
   services.osquery.flags = { };
@@ -1092,10 +1098,16 @@
   services.ntfy-sh.enable = false;
   services.ntfy-sh.settings.base-url = "https://ntfy.sh";
 
-  services.cpupower-gui.enable = true;
-  programs.coolercontrol.enable = true;
+  # services.cpupower-gui.enable = true;
+  # programs.coolercontrol.enable = true;
 
   # echo '1' > '/sys/module/snd_hda_intel/parameters/power_save'
   # echo 'enabled' > '/sys/class/net/wlan0/device/power/wakeup'
   # echo 'enabled' > '/sys/bus/usb/devices/4-4.1/power/wakeup'
+  #
+
+  programs.obs-studio = {
+    enable = true;
+    enableVirtualCamera = true;
+  };
 }

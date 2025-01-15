@@ -119,7 +119,7 @@
     # Windows-like panel at the bottom
     {
       location = "bottom";
-      height = 56;
+      height = 52;
       floating = true;
 
       widgets = [
@@ -147,7 +147,7 @@
   programs.plasma.configFile.kwinrc = {
     "org.kde.kdecoration2"."ButtonsOnLeft" = "SF";
     Desktops.Number = {
-      value = 3;
+      value = 4;
       # Forces kde to not change this value (even through the settings app).
       immutable = true;
     };
@@ -163,9 +163,10 @@
     with pkgs.kdePackages;
     [
       neochat
-      klevernotes
+      # klevernotes
       akregator
       kasts
+      merkuro
     ]
     ++ (with pkgs; [
       plasma-panel-colorizer

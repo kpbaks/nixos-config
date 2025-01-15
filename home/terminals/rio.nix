@@ -1,11 +1,11 @@
-{ pkgs, ... }:
+{ config, ... }:
 {
   programs.rio = {
-    enable = true;
+    enable = false;
     # catppuccin.enable = false;
     settings = {
       shell = {
-        program = "${pkgs.fish}/bin/fish";
+        program = "${config.programs.fish.package}/bin/fish";
         args = [ "--login" ];
       };
       editor = {

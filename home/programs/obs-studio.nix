@@ -1,7 +1,7 @@
-{ pkgs, ... }:
+{ osConfig, pkgs, ... }:
 {
 
-  programs.obs-studio.enable = true;
+  programs.obs-studio.enable = osConfig.programs.obs-studio.enable;
   programs.obs-studio.plugins = with pkgs.obs-studio-plugins; [
     # waveform
     wlrobs

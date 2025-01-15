@@ -3,6 +3,7 @@
     ./csharp.nix
     ./cpp.nix
     ./go.nix
+    ./java.nix
     # ./julia.nix
     ./odin.nix
     ./python.nix

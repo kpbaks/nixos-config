@@ -1,4 +1,3 @@
-{ ... }:
 {
   wayland.windowManager.river = {
     # enable = osConfig.programs.river.enable;

@@ -1,4 +1,3 @@
-{ ... }:
 {
   programs.noti.enable = true;
   # TODO: add some services

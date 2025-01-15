@@ -1,7 +1,6 @@
 {
-
   programs.zathura = {
-    enable = true;
+    enable = false;
     mappings = {
       "" = "navigate next";
       # D = "toggle_page_mode";

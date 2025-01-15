@@ -1,8 +1,4 @@
 {
-  config,
-  ...
-}:
-{
 
   # https://alacritty.org/config-alacritty.html
   programs.alacritty =
@@ -14,7 +10,7 @@
       mods = modifiers: builtins.concatStringsSep "|" modifiers;
     in
     {
-      enable = true;
+      enable = false;
       # catppuccin.enable = false;
       settings = {
         bell = {

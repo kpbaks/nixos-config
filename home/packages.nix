@@ -9,6 +9,7 @@
   # TODO: checkout https://github.com/azzamsa/zman
   # TODO: checkout https://github.com/6543/batmon/
   home.packages = with pkgs; [
+    # lutris
     # yazi
     # serial-studio
     net-snmp
@@ -20,28 +21,26 @@
     markdown-oxide
     dive
     # TODO: try out, might be useful for work
-    logstash
-    logstash-contrib
+    # logstash
+    # logstash-contrib
     ripsecrets
     gitleaks
     cfonts
     # zbar # `zbarimg` and `zbarcam`, utilities to work with qr codes
     # nodePackages_latest.fkill-cli
-    tparse
-    rich-cli
-    plocate # Much faster `locate`
-    curlie # prettier alternative to `curl`
+    # tparse
+    # rich-cli
+    # plocate # Much faster `locate`
+    # curlie # prettier alternative to `curl`
     vlc # media player
-    hurl # http request test tool
+    # hurl # http request test tool
     # bruno # non shitty alternative to postman and insomnia
-    droidcam
-    xwayland-satellite
-    speedtest-cli
-    cfspeedtest
-    hut # sourcehut cli
-    tea # gitea cli
-    codeberg-cli
-    eww
+    # speedtest-cli
+    # cfspeedtest
+    # hut # sourcehut cli
+    # tea # gitea cli
+    # codeberg-cli
+    # eww
     ripgrep-all # `rga`
     cmd-wrapped
     # superfile # `spf`
@@ -54,45 +53,43 @@
     xsv
     # kdeplasma-addons
     # davinci-resolve
-    kdenlive
+    # kdenlive
     video-trimmer
-    identity
+    # identity
     # image-analyzer
     # kaf
 
     # gotty
     # gomp # https://github.com/MarkForged/GOMP
-    openjdk
     # qt version recommended if you use kde-plasma
     # https://wiki.nixos.org/wiki/LibreOffice
     libreoffice-qt
     hunspell # https://github.com/hunspell/hunspell
     hunspellDicts.da-dk
     hunspellDicts.en-us
-    onlyoffice-bin
+    # onlyoffice-bin
     desktop-file-utils # https://www.freedesktop.org/wiki/Software/desktop-file-utils/
     vhs
     # ruby_3_3
     swappy
     grim
-    tesseract
+    # tesseract
     legit
-    birdtray
     pstree
     dprint
-    brotab
+    # brotab
     nb
     wl-clipboard
     # wl-clipboard-rs
-    erdtree
-    process-compose # Like `docker-compose` for ordinary processes
+    # erdtree
+    # process-compose # Like `docker-compose` for ordinary processes
     wtype # xdotool for wayland
     # jetbrains-toolbox
     # jetbrains.rider
     # jetbrains.rust-rover
     # jetbrains.clion
     # jetbrains.pycharm-community-bin
-    teams-for-linux
+    # teams-for-linux
     # teams
     # yad
     # zenity
@@ -138,7 +135,7 @@
     # c3c
     # lychee
     # tutanota-desktop
-    localsend # open source alternative to Apple Airdrop
+    # localsend # open source alternative to Apple Airdrop
     # inkscape
     # gimp
     # dogdns # rust alternative to dig
@@ -147,7 +144,7 @@
     # TODO: integrate with `cmake.fish`
     upx
     ripdrag # drag and drop files from the terminal
-    caddy # Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS
+    # caddy # Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS
     # charm-freeze
     pastel
     vivid
@@ -163,8 +160,8 @@
     # macchina # neofetch like program
     # neovim-remote # TODO: create `darkman` script to toggle light/dark mode with `set background=dark`
     lurk # like `strace` but with colors
-    kdiff3
-    meld
+    # kdiff3
+    # meld
     # spotify-player
     # micro
     procs
@@ -185,23 +182,22 @@
     # rofi-emoji-wayland # `rofimoji`
     # rofi-wayland
     pavucontrol # audio sink gui
-    overskride # bluetooth gui
-    wf-recorder # wayland screen recorder
-    wl-screenrec # wayland screen recorder
+    # overskride # bluetooth gui
+    # wf-recorder # wayland screen recorder
+    # wl-screenrec # wayland screen recorder
     # ianny
-    wluma
-    wlsunset # set screen gamma (aka. night light) based on time of day
+    # wluma
+    # wlsunset # set screen gamma (aka. night light) based on time of day
     pdf2svg
     poppler_utils # pdf utilities
     # webcord # fork of discord, with newer electron version, to support screen sharing
     vesktop # Vesktop is a custom Discord App aiming to give you better performance and improve linux support
-    hyprshot # screenshot tool designed to integrate with hyprland
+    hyprshot # screenshot tool defoo to integrate with hyprland
     grim # wayland screenshot tool
     slurp # wayland tool to make a screen selection
     # udiskie # daemon used to automatically mount external drives like USBs
     # flameshot
     brightnessctl # control screen brightness
-    thunderbird # email client
     # discord
     telegram-desktop # messaging client
     # spotify # music player
@@ -222,8 +218,6 @@
     # eww # custom desktop widgets
     htop # system resource monitor
     just # command runner
-    cmake # C/C++ build system generator
-    ninja # small build system with a focus on speed
     # kate # text editor
     duf # disk usage viewer
     du-dust # calculate directory sizes. `du` replacement
@@ -251,10 +245,10 @@
     mpv # media player
     # bitwarden # password manager
     # bitwarden-cli # bitwarden cli
-    pass # password manager
+    # pass # password manager
     pre-commit # git hook manager
     glow # terminal markdown viewer
-    mdcat # terminal markdown viewer
+    # mdcat # terminal markdown viewer
     hyperfine # powerful cli benchmark tool
     # nickel # configuration language
     # nls # nickel language server
@@ -269,7 +263,7 @@
 
     ouch # {,de}compression tool
     # inlyne # markdown viewer
-    web-ext # helper program to build browser extensions and debug instrument firefox
+    # web-ext # helper program to build browser extensions and debug instrument firefox
     # firefox-devedition
 
     # xurls # Extract urls from text
@@ -278,7 +272,7 @@
     # zulip
     # zulip-term
 
-    spacedrive
+    # spacedrive
     typos
     taplo
     harper

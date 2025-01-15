@@ -1,4 +1,3 @@
-{ ... }:
 {
-  programs.ion.enable = true;
+  programs.ion.enable = false;
 }

@@ -8,7 +8,7 @@
       extensions = inputs.nix-vscode-extensions.extensions.${pkgs.system};
     in
     {
-      enable = true;
+      enable = false;
       # package = pkgs.vscode;
       # package = pkgs.vscode.fhs;
       # TODO: override pkgs.vscodium to append flag --disable-workspace-trust

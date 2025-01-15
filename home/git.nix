@@ -1,6 +1,5 @@
 {
   config,
-  lib,
   pkgs,
   ...
 }:
@@ -28,6 +27,8 @@
     git-absorb
     lighttpd # needed by `git instaweb`
     dependabot-cli
+    git-doc
+    sublime-merge
   ];
 
   programs.gh = {
@@ -67,7 +68,8 @@
     extraConfig = {
       help.format = "man";
       help.autoCorrect = "prompt";
-      push.gpgSign = "if-signed"; # "if-signed"
+      push.gpgSign = true;
+      # push.gpgSign = "if-foo"; # "if-foo"
       # sequence.editor = "${lib.getExe pkgs.git-interactive-rebase-tool}";
       init.defaultBranch = "main";
       push.autoSetupRemote = true;
@@ -91,6 +93,9 @@
     };
 
     aliases = {
+      wta = "worktree add";
+      wtl = "worktree list";
+      wtr = "worktree remove";
       unstage = "reset HEAD --";
       # fixup = "!git log -n 50 --pretty=format:'%h %s' --no-merges | fzf | cut -c -7 | xargs -o git commit --fixup"
       # https://jordanelver.co.uk/blog/2020/06/04/fixing-commits-with-git-commit-fixup-and-git-rebase-autosquash/
@@ -163,6 +168,7 @@
     };
   };
 
+  programs.nushell.extraConfig = "alias lg = ${config.programs.lazygit.package}/bin/lazygit";
   programs.jujutsu.enable = true;
   programs.git-credential-oauth.enable = false;
 

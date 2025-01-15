@@ -1,4 +1,3 @@
-{ ... }:
 {
   programs.cava = {
     enable = false;

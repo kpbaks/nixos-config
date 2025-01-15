@@ -5,7 +5,7 @@
     ./atuin.nix
     ./bacon.nix
     ./bat.nix
-    # ./beeper.nix
+    ./beeper.nix
     ./bluetoothctl.nix
     ./broot
     ./carapace.nix
@@ -20,7 +20,7 @@
     ./moar.nix
     ./mpv.nix
     # ./noti.nix
-    ./obs-studio.nix
+    # ./obs-studio.nix
     ./pandoc.nix
     ./pls.nix
     ./ripgrep.nix
@@ -32,8 +32,9 @@
     # ./swaylock.nix
     ./tealdeer.nix
     # ./wlogout.nix
+    ./wl-screenrec.nix
     ./yt-dlp.nix
-    ./zathura.nix
+    # ./zathura.nix
     # ./yazi
     ./zellij.nix
     ./zoxide.nix
@@ -41,7 +42,7 @@
     ./imhex.nix
     ./signal.nix
     ./lla.nix
-    # ./television.nix
+    ./television.nix
     # ./qownnotes.nix
   ];
 }

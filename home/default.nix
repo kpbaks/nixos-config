@@ -77,7 +77,7 @@
     enableBashIntegration = true;
   };
 
-  services.network-manager-applet.enable = true;
+  services.network-manager-applet.enable = false;
 
   gtk.enable = true;
 
@@ -127,10 +127,22 @@
 
   programs.openscad.enable = true; # custom-modules/openscad.nix
 
+  # custom-modules/gitu.nix
   programs.gitu = {
     enable = true;
     settings = {
       general.show_help.enabled = true;
     };
+  };
+
+  programs.nix-your-shell.enable = true;
+
+  programs.kubecolor = {
+    enable = false;
+    enableAlias = true;
+  };
+
+  programs.cavalier = {
+    enable = true;
   };
 }

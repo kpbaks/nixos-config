@@ -16,6 +16,7 @@
       "https://yazi.cachix.org"
       "https://cosmic.cachix.org/"
       "https://cache.garnix.io" # used by `ironbar`
+      "https://watersucks.cachix.org"
     ];
     extra-trusted-public-keys = [
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
@@ -26,6 +27,7 @@
       "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
       "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE="
       "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
+      "watersucks.cachix.org-1:6gadPC5R8iLWQ3EUtfu3GFrVY7X6I4Fwz/ihW25Jbv8="
     ];
   };
 
@@ -33,11 +35,14 @@
   inputs.fh.url = "https://flakehub.com/f/DeterminateSystems/fh/*.tar.gz";
 
   inputs.impermanence.url = "github:nix-community/impermanence";
-  inputs.zen-browser.url = "github:MarceColl/zen-browser-flake";
+  inputs.zen-browser.url = "github:youwen5/zen-browser-flake";
   inputs.zen-browser.inputs.nixpkgs.follows = "nixpkgs";
 
   inputs.darkly.url = "github:Bali10050/Darkly";
   inputs.darkly.inputs.nixpkgs.follows = "nixpkgs";
+
+  inputs.steel.url = "github:mattwparas/steel";
+  inputs.steel.inputs.nixpkgs.follows = "nixpkgs";
 
   inputs.television.url = "github:alexpasmantier/television";
   inputs.television.inputs.nixpkgs.follows = "nixpkgs";
@@ -347,6 +352,13 @@
           # }
           inputs.niri.nixosModules.niri
           inputs.nixos-cli.nixosModules.nixos-cli
+          {
+            services.nixos-cli = {
+              enable = true;
+              # use_nvd = true;
+              # apply.use_nom = true;
+            };
+          }
           inputs.catppuccin.nixosModules.catppuccin
           { environment.systemPackages = [ inputs.nix-weather.packages.${system}.nix-weather ]; }
           # { environment.systemPackages = [ inputs.fh.packages.${system}.default ]; }
@@ -433,7 +445,8 @@
             inputs.nix-index-database.hmModules.nix-index
             # optional to also wrap and install comma
             { programs.nix-index-database.comma.enable = true; }
-            # { home.packages = [ inputs.zen-browser.packages.${system}.default ]; }
+            { home.packages = [ inputs.zen-browser.packages.${system}.default ]; }
+            { home.packages = [ inputs.steel.packages.${system}.default ]; }
           ];
         };
       };

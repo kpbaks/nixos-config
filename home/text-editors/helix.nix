@@ -14,6 +14,11 @@ let
     rev = "ef46edd0c03ea30a22f7e92bc68628fb7231dc8a";
     hash = "sha256-H76cnMlBT1Z/9WXAdoVslImkyy38uCqum9qEnH+Ics8=";
   };
+  left-bracket = command: [
+    command
+    "align_view_center"
+  ];
+  right-bracket = left-bracket;
 in
 {
 
@@ -41,11 +46,15 @@ in
       python3Packages.python-lsp-ruff
 
       lua-language-server
+      sonarlint-ls
+
       stylua
       selene
       harper
       scls
       nls
+      mdformat
+      python313Packages.mdformat-tables
     ];
 
     ignores = [
@@ -60,21 +69,31 @@ in
       # theme = "ao";
       # theme = "pop-dark";
       # theme = "tokyonight";
-      theme = "gruvbox_dark_hard";
+      # theme = "gruvbox_dark_hard";
+      theme = "kanagawa";
+      # theme = "kaolin-dark";
       # theme = "gruber-darker";
       editor = {
         cursorline = true;
         line-number = "relative";
-        lsp.display-messages = true;
-        lsp.auto-signature-help = true;
-        lsp.display-inlay-hints = true;
-        lsp.snippets = true;
-        lsp.display-signature-help-docs = true;
+        continue-comments = true;
+        lsp = {
+          display-messages = true;
+          display-progress-messages = true;
+          auto-signature-help = true;
+          display-inlay-hints = true;
+          snippets = true;
+          display-signature-help-docs = true;
+        };
+        auto-save = {
+          focus-lost = true;
+        };
         completion-trigger-len = 1;
         idle-timeout = 50; # ms
         auto-info = true;
         auto-format = true;
         undercurl = true;
+
         mouse = true;
         preview-completion-insert = true;
         color-modes = true;
@@ -107,7 +126,7 @@ in
         indent-guides = {
           render = true;
           character = "╎";
-          skip-levels = 1;
+          skip-levels = 0;
         };
         statusline = {
           separator = "│";
@@ -144,29 +163,27 @@ in
           wrap-around = true;
         };
       };
-      keys.insert = {
-        C-space = "signature_help";
-      };
+      # keys.insert = {
+      #   C-space = "signature_help";
+      # };
       keys.normal = {
+
+        # ret = [ "select_references_to_symbol_under_cursor" ];
         # y.d = [ ":yank-diagnostic" ];
         #
-        up = "select_textobject_inner";
-        down = "select_textobject_around";
-        left = "@[";
-        right = "@]";
-        ret = [
-          "open_below"
-          "normal_mode"
-        ];
+        # up = "select_textobject_inner";
+        # down = "select_textobject_around";
+        # left = "@[";
+        # right = "@]";
         D = [
           "select_mode"
           "goto_line_end"
           "delete_selection"
         ];
-        H = [
-          "goto_line_start"
-          "goto_first_nonwhitespace"
-        ];
+        # H = [
+        #   "goto_line_start"
+        #   "goto_first_nonwhitespace"
+        # ];
         Y = [
           "save_selection"
           "select_mode"
@@ -174,18 +191,18 @@ in
           "yank"
           "jump_backward"
         ]; # Similar to Y in nvim
-        w = [
-          "move_prev_word_start"
-          # "select_textobject_inner",
-          # "w",
-          "move_next_word_start"
-        ];
-        W = [
-          "move_prev_long_word_start"
-          # "select_textobject_inner",
-          # "w",
-          "move_next_long_word_start"
-        ];
+        # w = [
+        #   "move_prev_word_start"
+        #   # "select_textobject_inner",
+        #   # "w",
+        #   "move_next_word_start"
+        # ];
+        # W = [
+        #   "move_prev_long_word_start"
+        #   # "select_textobject_inner",
+        #   # "w",
+        #   "move_next_long_word_start"
+        # ];
 
         "*" = [
           "move_char_right"
@@ -195,46 +212,46 @@ in
           "make_search_word_bounded"
           "search_next"
         ];
-        "#" = [ "toggle_comments" ];
-        # "#" = [
-        #   "move_char_right"
-        #   "move_prev_word_start"
-        #   "move_next_word_end"
-        #   "search_selection"
-        #   "make_search_word_bounded"
-        #   "search_prev"
+        "#" = [
+          "move_char_right"
+          "move_prev_word_start"
+          "move_next_word_end"
+          "search_selection"
+          "make_search_word_bounded"
+          "search_prev"
+        ];
+        # A-down = [
+        #   "extend_to_line_bounds"
+        #   "yank"
+        #   "delete_selection"
+        #   "move_line_down"
+        #   "paste_before"
         # ];
-        A-down = [
-          "extend_to_line_bounds"
-          "yank"
-          "delete_selection"
-          "move_line_down"
-          "paste_before"
-        ];
-        A-j = [
-          "extend_to_line_bounds"
-          "yank"
-          "delete_selection"
-          "move_line_down"
-          "paste_before"
-        ];
-        A-up = [
-          "extend_to_line_bounds"
-          "yank"
-          "delete_selection"
-          "move_line_up"
-          "paste_before"
-        ];
-        A-k = [
-          "extend_to_line_bounds"
-          "yank"
-          "delete_selection"
-          "move_line_up"
-          "paste_before"
-        ];
+        # A-j = [
+        #   "extend_to_line_bounds"
+        #   "yank"
+        #   "delete_selection"
+        #   "move_line_down"
+        #   "paste_before"
+        # ];
+        # A-up = [
+        #   "extend_to_line_bounds"
+        #   "yank"
+        #   "delete_selection"
+        #   "move_line_up"
+        #   "paste_before"
+        # ];
+        # A-k = [
+        #   "extend_to_line_bounds"
+        #   "yank"
+        #   "delete_selection"
+        #   "move_line_up"
+        #   "paste_before"
+        # ];
 
         space.space = "last_picker";
-        space.w = ":w";
+        # space.w = ":w";
+        space.w = ":update";
         C-s = ":w";
         # C-s = [
         #   "select_all"
@@ -243,7 +260,7 @@ in
         # ];
         space.q = ":buffer-close";
         space.Q = ":buffer-close-others";
-        C-q = ":q";
+        C-q = ":quit";
         space.p = "paste_clipboard_before"; # I like <space>P more as the default
         # space.n = ":set-option line-number absolute";
         space.N = ":set-option line-number relative";
@@ -282,8 +299,13 @@ in
         C-end = "goto_file_end";
         C-pageup = "goto_previous_buffer";
         C-pagedown = "goto_next_buffer";
+
+        space."." = "code_action";
+        "C-." = "code_action";
+
         g = {
           a = "code_action"; # `ga` -> show possible code actions
+          A = ":lsp-workspace-command";
           q = ":reflow";
           Y = [
             "extend_line_below"
@@ -311,22 +333,48 @@ in
           down = "jump_view_down";
 
           # "~" = "switch_case"
-          u = "switch_to_lowercase";
-          U = "switch_to_uppercase";
+          # u = "switch_to_lowercase";
+          # U = "switch_to_uppercase";
         };
-        "[".b = ":buffer-previous";
-        "]".b = ":buffer-next";
+        "[" = builtins.mapAttrs (_: command: left-bracket command) {
+          b = ":buffer-previous";
+          d = "goto_prev_diag";
+          D = "goto_first_diag";
+          g = "goto_prev_change";
+          G = "goto_first_change";
+          f = "goto_prev_function";
+          t = "goto_prev_class";
+          a = "goto_prev_parameter";
+          c = "goto_prev_comment";
+          e = "goto_prev_entry";
+          T = "goto_prev_test";
+          p = "goto_prev_paragraph";
+        };
+        "]" = builtins.mapAttrs (_: command: right-bracket command) {
+          b = ":buffer-next";
+          d = "goto_next_diag";
+          D = "goto_last_diag";
+          g = "goto_next_change";
+          G = "goto_last_change";
+          f = "goto_next_function";
+          t = "goto_next_class";
+          a = "goto_next_parameter";
+          c = "goto_next_comment";
+          e = "goto_next_entry";
+          T = "goto_next_test";
+          p = "goto_next_paragraph";
+        };
       };
       keys.select = {
-        A-x = "extend_to_line_bounds";
+        # A-x = "extend_to_line_bounds";
         X = [
           "extend_line_up"
           "extend_to_line_bounds"
         ];
-        g = {
-          u = "switch_to_lowercase";
-          U = "switch_to_uppercase";
-        };
+        # g = {
+        #   u = "switch_to_lowercase";
+        #   U = "switch_to_uppercase";
+        # };
       };
     };
 
@@ -382,6 +430,10 @@ in
         args = [ "lsp" ];
       };
 
+      language-server.sonarlint-ls = {
+        command = "${lib.getExe pkgs.sonarlint-ls}";
+      };
+
       language =
         let
           indent = {
@@ -397,8 +449,26 @@ in
               "marksman"
               "harper-ls"
             ];
-            file-types = [ "qmd" ];
-            formatter.command = "${pkgs.mdformat}/bin/mdformat";
+            file-types = [
+              "qmd" # to quarto langauge yet
+              "md"
+              "livemd"
+              "markdown"
+              "mdx"
+              "mkd"
+              "mkdn"
+              "mdwn"
+              "mdown"
+              "markdn"
+              "mdtxt"
+              "mdtext"
+              "workbook"
+              { glob = "PULLREQ_EDITMSG"; }
+            ];
+            formatter = {
+              command = "${pkgs.mdformat}/bin/mdformat";
+              args = [ "-" ];
+            };
           }
           {
             name = "bash";
@@ -434,9 +504,16 @@ in
             file-types = [ "fish" ];
           }
           {
+            name = "java";
+            auto-format = true;
+            language-servers = [
+              "jdtls"
+              "sonarlint-ls" # TODO: test it works
+            ];
+          }
+          {
             name = "json";
             auto-format = true;
-            file-types = [ ".spacedrive" ];
             formatter = {
               command = "${pkgs.jaq}/bin/jaq";
               args = [ "." ];
@@ -510,6 +587,7 @@ in
     };
   };
 
+  # TODO: test this actually runs on a rebuild
   home.activation.fetch-and-build-grammars =
     let
       hx = "${config.programs.helix.package}/bin/hx";

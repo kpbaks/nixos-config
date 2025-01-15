@@ -1,5 +1,3 @@
-{ ... }:
 {
-
   programs.kakoune.enable = true;
 }
