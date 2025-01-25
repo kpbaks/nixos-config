@@ -22,7 +22,7 @@ in
       # inputs.hyprland-plugins.packages.${pkgs.system}.hyprexpo
     ];
     settings.exec-once = [
-      "${pkgs.hyprpanel}/bin/hyprpanel"
+      # "${pkgs.hyprpanel}/bin/hyprpanel"
     ];
     extraConfig =
       # hyprconf
@@ -298,7 +298,7 @@ in
   home.packages = with pkgs; [
     hyprlock # wayland screen lock
     hypridle # hyprlands idle daemon
-    hyprpanel
+    # hyprpanel
   ];
 
   xdg.configFile."hypr/hypridle.conf".text =

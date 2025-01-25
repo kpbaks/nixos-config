@@ -1,7 +1,7 @@
 { pkgs, ... }:
 {
   services.dunst = {
-    enable = false;
+    enable = true;
     # catppuccin.enable = false;
     settings = {
       global = {

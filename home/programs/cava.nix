@@ -1,8 +1,8 @@
 {
   programs.cava = {
-    enable = false;
+    enable = true;
     # catppuccin.enable = false;
-    catppuccin.transparent = true;
+    # catppuccin.transparent = true;
     settings = {
       general.framerate = 60;
       general.sleep_timer = 3;

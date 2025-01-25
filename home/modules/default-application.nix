@@ -1,4 +1,9 @@
-{ config, pkgs, ... }:
+{
+  config,
+  inputs,
+  pkgs,
+  ...
+}:
 {
   options.default-application =
     let
@@ -7,6 +12,7 @@
     in
     {
       terminal = package;
+      browser = package;
     };
   config.default-application = {
     # terminal = pkgs.kitty;
@@ -16,5 +22,6 @@
     # terminal = config.programs.foot.package;
     # terminal = config.programs.alacritty.package;
     terminal = pkgs.ghostty;
+    browser = inputs.zen-browser.packages.${pkgs.system}.default;
   };
 }

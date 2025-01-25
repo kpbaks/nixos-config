@@ -1,45 +1,39 @@
 {
   config,
-  osConfig,
   pkgs,
   inputs,
   ...
 }:
 {
   imports = [
-    ./modules
-    ./programs
-    ./services
     ./bars
     ./browsers
+    ./calendar.nix
     ./custom-modules
+    ./desktop-environments
+    ./email.nix
+    ./environment-variables.nix
+    ./fonts.nix
+    ./git.nix
+    ./kde-plasma
     ./launchers
+    ./modules
+    # ./nixvim.nix
     ./notification-daemons
+    ./packages.nix
+    ./pgp.nix
     ./programming-languages
     ./programs
     ./scripts
     ./services
     ./shells
+    ./spotify.nix
     ./terminals
     ./text-editors
-    ./wms
-    ./desktop-environments
     ./vcs
-    ./packages.nix
-    ./kde-plasma
-    ./nixvim.nix
-    ./git.nix
-    # ./mercurial.nix
+    ./wms
     ./xdg
-    ./email.nix
-    ./calendar.nix
-    ./spotify.nix
-    ./environment-variables.nix
-    ./fonts.nix
-    ./pgp.nix
   ];
-
-  home.enableDebugInfo = false;
 
   # TODO: set up `localsend` service to start in background
   # TODO: add home-manager support to nixd
@@ -103,7 +97,7 @@
   # qt.style.name = "kvantum";
   # qt.platformTheme.name = "kvantum";
   # qt.style.catppuccin.enable = false;
-  catppuccin.kvantum.enable = false;
+  # catppuccin.kvantum.enable = false;
   # qt.style.name = "breeze";
   # qt.platformTheme.name = "kde";
 
@@ -142,7 +136,5 @@
     enableAlias = true;
   };
 
-  programs.cavalier = {
-    enable = true;
-  };
+  programs.cavalier.enable = false;
 }

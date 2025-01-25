@@ -10,7 +10,7 @@
       mods = modifiers: builtins.concatStringsSep "|" modifiers;
     in
     {
-      enable = false;
+      enable = true;
       # catppuccin.enable = false;
       settings = {
         bell = {

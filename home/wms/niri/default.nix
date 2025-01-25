@@ -27,11 +27,11 @@
         in
         lib.strings.toUpper firstchar + lib.strings.toLower rest;
 
-      catppuccin-cursor =
-        let
-          variant = "${config.catppuccin.flavor}${title-case-word config.catppuccin.accent}";
-        in
-        catppuccin-cursors.${variant};
+      # catppuccin-cursor =
+      #   let
+      #     variant = "${config.catppuccin.flavor}${title-case-word config.catppuccin.accent}";
+      #   in
+      #   catppuccin-cursors.${variant};
 
     in
     [
@@ -44,7 +44,7 @@
       wlr-randr
       wlr-layout-ui
       # pkgs.catppuccin-fcitx5
-      catppuccin-cursor
+      # catppuccin-cursor
       # pkgs.catppuccin-cursors.${config.}
       # xwayland-satellite-nixpkgs
       # xwayland-satellite-unstable
@@ -118,11 +118,11 @@
     default-column-width.proportion = 1.0 / 2.0;
     # default-column-width.proportion = 2.0 / 3.0;
     # default-column-width = {proportion = 1.0;};
-    focus-ring = with config.flavor; {
+    focus-ring = {
       enable = true;
       width = 4;
-      active.color = lavender.hex;
-      inactive.color = flamingo.hex;
+      # active.color = lavender.hex;
+      # inactive.color = flamingo.hex;
       # active.gradient = {
       #   from = "#80c8ff";
       #   to = "#d3549a";

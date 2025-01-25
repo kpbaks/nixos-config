@@ -2,7 +2,7 @@
   # TODO(package):
   # - https://github.com/siddrs/tokyo-night-sddm
 
-  description = "@kpbaks' NixOS configuration";
+  description = "@kpbaks' NixOS and home-manager configuration";
 
   # TODO(learn): what is the difference between `*` and `extra-*` options?
   nixConfig = {
@@ -127,7 +127,6 @@
 
     hyprspace = {
       url = "github:KZDKM/Hyprspace";
-
       # Hyprspace uses latest Hyprland. We declare this to keep them in sync.
       inputs.hyprland.follows = "hyprland";
     };
@@ -138,14 +137,10 @@
     #   inputs.hyprland.follows = "hyprland"; # IMPORTANT
     # };
 
-    # TODO: use
-    # nur.url = "github:nix-community/NUR";
-
     helix = {
       url = "github:helix-editor/helix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
     simple-completion-language-server = {
       url = "github:estin/simple-completion-language-server";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -247,7 +242,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  inputs.hyprpanel.url = "github:Jas-SinghFSU/HyprPanel";
+  # inputs.hyprpanel.url = "github:Jas-SinghFSU/HyprPanel";
+  #
+  #
+  # inputs.crates-lsp.url = "github:kpbaks/crates-lsp/feature/flake";
+  # inputs.crates-lsp.url = "/home/kpbaks/development/forks/crates-lsp";
 
   outputs =
     {
@@ -260,30 +259,28 @@
       hostname = "nixos";
       username = "kpbaks";
       system = "x86_64-linux";
-      used-systems = [ "x86_64-linux" ];
-      for-all-systems = nixpkgs.lib.genAttrs used-systems;
+      for-all-systems = nixpkgs.lib.genAttrs [ system ];
+      overlays = [
+        inputs.rust-overlay.overlays.default
+        # inputs.hyprpanel.overlay
+        (final: prev: { ghostty = inputs.ghostty.packages.${system}.default; })
+        # inputs.wired-notify.overlays.default
+        inputs.niri.overlays.niri
+        (final: prev: { woomer = inputs.woomer.packages.${system}.default; })
+        inputs.swww.overlays.default
+        # (final: prev: { swww = inputs.swww.packages.${prev.system}.swww; })
+        # (final: prev: { zjstatus = inputs.zjstatus.packages.${prev.system}.default; })
+        inputs.yazi.overlays.default
+        (final: prev: { television = inputs.television.packages.${prev.system}.default; })
+        # inputs.neovim-nightly-overlay.overlay
+      ];
 
       pkgs = import nixpkgs {
-        inherit system;
-        overlays = [
-          inputs.rust-overlay.overlays.default
-          inputs.hyprpanel.overlay
-          (final: prev: { ghostty = inputs.ghostty.packages.${system}.default; })
-          # inputs.rust-overlay.overlays.default
-          # inputs.wired-notify.overlays.default
-          inputs.niri.overlays.niri
-          (final: prev: { woomer = inputs.woomer.packages.${system}.default; })
-          inputs.swww.overlays.default
-          # (final: prev: { swww = inputs.swww.packages.${prev.system}.swww; })
-          (final: prev: { zjstatus = inputs.zjstatus.packages.${prev.system}.default; })
-          inputs.yazi.overlays.default
-          (final: prev: { television = inputs.television.packages.${prev.system}.default; })
-          # inputs.neovim-nightly-overlay.overlay
-        ];
+        inherit system overlays;
         config.allowUnfree = true;
+        config.allowBroken = false;
       };
     in
-    # pkgs = nixpkgs.legacyPackages.${system};
     {
       formatter.${system} = pkgs.nixfmt-rfc-style;
 
@@ -291,7 +288,6 @@
         pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
           src = ./.;
           hooks = {
-            # nixpkgs-fmt.enable = true;
             nixfmt-rfc-style.enable = true;
             # deadnix.enable = true;
             flake-checker.enable = true;
@@ -300,6 +296,7 @@
             check-json.enable = true;
             check-yaml.enable = true;
             lychee.enable = true;
+            # trufflehog.enable = true;
           };
         };
       });
@@ -351,8 +348,8 @@
           #   environment.systemPackages = [ inputs.agenix.packages.${system}.default ];
           # }
           inputs.niri.nixosModules.niri
-          inputs.nixos-cli.nixosModules.nixos-cli
           {
+            imports = [ inputs.nixos-cli.nixosModules.nixos-cli ];
             services.nixos-cli = {
               enable = true;
               # use_nvd = true;
@@ -360,12 +357,16 @@
             };
           }
           inputs.catppuccin.nixosModules.catppuccin
-          { environment.systemPackages = [ inputs.nix-weather.packages.${system}.nix-weather ]; }
+          # { environment.systemPackages = [ inputs.nix-weather.packages.${system}.nix-weather ]; }
           # { environment.systemPackages = [ inputs.fh.packages.${system}.default ]; }
 
-          inputs.nixos-cosmic.nixosModules.default
           {
+            imports = [
+              inputs.nixos-cosmic.nixosModules.default
+            ];
             services.desktopManager.cosmic.enable = true;
+            services.displayManager.cosmic-greeter.enable = true;
+
             # services.displayManager.cosmic-greeter.enable = true;
           }
           # inputs.nixos-hardware.nixosModules.tuxedo-infinitybook-pro14-gen7
@@ -386,7 +387,7 @@
         "${username}@${hostname}" = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = {
-            inherit inputs username system;
+            inherit inputs username;
           };
           modules = [
             ./home
@@ -404,30 +405,27 @@
               nixpkgs.config.permittedInsecurePackages = [
                 "olm-3.2.16"
                 "electron-27.3.11"
-                # "electron-29.4.6"
-                # "electron-28.3.3" # needed for `logseq` 05-07-2024
-                # "electron-27.3.11"
               ];
             }
-            (
-              { config, ... }:
-              let
-                cfg = config.catppuccin;
-              in
-              {
-                imports = [ inputs.catppuccin.homeManagerModules.catppuccin ];
-                config.catppuccin.enable = true; # Enable for all available programs you're using!
-                config.catppuccin.flavor = "mocha";
-                config.catppuccin.accent = "lavender";
+            # (
+            #   { config, ... }:
+            #   let
+            #     cfg = config.catppuccin;
+            #   in
+            #   {
+            #     imports = [ inputs.catppuccin.homeManagerModules.catppuccin ];
+            #     config.catppuccin.enable = true; # Enable for all available programs you're using!
+            #     config.catppuccin.flavor = "mocha";
+            #     config.catppuccin.accent = "lavender";
 
-                options.flavor = pkgs.lib.mkOption { type = pkgs.lib.types.attrs; };
+            #     options.flavor = pkgs.lib.mkOption { type = pkgs.lib.types.attrs; };
 
-                config.flavor = pkgs.lib.mkIf cfg.enable (
-                  (pkgs.lib.importJSON (config.catppuccin.sources.palette + "/palette.json"))
-                  .${config.catppuccin.flavor}.colors
-                );
-              }
-            )
+            #     config.flavor = pkgs.lib.mkIf cfg.enable (
+            #       (pkgs.lib.importJSON (config.catppuccin.sources.palette + "/palette.json"))
+            #       .${config.catppuccin.flavor}.colors
+            #     );
+            #   }
+            # )
             # {
             #   imports = [ inputs.stylix.homeManagerModules.stylix ];
             #   stylix.enable = false;
@@ -442,11 +440,15 @@
             #   };
             # }
 
-            inputs.nix-index-database.hmModules.nix-index
-            # optional to also wrap and install comma
-            { programs.nix-index-database.comma.enable = true; }
+            {
+              imports = [
+                inputs.nix-index-database.hmModules.nix-index
+              ];
+              programs.nix-index-database.comma.enable = true;
+            }
             { home.packages = [ inputs.zen-browser.packages.${system}.default ]; }
             { home.packages = [ inputs.steel.packages.${system}.default ]; }
+            # { home.packages = [ inputs.crates-lsp.packages.${system}.default ]; }
           ];
         };
       };

@@ -11,6 +11,7 @@ let
     pkgs.writers.writeFishBin "spotify-cover-art" { }
       # fish
       ''
+        # TODO: is there a package in osConfig we can refer to instead?
         set -l cdn (${pkgs.playerctl}/bin/playerctl -p spotify metadata mpris:artUrl)
         if test -z $cdn
           # spotify not running
@@ -30,12 +31,10 @@ in
 {
   imports = [ inputs.spicetify-nix.homeManagerModules.default ];
 
-  home.packages =
-    builtins.attrValues scripts
-    ++ (with pkgs; [
-      # spotify-tray
-      # spotify-cli-linux
-    ]);
+  home.packages = with pkgs; [
+    spotify
+    scripts.spotify-cover-art
+  ];
 
   programs.spotify-player.enable = false;
   services.spotifyd.enable = false;

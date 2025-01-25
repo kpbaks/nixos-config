@@ -1,7 +1,7 @@
 { config, ... }:
 {
   programs.rio = {
-    enable = false;
+    enable = true;
     # catppuccin.enable = false;
     settings = {
       shell = {

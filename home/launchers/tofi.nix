@@ -1,6 +1,6 @@
 {
   programs.tofi = {
-    enable = false;
+    enable = true;
     settings = {
       width = "100%";
       height = "100%";

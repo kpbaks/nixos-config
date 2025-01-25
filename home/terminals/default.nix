@@ -1,11 +1,12 @@
 {
   imports = [
-    ./alacritty.nix
+    # ./alacritty.nix
     ./kitty
-    ./rio.nix
-    ./wezterm.nix
-    ./foot.nix
-    ./gnome-terminal.nix
+    # ./rio.nix
+    # ./wezterm.nix
+    # ./foot.nix
+    # ./gnome-terminal.nix
     ./ghostty.nix
+    # ./ptyxis.nix
   ];
 }

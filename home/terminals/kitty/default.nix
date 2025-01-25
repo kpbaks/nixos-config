@@ -1,6 +1,6 @@
 # TODO: try out https://www.reddit.com/r/KittyTerminal/comments/1g7vkwt/neovide_like_cursor_animation_in_kitty_terminal/
 { config, pkgs, ... }:
-with config.flavor;
+# with config.flavor;
 {
   home.packages = with pkgs; [
 
@@ -77,7 +77,7 @@ with config.flavor;
       enable_audio_bell = false;
       bell_on_tab = "🔔 ";
       visual_bell_duration = "2.0 ease-in linear";
-      visual_bell_color = red.hex;
+      # visual_bell_color = red.hex;
       update_check_interval = 0;
       sync_to_monitor = true; # sync frame-rate to match with monitor
       window_alert_on_bell = "yes";
@@ -104,7 +104,7 @@ with config.flavor;
       allow_hyperlinks = "yes";
       # TODO: use catppuccin color
       # url_color = "#0087bd";
-      url_color = sky.hex;
+      # url_color = sky.hex;
       # url_style = "curly";
       url_style = "dotted";
       open_url_with = "default";
@@ -138,8 +138,8 @@ with config.flavor;
       # TODO: use catppuccin color
       # https://sw.kovidgoyal.net/kitty/conf/#opt-kitty.tab_title_template
       tab_title_template = "{fmt.fg.red}{bell_symbol} {activity_symbol}{fmt.fg.tab}{title}";
-      tab_bar_background = surface0.hex;
-      tab_bar_margin_color = flamingo.hex;
+      # tab_bar_background = surface0.hex;
+      # tab_bar_margin_color = flamingo.hex;
     };
     shellIntegration.mode = "no-cursor";
     shellIntegration.enableFishIntegration = true;
@@ -207,7 +207,7 @@ with config.flavor;
       action launch --type=os-window --cwd -- $FILE_PATH
     '';
 
-  # pkgs.stdenv.isDarwin 
+  # pkgs.stdenv.isDarwin
   # TODO: only applicable for macOS
   # https://sw.kovidgoyal.net/kitty/open_actions/#scripting-the-opening-of-files-with-kitty-on-macos
   xdg.configFile."kitty/launch-actions.conf".text =

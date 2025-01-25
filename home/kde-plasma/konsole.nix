@@ -5,22 +5,23 @@
   ...
 }:
 let
-  catppuccin-konsole = pkgs.fetchFromGitHub {
-    owner = "catppuccin";
-    repo = "konsole";
-    rev = "3b64040e3f4ae5afb2347e7be8a38bc3cd8c73a8";
-    hash = "sha256-d5+ygDrNl2qBxZ5Cn4U7d836+ZHz77m6/yxTIANd9BU=";
-  };
+  # catppuccin-konsole = pkgs.fetchFromGitHub {
+  #   owner = "catppuccin";
+  #   repo = "konsole";
+  #   rev = "3b64040e3f4ae5afb2347e7be8a38bc3cd8c73a8";
+  #   hash = "sha256-d5+ygDrNl2qBxZ5Cn4U7d836+ZHz77m6/yxTIANd9BU=";
+  # };
 
-  user-defined-stylesheet-path = "konsole/stylesheets/default.css"; # relative to ~/.config/
 in
+# user-defined-stylesheet-path = "konsole/stylesheets/default.css"; # relative to ~/.config/
 {
   programs.konsole.enable = true;
   programs.konsole.defaultProfile = "Personal";
 
   programs.konsole.profiles.Personal = {
-    command = "${pkgs.fish}/bin/fish";
-    colorScheme = "catppuccin-${config.catppuccin.flavor}";
+    command = "${config.programs.fish.package}/bin/fish";
+    # command = "${pkgs.fish}/bin/fish";
+    # colorScheme = "catppuccin-${config.catppuccin.flavor}";
     font = {
       name = "JetBrainsMono Nerd Font Mono";
       size = 14;
@@ -52,54 +53,54 @@ in
         ExpandTabWidth = true;
         TabBarUseUserStyleSheet = true;
         # TabBarUserStyleSheetFile = "file:///home/kpbaks/Desktop/foo.css";
-        TabBarUserStyleSheetFile = "file://${config.xdg.configHome}/${user-defined-stylesheet-path}";
+        # TabBarUserStyleSheetFile = "file://${config.xdg.configHome}/${user-defined-stylesheet-path}";
       };
     };
   };
 
-  programs.konsole.customColorSchemes =
-    lib.pipe
-      [
-        "frappe"
-        "mocha"
-        "latte"
-        "macchiato"
-      ]
-      [
-        (map (theme: "catppuccin-${theme}"))
-        (map (name: {
-          inherit name;
-          # value = /. + "${catppuccin-konsole}/themes/${name}.colorscheme";
-          value = "${catppuccin-konsole}/themes/${name}.colorscheme";
-        }))
-        builtins.listToAttrs
-      ];
+  # programs.konsole.customColorSchemes =
+  #   lib.pipe
+  #     [
+  #       "frappe"
+  #       "mocha"
+  #       "latte"
+  #       "macchiato"
+  #     ]
+  #     [
+  #       (map (theme: "catppuccin-${theme}"))
+  #       (map (name: {
+  #         inherit name;
+  #         # value = /. + "${catppuccin-konsole}/themes/${name}.colorscheme";
+  #         # value = "${catppuccin-konsole}/themes/${name}.colorscheme";
+  #       }))
+  #       builtins.listToAttrs
+  #     ];
 
   # xdg.configFile."konsole/stylesheets/default.css".text = # css
   # TODO: use catppuccin colors and jetbrains mono font
-  xdg.configFile.${user-defined-stylesheet-path}.text = # css
-    ''
-      QTabBar {
-        background: #EFF0F1;
-        padding-bottom: 10px;
-      }
+  # xdg.configFile.${user-defined-stylesheet-path}.text = # css
+  #   ''
+  #     QTabBar {
+  #       background: #EFF0F1;
+  #       padding-bottom: 10px;
+  #     }
 
-      QTabBar::tab {
-        background: #ff0000;
-        padding: 18px;
-        border-bottom: 2px solid transparent;
+  #     QTabBar::tab {
+  #       background: #ff0000;
+  #       padding: 18px;
+  #       border-bottom: 2px solid transparent;
 
-        font-size: 14px;
-        color: #31363B;
-      }
+  #       font-size: 14px;
+  #       color: #31363B;
+  #     }
 
-      QTabBar::tab:hover {
-        border-bottom: 2px solid rgba(0, 0, 0, 0.12);
-      }
+  #     QTabBar::tab:hover {
+  #       border-bottom: 2px solid rgba(0, 0, 0, 0.12);
+  #     }
 
-      QTabBar::tab:selected {
-        border-bottom: 2px solid rgba(0, 0, 0, 1);
-      }
+  #     QTabBar::tab:selected {
+  #       border-bottom: 2px solid rgba(0, 0, 0, 1);
+  #     }
 
-    '';
+  #   '';
 }

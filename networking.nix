@@ -1,6 +1,3 @@
-let
-  user = "kpbaks";
-in
 {
   # networking.wireless = {
   #   enable = true;

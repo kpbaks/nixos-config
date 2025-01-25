@@ -15,6 +15,7 @@
     # julia
     # julia-lts
     # julia-stable
+    julia-mono
   ];
 
   # sourced every time the `julia` is started

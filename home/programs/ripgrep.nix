@@ -23,7 +23,7 @@
             ]
           );
       in
-      with config.flavor;
+      # with config.flavor;
       [
         # Don't let ripgrep vomit really long lines to my terminal, and show a preview.
         "--max-columns=150"
@@ -36,12 +36,12 @@
         # "--hyperlink-format=default"
         "--hyperlink-format=kitty"
         # Set the colors.
-        "--colors=line:fg:${hex2ripgrep-color teal.hex}"
-        "--colors=column:fg:${hex2ripgrep-color maroon.hex}"
-        "--colors=path:fg:${hex2ripgrep-color sky.hex}"
+        # "--colors=line:fg:${hex2ripgrep-color teal.hex}"
+        # "--colors=column:fg:${hex2ripgrep-color maroon.hex}"
+        # "--colors=path:fg:${hex2ripgrep-color sky.hex}"
         "--colors=match:none"
-        "--colors=match:bg:${hex2ripgrep-color peach.hex}"
-        "--colors=match:fg:${hex2ripgrep-color crust.hex}"
+        # "--colors=match:bg:${hex2ripgrep-color peach.hex}"
+        # "--colors=match:fg:${hex2ripgrep-color crust.hex}"
         "--colors=match:style:bold"
 
         "--smart-case"

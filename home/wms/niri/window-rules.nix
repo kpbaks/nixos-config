@@ -82,5 +82,20 @@ in
       ];
       border.active.color = "red";
     }
+    {
+      # Open the Firefox Picture-in-Picture window at the bottom-left corner of the screen
+      matches = [
+        {
+          app-id = "firefox$";
+          title = "^Picture-in-Picture$";
+        }
+      ];
+      open-floating = true;
+      default-floating-position = {
+        x = 32;
+        y = 32;
+        relative-to = "bottom-left";
+      };
+    }
   ];
 }

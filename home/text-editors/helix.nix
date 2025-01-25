@@ -16,7 +16,7 @@ let
   };
   left-bracket = command: [
     command
-    "align_view_center"
+    # "align_view_center"
   ];
   right-bracket = left-bracket;
 in
@@ -24,11 +24,12 @@ in
 
   imports = [
     ./yazi-picker.nix
+    # inputs.crates-lsp.homeModules.${pkgs.system}.default
   ];
   # TODO: convert
   # programs.helix.enable = true;
   # programs.helix.defaultEditor = true;
-  catppuccin.helix.enable = false;
+  # catppuccin.helix.enable = false;
   programs.helix = {
     enable = true;
     defaultEditor = true;
@@ -84,6 +85,7 @@ in
           display-inlay-hints = true;
           snippets = true;
           display-signature-help-docs = true;
+          goto-reference-include-declaration = false;
         };
         auto-save = {
           focus-lost = true;
@@ -266,6 +268,9 @@ in
         space.N = ":set-option line-number relative";
         space.t.i = ":toggle-option lsp.display-inlay-hints";
         space.t.w = ":toggle-option soft-wrap.enable";
+        space.t.n = ":toggle-option indent-guides.render";
+        space.t.p = ":toggle-option lsp.display-progress-messages";
+        # space.t.d = [":toggle-option "];
         space.l = {
           r = ":lsp-restart";
           s = ":lsp-stop";
@@ -314,18 +319,25 @@ in
             "paste_after"
             "goto_line_start"
           ];
-          H = [
-            "select_mode"
-            "goto_line_start"
-          ];
-          L = [
-            "select_mode"
-            "goto_line_end"
-          ];
+          # H = [
+          #   "select_mode"
+          #   "goto_line_start"
+          # ];
+          # L = [
+          #   "select_mode"
+          #   "goto_line_end"
+          # ];
           S = [
             "select_mode"
             "goto_first_nonwhitespace"
           ];
+
+          # Select the current word
+          W = "@miw";
+          # Move to inside the previous parenthesis
+          H = "@F)mi(";
+          # Move to inside the next parenthesis
+          L = "@f(mi(";
 
           left = "jump_view_left";
           right = "jump_view_right";
@@ -336,36 +348,37 @@ in
           # u = "switch_to_lowercase";
           # U = "switch_to_uppercase";
         };
-        "[" = builtins.mapAttrs (_: command: left-bracket command) {
-          b = ":buffer-previous";
-          d = "goto_prev_diag";
-          D = "goto_first_diag";
-          g = "goto_prev_change";
-          G = "goto_first_change";
-          f = "goto_prev_function";
-          t = "goto_prev_class";
-          a = "goto_prev_parameter";
-          c = "goto_prev_comment";
-          e = "goto_prev_entry";
-          T = "goto_prev_test";
-          p = "goto_prev_paragraph";
-        };
-        "]" = builtins.mapAttrs (_: command: right-bracket command) {
-          b = ":buffer-next";
-          d = "goto_next_diag";
-          D = "goto_last_diag";
-          g = "goto_next_change";
-          G = "goto_last_change";
-          f = "goto_next_function";
-          t = "goto_next_class";
-          a = "goto_next_parameter";
-          c = "goto_next_comment";
-          e = "goto_next_entry";
-          T = "goto_next_test";
-          p = "goto_next_paragraph";
-        };
+        # "[" = builtins.mapAttrs (_: command: left-bracket command) {
+        #   b = ":buffer-previous";
+        #   d = "goto_prev_diag";
+        #   D = "goto_first_diag";
+        #   g = "goto_prev_change";
+        #   G = "goto_first_change";
+        #   f = "goto_prev_function";
+        #   t = "goto_prev_class";
+        #   a = "goto_prev_parameter";
+        #   c = "goto_prev_comment";
+        #   e = "goto_prev_entry";
+        #   T = "goto_prev_test";
+        #   p = "goto_prev_paragraph";
+        # };
+        # "]" = builtins.mapAttrs (_: command: right-bracket command) {
+        #   b = ":buffer-next";
+        #   d = "goto_next_diag";
+        #   D = "goto_last_diag";
+        #   g = "goto_next_change";
+        #   G = "goto_last_change";
+        #   f = "goto_next_function";
+        #   t = "goto_next_class";
+        #   a = "goto_next_parameter";
+        #   c = "goto_next_comment";
+        #   e = "goto_next_entry";
+        #   T = "goto_next_test";
+        #   p = "goto_next_paragraph";
+        # };
       };
       keys.select = {
+        y = [ "yank_joined" ];
         # A-x = "extend_to_line_bounds";
         X = [
           "extend_line_up"
@@ -432,6 +445,35 @@ in
 
       language-server.sonarlint-ls = {
         command = "${lib.getExe pkgs.sonarlint-ls}";
+      };
+
+      language-server.rust-analyzer = {
+        config = {
+
+          check.command = "clippy";
+          assist = {
+            emitMustUse = true;
+
+          };
+          diagnostics = {
+            experimental.enable = true;
+            styleLints.enable = true;
+          };
+          imports = {
+            preferPrelude = true;
+          };
+          inlayHints = {
+            bindingModeHints.enable = false;
+            closingBraceHints.minLines = 10;
+            closureReturnTypeHints.enable = "with_block";
+            discriminantHints.enable = "fieldless";
+            lifetimeElisionHints.enable = "skip_trivial";
+            typeHints.hideClosureInitialization = false;
+          };
+          semanticHighlighting = {
+            operator.specialization.enable = true;
+          };
+        };
       };
 
       language =
@@ -552,6 +594,10 @@ in
             # formatter.args = [ "--stdin" ];
             inherit indent;
           }
+          # {
+          #   name = "python";
+          #   language-servers = ["basedpyright"];
+          # }
           {
             name = "toml";
             auto-format = true;

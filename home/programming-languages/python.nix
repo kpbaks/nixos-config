@@ -1,6 +1,7 @@
 { pkgs, ... }:
 
 let
+  # TODO: improve this
   PYTHONSTARTUP =
     pkgs.writers.writePython3Bin "PYTHONSTARTUP.py"
       {
@@ -80,6 +81,6 @@ in
     PYTHON_COLORS = "1"; # use colors in the new python repl introduced in v3.13 (default)
   };
 
-  programs.matplotlib.enable = true;
+  programs.matplotlib.enable = false;
   programs.matplotlib.config = { };
 }

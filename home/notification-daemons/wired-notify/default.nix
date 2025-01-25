@@ -6,7 +6,7 @@
   ];
 
   services.wired = {
-    enable = false;
+    enable = true;
     config = ./wired.ron;
   };
 }

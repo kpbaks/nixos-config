@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, pkgs, ... }:
 {
 
   programs.zed-editor.enable = true;
@@ -54,6 +54,9 @@
     };
 
     languages = {
+      Python = {
+        language_servers = [ "${lib.getExe pkgs.basedpyright}" ];
+      };
       Nix = {
         tab_size = 4;
         language_servers = [
@@ -64,12 +67,42 @@
     };
   };
 
-  programs.zed-editor.userKeymaps = [
-    # {
-    #   context = "Workspace";
-    #   bindings = {
-    #     ctrl-shift-t = "workspace::NewTerminal";
-    #   };
-    # }
-  ];
+  programs.zed-editor.userKeymaps =
+
+    let
+
+      mapping = context: binding: action: {
+        inherit context;
+        bindings.${binding} = action;
+      };
+      workspace = mapping "Workspace";
+      terminal = mapping "Terminal";
+      editor = mapping "Editor";
+      pane = mapping "Pane";
+    in
+    [
+      # "ctrl-alt--": "pane::GoBack",
+      # "ctrl-alt-_": "pane::GoForward",
+      (pane "alt-left" "pane::GoBack")
+      (pane "alt-right" "pane::GoForward")
+      (workspace "ctrl-shift-t" "workspace::NewTerminal")
+      (terminal "ctrl-n" [
+        "terminal::SendKeystroke"
+        "ctrl-n"
+      ])
+
+      # {
+      #   "context": "Terminal",
+      #   "bindings": {
+      #     "ctrl-n": ["terminal::SendKeystroke", "ctrl-n"]
+      #   }
+      # }
+
+      # {
+      #   context = "Workspace";
+      #   bindings = {
+      #     ctrl-shift-t = "workspace::NewTerminal";
+      #   };
+      # }
+    ];
 }

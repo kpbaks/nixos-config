@@ -31,31 +31,6 @@
     sublime-merge
   ];
 
-  programs.gh = {
-    enable = true;
-    gitCredentialHelper.enable = true;
-    extensions = with pkgs; [
-      gh-eco
-      gh-markdown-preview
-      # gh-notify
-      # gh-cal
-      # gh-f
-      # gh-poi
-      gh-actions-cache
-      # gh-copilot
-      # gh-screensaver
-    ];
-
-    # settings.git_protocol = "https"; # or "ssh"
-    settings.git_protocol = "ssh"; # or "ssh"
-    settings.aliases = {
-      co = "pr checkout";
-      conflicts = "diff --name-only --diff-filter=U --relative";
-    };
-  };
-
-  programs.gh-dash.enable = true;
-
   # TODO: create wrapper script that uses `kitty` for diff program, if `git diff` is called in a kitty window,
   # and uses difftastic otherwise.
   # https://sw.kovidgoyal.net/kitty/kittens/diff/#integrating-with-git
@@ -76,9 +51,10 @@
       # pull.ff = "only";
       pull.rebase = false;
       merge.conflictstyle = "zdiff3";
+      merge.tool = "smerge"; # sublime merge
+      # mergetool.smerge.path = "${lib.getExe pkgs.sublime-sublime-merge}";
       # rebase.autostash = true;
       commit.verbose = true;
-      merge.tool = "nvimdiff";
       rebase.autosquash = true;
       rebase.stat = true;
       rebase.updateRefs = true;
@@ -90,6 +66,7 @@
       tag.forceSignAnnotated = true;
       # TODO: try out
       rerere.enabled = true;
+
     };
 
     aliases = {
@@ -118,6 +95,10 @@
   programs.git-cliff.enable = true;
   programs.gitui = {
     enable = true;
+    # TODO: add pr to home-manager to be able to set `keyConfig = "vim"`, to easily
+    # use that keymap configuration.
+    # https://github.com/extrawurst/gitui/blob/master/vim_style_key_config.ron
+    # keyConfig = "vim";
   };
   programs.lazygit = {
     enable = true;
@@ -135,13 +116,13 @@
         filterMode = "fuzzy";
         # windowSize = "half";
 
-        branchColors = with config.flavor; {
-          "feature" = green.hex;
-          "hotfix" = maroon.hex;
-          "release" = lavender.hex;
-          "bugfix" = peach.hex;
-          "doc" = yellow.hex;
-        };
+        # branchColors = with config.flavor; {
+        #   "feature" = green.hex;
+        #   "hotfix" = maroon.hex;
+        #   "release" = lavender.hex;
+        #   "bugfix" = peach.hex;
+        #   "doc" = yellow.hex;
+        # };
 
       };
 

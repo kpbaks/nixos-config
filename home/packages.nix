@@ -9,6 +9,7 @@
   # TODO: checkout https://github.com/azzamsa/zman
   # TODO: checkout https://github.com/6543/batmon/
   home.packages = with pkgs; [
+    binsider
     # lutris
     # yazi
     # serial-studio

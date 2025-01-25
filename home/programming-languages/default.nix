@@ -1,15 +1,15 @@
 {
   imports = [
     ./csharp.nix
-    ./cpp.nix
-    ./go.nix
-    ./java.nix
+    # ./cpp.nix
+    # ./go.nix
+    # ./java.nix
     # ./julia.nix
-    ./odin.nix
+    # ./odin.nix
     ./python.nix
-    ./ocaml.nix
+    # ./ocaml.nix
     ./roc.nix
-    ./rust.nix
+    # ./rust.nix
     ./zig.nix
   ];
 }

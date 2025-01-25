@@ -8,10 +8,12 @@
 
   # https://github.com/sodiboo/niri-flake/blob/main/docs.md#programsnirisettingsbinds
   # TODO: wrap in `swayosd-client`
+  # TODO: add Mod+F keybind to toggle floating layout
   programs.niri.settings.binds =
     with config.lib.niri.actions;
     let
-      terminal = pkgs.lib.getExe config.default-application.terminal;
+      terminal = lib.getExe config.default-application.terminal;
+      browser = lib.getExe config.default-application.browser;
       # sh = spawn "sh" "-c";
       fish = spawn "fish" "--no-config" "-c";
       # nu = spawn "nu" "-c";
@@ -22,7 +24,7 @@
       swayosd-client = spawn "swayosd-client";
       run-flatpak = spawn "flatpak" "run";
       # browser = spawn "${pkgs.firefox}/bin/firefox";
-      browser = run-flatpak "io.github.zen_browser.zen";
+      # browser = run-flatpak "io.github.zen_browser.zen";
       # run-in-terminal = spawn "kitty";
       # run-in-terminal = spawn "${pkgs.alacritty}/bin/alacritty";
       # run-in-terminal = spawn "${pkgs.kitty}/bin/kitty";
@@ -136,8 +138,10 @@
       # "Mod+Y".action = focus-or-spawn "foot" "${pkgs.foot}/bin/foot";
 
       "Mod+Shift+T".action = spawn terminal "${pkgs.fish}/bin/fish" "--private";
-      "Mod+F".action = focus-or-spawn "zen-alpha" "flatpak run io.github.zen_browser.zen";
-      "Mod+G".action = focus-or-spawn "org.telegram.desktop" "${pkgs.telegram-desktop}/bin/telegram-desktop";
+      "Mod+B".action = focus-or-spawn "${browser}";
+      # "Mod+B".action = focus-or-spawn "zen-alpha" "flatpak run io.github.zen_browser.zen";
+      "Mod+G".action =
+        focus-or-spawn "org.telegram.desktop" "${pkgs.telegram-desktop}/bin/telegram-desktop";
       # S for spotify
       "Mod+S".action = spawn "spotify";
       # D for discord
@@ -154,7 +158,8 @@
       "Mod+Z".action = focus-or-spawn "dev.zed.Zed" "${lib.getExe config.programs.zed-editor.package}";
 
       # FIXME: does not work
-      "Mod+A".action = run-in-terminal "${pkgs.alsa-utils}/bin/alsamixer --black-background --mouse --view playback";
+      "Mod+A".action =
+        run-in-terminal "${pkgs.alsa-utils}/bin/alsamixer --black-background --mouse --view playback";
 
       # "Mod+P".action = spawn (
       #   pkgs.lib.getExe scripts.search-clipboard-content-with-browser-search-engine
@@ -226,7 +231,8 @@
       "Mod+Shift+M".action = maximize-column;
 
       # "Mod+K".action = spawn "${pkgs.kdePackages.kdeconnect-kde}/bin/kdeconnect-app";
-      "Mod+K".action = focus-or-spawn "org.kde.kdeconnect.app" "${pkgs.kdePackages.kdeconnect-kde}/bin/kdeconnect-app";
+      "Mod+K".action =
+        focus-or-spawn "org.kde.kdeconnect.app" "${pkgs.kdePackages.kdeconnect-kde}/bin/kdeconnect-app";
 
       # // There are also commands that consume or expel a single window to the side.
       "Mod+BracketLeft".action = consume-or-expel-window-left;
@@ -245,7 +251,8 @@
       # TODO: improve by checking if an editor process instance is already running, before spawning another
       # "Mod+Comma".action = run-with-fish-within-terminal "hx ~/dotfiles/{flake,configuration}.nix";
       # "Mod+Period".action = spawn "${pkgs.swaynotificationcenter}/bin/swaync-client" "--toggle-panel";
-      "Mod+Period".action = focus-or-spawn "org.kde.plasma.emojier" "${pkgs.plasma-desktop}/bin/plasma-emojier";
+      "Mod+Period".action =
+        focus-or-spawn "org.kde.plasma.emojier" "${pkgs.plasma-desktop}/bin/plasma-emojier";
       # TODO: color picker keybind
 
       "Mod+M".action = focus-or-spawn "thunderbird" "${pkgs.thunderbird}/bin/thunderbird";

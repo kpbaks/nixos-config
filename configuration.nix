@@ -1,6 +1,3 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
 {
   config,
   pkgs,
@@ -15,7 +12,6 @@
     ./networking.nix
     # ./steam.nix
     # ./hdmi-cec.nix
-
     # ./tuxedo-laptop-second-nvme-drive.nix
   ];
 
@@ -62,6 +58,7 @@
   nix.checkConfig = true;
   nix.checkAllErrors = true;
 
+  # TODO: can this be made dependent on the running machine e.g. NumCPU / 2
   nix.settings.cores = 10; # number of cores per build, think `make -j N`
   nix.settings.max-jobs = 6; # number of builds that can be ran in parallel
   nix.settings.auto-optimise-store = true; # automatically detects files in the store that have identical contents, and replaces them with hard links to a single copy
@@ -80,7 +77,7 @@
 
   # Allow unfree packages e.g. closed-source nvidia drivers
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.allowBroken = true;
+  nixpkgs.config.allowBroken = false;
 
   # Needed by `nixd` lsp
   nix.nixPath = [ "nixpkgs=${inputs.nixpkgs}" ];
@@ -122,7 +119,7 @@
   boot.loader.timeout = 10; # seconds (default is 5)
   # boot.loader.timeout = null; # wait indefinitely for user to select
   boot.loader.systemd-boot.enable = true;
-  boot.loader.systemd-boot.memtest86.enable = true;
+  boot.loader.systemd-boot.memtest86.enable = false;
   boot.loader.systemd-boot.configurationLimit = 10; # Make it harder to fill up /boot partition
   boot.loader.systemd-boot.consoleMode = "max";
 
@@ -141,9 +138,9 @@
     # btrfs = true;
   };
 
-  # boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
   # boot.kernelPackages = pkgs.linuxPackages_zen;
-  boot.kernelPackages = pkgs.linuxPackages_6_12;
+  # boot.kernelPackages = pkgs.linuxPackages_6_12;
 
   boot.plymouth =
     let
@@ -307,7 +304,7 @@
     DIRENV_LOG_FORMAT = ""; # silence `direnv` msgs
     # EDITOR = "hx";
     # EDITOR = pkgs.lib.getExe pkgs.helix;
-    NIXPKGS_ALLOW_UNFREE = "1";
+    # NIXPKGS_ALLOW_UNFREE = "1";
     # LIBVA_DRIVER_NAME = "iHD"; # Force intel-media-driver
     # https://jqlang.github.io/jq/manual/#colors
   };
@@ -324,15 +321,6 @@
   i18n.defaultLocale = "en_US.UTF-8";
 
   i18n.extraLocaleSettings = {
-    # LC_ADDRESS = "da_DK.UTF-8";
-    # LC_IDENTIFICATION = "da_DK.UTF-8";
-    # LC_MEASUREMENT = "da_DK.UTF-8";
-    # LC_MONETARY = "da_DK.UTF-8";
-    # LC_NAME = "da_DK.UTF-8";
-    # LC_NUMERIC = "da_DK.UTF-8";
-    # LC_PAPER = "da_DK.UTF-8";
-    # LC_TELEPHONE = "da_DK.UTF-8";
-    # LC_TIME = "da_DK.UTF-8";
     LC_ADDRESS = config.i18n.defaultLocale;
     LC_IDENTIFICATION = config.i18n.defaultLocale;
     LC_MEASUREMENT = config.i18n.defaultLocale;
@@ -443,10 +431,11 @@
   # users.defaultUserShell = pkgs.fish;
   users.defaultUserShell = pkgs.nushell;
   # users.defaultUserShell = pkgs.bash;
-  users.users.kpbaks = {
+  users.users.${username} = {
     isNormalUser = true;
     description = "Kristoffer Sørensen";
     # TODO: document why it is necessary to be part of each group
+    # TODO: use lib.optional to simplify
     extraGroups = pkgs.lib.lists.unique (
       [
         "networkmanager"
@@ -469,6 +458,7 @@
     );
     packages = [ ]; # managed by home-manager, see ./home.nix
   };
+  # TODO: document
   users.groups.input.members = [ username ];
 
   fonts.packages = with pkgs; [
@@ -480,9 +470,7 @@
     nerd-fonts.commit-mono
     nerd-fonts.iosevka
     cantarell-fonts
-    # line-awesome
     font-awesome
-    # font-awesome_5
   ];
 
   # List packages installed in system profile.
@@ -496,14 +484,16 @@
     wayland-utils
     alsa-utils # `alsamixer`
     # fh # flakehub cli
-    adbfs-rootless
+    adbfs-rootless # TODO: only if adb is enabled
+
     # TODO: checkout and experiment with (tir 10 sep 21:58:53 CEST 2024)
-    numactl
-    numad
-    numatop
+    # TODO: a laptop does not have numa
+    # numactl
+    # numad
+    # numatop
     inetutils
     # inputs.nixos-cli.packages.${system}.default
-    scrcpy
+    scrcpy # TODO: only if adb is enabled
 
     # distrobox
     libinput
@@ -528,7 +518,7 @@
     git
     gh
     # Linux
-    btrfs-progs # Tools to interact with btrfs file system partitions
+    # btrfs-progs # Tools to interact with btrfs file system partitions
     udev
     systemctl-tui
     systeroid # A more powerful alternative to sysctl(8) with a terminal user interface 🐧
@@ -661,17 +651,15 @@
     enable = false;
     xwayland.enable = true;
     # package = pkgs.hyprland;
+    # TODO: use overlay
     package = inputs.hyprland.packages.${pkgs.stdenv.system}.default;
   };
 
   programs.niri.enable = true;
   programs.niri.package = pkgs.niri;
-
-  services.desktopManager.cosmic.enable = true;
-  services.displayManager.cosmic-greeter.enable = true;
-  # hardware.system76.power-daemon.enable = true;
-  # programs.cosmic.enable = true;
   # programs.niri.package = pkgs.niri-unstable;
+
+  # hardware.system76.power-daemon.enable = true;
   services.system76-scheduler.enable = true;
 
   programs.river.enable = false;
@@ -792,6 +780,7 @@
   # Prevent OOM when building with nix e.g. `nixos-rebuild switch`
   # By setting the maximum allowed usage of memory at the same time to be lower than the installed
   # currently: laptop with 16 GiB
+  # TODO: can this be made dependent on the host builder e.g. 80% of total mem
   systemd.services.nix-daemon.serviceConfig = {
     MemoryHigh = "8G";
     MemoryMax = "10G";
@@ -823,44 +812,19 @@
     # pkgs.gvisor
   ];
   # Users must be in the podman group in order to connect. As with Docker, members of this group can gain root access.
-  virtualisation.podman.dockerSocket.enable = builtins.elem "podman" config.users.users.kpbaks.extraGroups;
+  virtualisation.podman.dockerSocket.enable =
+    builtins.elem "podman"
+      config.users.users.${username}.extraGroups;
   virtualisation.podman.autoPrune.enable = false;
   virtualisation.podman.autoPrune.dates = "monthly";
   virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
   virtualisation.podman.dockerCompat = !config.virtualisation.docker.enable;
 
-  # services.mosquitto = {
-  #   enable = true;
-  #   listeners = [
-  #     {
-  #       acl = ["pattern readwrite #"];
-  #       omitPasswordAuth = true;
-  #       settings.allow_anonymous = true;
-  #     }
-  #   ];
-  # };
-
-  # networking.firewall = {
-  #   enable = true;
-  #   allowedTCPPorts = [
-  #     # (
-  #     #   if services.mosquitto.enable
-  #     #   then 1883
-  #     #   else null
-  #     # )
-  #     # (pkgs.mkIf services.mosquitto.enable 1883 [])
-  #   ];
-  #   # ++ (
-  #   #   if services.mosquitto.enable
-  #   #   then [1883]
-  #   #   else []
-  #   # );
-  # };
-
   # needed for `darkman`
   # services.geoclue2.enable = false;
   # NOTE: temporary fix reported by: https://github.com/NixOS/nixpkgs/issues/327464
   environment.etc."geoclue/conf.d/.valid".text = ''created the directory.'';
+  location.provider = "geoclue2";
 
   # show dots when typing password for sudo
   security.sudo.extraConfig = ''
@@ -1015,6 +979,7 @@
   # TODO: checkout this
   # https://github.com/Mic92/dotfiles/blob/main/nixos/modules/suspend-on-low-power.nix
 
+  # For my ZSA Moonlander keyboard
   hardware.keyboard.zsa.enable = true;
 
   # *** Android ***
@@ -1082,7 +1047,7 @@
   services.osquery.settings = { };
 
   # TODO: check if works in wsl?
-  services.envfs.enable = true; # use fusefs to resolve shebangs like #!/bin/bash that does not work on NixOS because of not being compliant with FHS standard
+  services.envfs.enable = false; # use fusefs to resolve shebangs like #!/bin/bash that does not work on NixOS because of not being compliant with FHS standard
 
   services.postgresql = {
     enable = false;
@@ -1110,4 +1075,10 @@
     enable = true;
     enableVirtualCamera = true;
   };
+
+  zramSwap = {
+    enable = true;
+  };
+  environment.enableAllTerminfo = true;
+
 }
