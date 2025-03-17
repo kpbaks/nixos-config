@@ -34,6 +34,8 @@ let
     ./ros2-repos.nix
     ./my-forks.nix
     ./just-a-chill-guy.nix
+    ./issue.nix
+    ./whichie.nix
     # ./sync-fork.nix
     # ./lg.nix
     # ./tokei-pie.nix

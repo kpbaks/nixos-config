@@ -7,19 +7,55 @@
       main = {
         # term = "xterm-256color";
         # font = "JetBrains Nerd Font Mono:size=14";
-        font = "JetBrainsMono Nerd Font:size=10";
+        font = "JetBrainsMono Nerd Font Mono:size=12";
         dpi-aware = "yes";
       };
       colors = {
-        alpha = 0.9;
+        alpha = 1.0;
       };
+
+      security.osc52 = "enabled";
 
       desktop-notifications = {
         inhibit-when-focused = "yes";
       };
 
+      # [key-bindings]
+      # # scrollback-up-page=Shift+Page_Up Shift+KP_Page_Up
+      # # scrollback-up-half-page=none
+      # # scrollback-up-line=none
+      # # scrollback-down-page=Shift+Page_Down Shift+KP_Page_Down
+      # # scrollback-down-half-page=none
+      # # scrollback-down-line=none
+      # # scrollback-home=none
+      # # scrollback-end=none
+      # # clipboard-copy=Control+Shift+c XF86Copy
+      # # clipboard-paste=Control+Shift+v XF86Paste
+      # # primary-paste=Shift+Insert
+      # # search-start=Control+Shift+r
+      # # font-increase=Control+plus Control+equal Control+KP_Add
+      # # font-decrease=Control+minus Control+KP_Subtract
+      # # font-reset=Control+0 Control+KP_0
+      # # spawn-terminal=Control+Shift+n
+      # # minimize=none
+      # # maximize=none
+      # # fullscreen=none
+      # # pipe-visible=[sh -c "xurls | fuzzel | xargs -r firefox"] none
+      # # pipe-scrollback=[sh -c "xurls | fuzzel | xargs -r firefox"] none
+      # # pipe-selected=[xargs -r firefox] none
+      # # pipe-command-output=[wl-copy] none # Copy last command's output to the clipboard
+      # # show-urls-launch=Control+Shift+o
+      # # show-urls-copy=none
+      # # show-urls-persistent=none
+      # # prompt-prev=Control+Shift+z
+      # # prompt-next=Control+Shift+x
+      # # unicode-input=Control+Shift+u
+      # # noop=none
+      # # quit=none
+
       key-bindings = {
         # pipe-command-output = "[${pkgs.wl-clipboard}/bin/wl-copy] Control+Shift+c"; # Copy last command's output to the clipboard
+        fullscreen = "f11";
       };
 
       # [desktop-notifications]

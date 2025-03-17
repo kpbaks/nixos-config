@@ -1,6 +1,5 @@
 # TODO: package these for nixpkgs:
 # - https://github.com/darrenburns/posting
-# - https://github.com/achristmascarl/rainfrog
 { pkgs, ... }:
 {
   # TODO: checkout
@@ -9,9 +8,13 @@
   # TODO: checkout https://github.com/azzamsa/zman
   # TODO: checkout https://github.com/6543/batmon/
   home.packages = with pkgs; [
+    kraft
+    bloaty
+    serpl
+    topiary
+    aha
     binsider
-    # lutris
-    # yazi
+    # lutri
     # serial-studio
     net-snmp
     flameshot
@@ -49,9 +52,9 @@
     complgen
     # TODO: package this for nixpkgs
     # csvtk # https://github.com/shenwei356/csvtk
-    datamash
-    youplot
-    xsv
+    # datamash
+    # youplot
+    # xan
     # kdeplasma-addons
     # davinci-resolve
     # kdenlive
@@ -64,13 +67,13 @@
     # gomp # https://github.com/MarkForged/GOMP
     # qt version recommended if you use kde-plasma
     # https://wiki.nixos.org/wiki/LibreOffice
-    libreoffice-qt
-    hunspell # https://github.com/hunspell/hunspell
-    hunspellDicts.da-dk
-    hunspellDicts.en-us
+    # libreoffice-qt
+    # hunspell # https://github.com/hunspell/hunspell
+    # hunspellDicts.da-dk
+    # hunspellDicts.en-us
     # onlyoffice-bin
     desktop-file-utils # https://www.freedesktop.org/wiki/Software/desktop-file-utils/
-    vhs
+    # vhs
     # ruby_3_3
     swappy
     grim
@@ -108,7 +111,7 @@
     # helvum # GTK-based patchbay for pipewire
     watchexec
     # rerun # FIXME: does not compile
-    logseq
+    # logseq
     # smassh # TUI based typing test application inspired by MonkeyType
     kondo # cleans dependencies and build artifacts from your projects.
     # TODO: integrate with helix
@@ -277,5 +280,6 @@
     typos
     taplo
     harper
+    kdePackages.itinerary
   ];
 }

@@ -1,7 +1,6 @@
 # https://yazi-rs.github.io/docs/tips/#folder-rules
-{ ... }:
 {
-  xdg.configFile."yazi/plugins/folder-rules.yazi/init.lua".text = # lua
+  xdg.configFile."yazi/plugins/folder-rules.yazi/main.lua".text = # lua
     ''
       local function setup()
         ps.sub("cd", function()
@@ -17,7 +16,6 @@
       return { setup = setup }
     '';
 
-	  
   programs.yazi.initLua = # lua
     ''
       require("folder-rules"):setup()

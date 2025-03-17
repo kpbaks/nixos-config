@@ -1,4 +1,9 @@
-{ config, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
 
   # ref: https://pastebin.com/xycT4nrk
@@ -168,10 +173,17 @@
       # https://github.com/rose-pine/swaync
       # TODO: inject catppuccin colors by prepending each color with `@define-color`
       # style = builtins.readFile ./style.css;
-      style = builtins.readFile ./macchiato.css;
+      # style = builtins.readFile ./macchiato.css;
     };
 
   programs.niri.settings.binds = with config.lib.niri.actions; {
+    # Similar to Windows 11: https://support.microsoft.com/en-us/windows/find-your-notifications-and-quick-settings-actions-cccdb22c-bda9-5ad5-897d-897ac67f7e39#WindowsVersion=Windows_11
     "Mod+Shift+N".action = spawn "${pkgs.swaynotificationcenter}/bin/swaync-client" "--toggle-panel";
+  };
+
+  # Modify service definition to enable in a tiling WM like niri, but
+  # disable in when using KDE Plasma.
+  systemd.user.services.swaync = lib.mkAfter {
+    User.ConditionEnvironment = "XDG_CURRENT_DESKTOP=niri";
   };
 }

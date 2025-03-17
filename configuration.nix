@@ -10,6 +10,8 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./networking.nix
+    ./zsa.nix
+    ./wacom-intuos.nix
     # ./steam.nix
     # ./hdmi-cec.nix
     # ./tuxedo-laptop-second-nvme-drive.nix
@@ -239,7 +241,7 @@
     # xorg.libxshmfence
     zlib
   ];
-  programs.direnv.enable = true;
+  # programs.direnv.enable = true;
 
   hardware.i2c.enable = true;
 
@@ -251,8 +253,12 @@
 
   # https://lavafroth.is-a.dev/post/android-phone-for-webcam-nixos/
   boot.extraModulePackages = with pkgs; [ linuxPackages_latest.v4l2loopback ];
+  # Opening libva device from DRM device /dev/dri/renderD128
+  # [h264_vaapi @ 0x563ed816dd00] No usable encoding profile found.
+  # failed to open encoder in low_power mode (Function not implemented), trying non low_power mode. if you have an intel iGPU, set enable_guc=2 in the i915 module to use the fixed function encoder. pass --low-power=off to suppress this warning
   boot.extraModprobeConfig = ''
     options v4l2loopback exclusive_caps=1 card_label="Virtual Webcam"
+    options i915 enable_guc=2
   '';
 
   # FIXME: 'evdi' not found
@@ -301,7 +307,6 @@
     ];
   };
   environment.variables = {
-    DIRENV_LOG_FORMAT = ""; # silence `direnv` msgs
     # EDITOR = "hx";
     # EDITOR = pkgs.lib.getExe pkgs.helix;
     # NIXPKGS_ALLOW_UNFREE = "1";
@@ -339,7 +344,7 @@
   # Enable the KDE Plasma Desktop Environment.
   # TODO: try out https://github.com/khaneliman/catppuccin-sddm-corners
   services.displayManager.sddm = {
-    enable = false;
+    enable = true;
     # catppuccin.enable = true;
     wayland.enable = true;
     # autoNumlock = true;
@@ -428,8 +433,8 @@
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   programs.fish.enable = true;
-  # users.defaultUserShell = pkgs.fish;
-  users.defaultUserShell = pkgs.nushell;
+  users.defaultUserShell = pkgs.fish;
+  # users.defaultUserShell = pkgs.nushell;
   # users.defaultUserShell = pkgs.bash;
   users.users.${username} = {
     isNormalUser = true;
@@ -514,7 +519,7 @@
     # bottles
     wget
     atool # {,de}compress various compression formats
-    helix # text editor
+    # helix # text editor
     git
     gh
     # Linux
@@ -532,6 +537,7 @@
     moreutils # `sponge` etc.
 
     # Nix(os) tools
+    hydra-check
     nix-prefetch-scripts
     nixfmt-rfc-style
     nix-output-monitor # `nom`
@@ -556,7 +562,7 @@
     dig # lookup dns name resolving
     dogdns # loopup dns name resolving, but in rust!
     nmap
-    sniffnet
+    # sniffnet
 
     (pkgs.writers.writeFishBin "logout" { }
       # fish
@@ -979,9 +985,6 @@
   # TODO: checkout this
   # https://github.com/Mic92/dotfiles/blob/main/nixos/modules/suspend-on-low-power.nix
 
-  # For my ZSA Moonlander keyboard
-  hardware.keyboard.zsa.enable = true;
-
   # *** Android ***
   # sudo waydroid upgrade
   # TODO: get this working
@@ -1081,4 +1084,6 @@
   };
   environment.enableAllTerminfo = true;
 
+  # TODO: wrap .desktop file Exec entry in a call to run0 or kdialog with sudo to run as root
+  programs.sniffnet.enable = true;
 }

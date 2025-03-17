@@ -84,6 +84,7 @@
   #     capturer = "none"
   #   '';
 
+  # TODO: use the new home-manager module `services.wluma`
   # https://github.com/maximbaz/wluma/blob/main/wluma.service
   systemd.user.services.wluma = {
     Unit = {

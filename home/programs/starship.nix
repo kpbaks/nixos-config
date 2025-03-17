@@ -4,7 +4,10 @@
   programs.starship = {
     enable = true;
     enableTransience = true;
-    settings = { };
+    enableBashIntegration = true;
+    enableFishIntegration = false;
+    enableNushellIntegration = false;
+    # settings = { };
     # preset = "jetpack";
     # $\{env_var.AGAIN_ENABLED}
     # $\{env_var.AGAIN_DYNAMIC_ENABLED}

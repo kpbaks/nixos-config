@@ -1,4 +1,3 @@
-{ ... }:
 {
   programs.okular = {
     enable = true;

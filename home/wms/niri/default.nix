@@ -82,13 +82,13 @@
     XDG_CURRENT_DESKTOP = "niri";
     XDG_SESSION_TYPE = "wayland";
   };
-  programs.niri.settings.cursor = {
-    # TODO: figure out if this cursor pack is packaged in nixpkgs, and if it is
-    # then depend on it properly.
-    # theme = "breeze_cursors";
-    theme = "catppuccin_cursors";
-    size = 32;
-  };
+  # programs.niri.settings.cursor = {
+  #   # TODO: figure out if this cursor pack is packaged in nixpkgs, and if it is
+  #   # then depend on it properly.
+  #   # theme = "breeze_cursors";
+  #   theme = "catppuccin_cursors";
+  #   size = 32;
+  # };
   programs.niri.settings.input.workspace-auto-back-and-forth = true;
   programs.niri.settings.input.keyboard.xkb = {
     layout = "us,dk";
@@ -137,7 +137,7 @@
         # "ironbar"
         # "${pkgs.swww}/bin/swww-daemon"
         "${pkgs.copyq}/bin/copyq"
-        "${pkgs.eww}/bin/eww daemon"
+        # "${pkgs.eww}/bin/eww daemon"
         # "${pkgs.birdtray}/bin/birdtray"
         "${pkgs.wluma}/bin/wluma"
         # TODO: does not show-up
@@ -206,23 +206,23 @@
 
   # https://haseebmajid.dev/posts/2023-07-25-nixos-kanshi-and-hyprland/
   # "eDP-1" is laptop screen
-  services.kanshi = {
-    enable = config.programs.niri.enable;
-    # TODO: does this target exist?
-    systemdTarget = "niri-session.target";
-    settings = [
-      {
-        profile.name = "undocked";
-        profile.outputs = [
-          {
-            criteria = "eDP-1";
-            scale = 1.0;
-            status = "enable";
-          }
-        ];
-      }
-    ];
-  };
+  # services.kanshi = {
+  #   enable = config.programs.niri.enable;
+  #   # TODO: does this target exist?
+  #   systemdTarget = "niri-session.target";
+  #   settings = [
+  #     {
+  #       profile.name = "undocked";
+  #       profile.outputs = [
+  #         {
+  #           criteria = "eDP-1";
+  #           scale = 1.0;
+  #           status = "enable";
+  #         }
+  #       ];
+  #     }
+  #   ];
+  # };
 
   # systemd.user.services.niri-notify-when-keyboard-layout-changes = {
   #   Install.WantedBy = [ "graphical-session.target" ];

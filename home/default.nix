@@ -11,14 +11,15 @@
     ./calendar.nix
     ./custom-modules
     ./desktop-environments
+    ./direnv.nix
     ./email.nix
     ./environment-variables.nix
     ./fonts.nix
-    ./git.nix
-    ./kde-plasma
+    # ./git.nix
+    # ./kde-plasma
     ./launchers
     ./modules
-    # ./nixvim.nix
+    ./nixvim.nix
     ./notification-daemons
     ./packages.nix
     ./pgp.nix
@@ -33,6 +34,7 @@
     ./vcs
     ./wms
     ./xdg
+    ./obsidian.nix
   ];
 
   # TODO: set up `localsend` service to start in background
@@ -59,9 +61,6 @@
   # targets.genericLinux.enable = false;
 
   programs.btop.enable = false;
-
-  programs.direnv.enable = true;
-  programs.direnv.nix-direnv.enable = true;
 
   programs.jq.enable = true;
 
@@ -98,36 +97,30 @@
   # qt.platformTheme.name = "kvantum";
   # qt.style.catppuccin.enable = false;
   # catppuccin.kvantum.enable = false;
-  # qt.style.name = "breeze";
-  # qt.platformTheme.name = "kde";
+  qt.style.name = "breeze";
+  qt.platformTheme.name = "kde";
 
-  qt = {
-    style.package = [
-      inputs.darkly.packages.${pkgs.system}.darkly-qt5
-      inputs.darkly.packages.${pkgs.system}.darkly-qt6
-    ];
-    platformTheme.name = "qtct";
-  };
+  # qt = {
+  #   style.package = [
+  #     inputs.darkly.packages.${pkgs.system}.darkly-qt5
+  #     inputs.darkly.packages.${pkgs.system}.darkly-qt6
+  #   ];
+  #   platformTheme.name = "qtct";
+  # };
 
-  home.pointerCursor = {
-    name = "phinger-cursors-light";
-    package = pkgs.phinger-cursors;
-    size = 32;
-    gtk.enable = true;
-  };
+  # home.pointerCursor = {
+  #   name = "phinger-cursors-light";
+  #   package = pkgs.phinger-cursors;
+  #   size = 32;
+  #   gtk.enable = true;
+  # };
 
   # services.poweralertd.enable = osConfig.services.upower.enable;
-  services.poweralertd.enable = true;
+  # services.poweralertd.enable = true;
 
   programs.openscad.enable = true; # custom-modules/openscad.nix
 
   # custom-modules/gitu.nix
-  programs.gitu = {
-    enable = true;
-    settings = {
-      general.show_help.enabled = true;
-    };
-  };
 
   programs.nix-your-shell.enable = true;
 
@@ -137,4 +130,9 @@
   };
 
   programs.cavalier.enable = false;
+
+  home.shell = {
+    enableFishIntegration = true;
+    enableNushellIntegration = true;
+  };
 }

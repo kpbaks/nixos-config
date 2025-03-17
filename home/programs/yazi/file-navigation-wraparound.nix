@@ -1,11 +1,10 @@
-{ ... }:
+# FIXME: does not work. Cursor no move (Tue Feb 11 10:03:10 PM CET 2025)
 let
   plugin_name = "file-navigation-wraparound";
 in
 {
-
   # https://yazi-rs.github.io/docs/tips/#navigation-wraparound
-  xdg.configFile."yazi/plugins/${plugin_name}.yazi/init.lua".text = # lua
+  xdg.configFile."yazi/plugins/${plugin_name}.yazi/main.lua".text = # lua
     ''
         return {
       	entry = function(_, args)
@@ -19,19 +18,19 @@ in
   programs.yazi.keymap.manager.prepend_keymap = [
     {
       on = [ "k" ];
-      run = "plugin --sync ${plugin_name} --args=-1";
+      run = "plugin --sync ${plugin_name} -1";
     }
     {
       on = [ "j" ];
-      run = "plugin --sync ${plugin_name} --args=1";
+      run = "plugin --sync ${plugin_name} 1";
     }
     {
       on = [ "<Up>" ];
-      run = "plugin --sync ${plugin_name} --args=-1";
+      run = "plugin --sync ${plugin_name} -1";
     }
     {
       on = [ "<Down>" ];
-      run = "plugin --sync ${plugin_name} --args=1";
+      run = "plugin --sync ${plugin_name} 1";
     }
   ];
 }

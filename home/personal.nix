@@ -1,4 +1,3 @@
-{ ... }:
 {
 
   # name = "Kristoffer Sørensen";

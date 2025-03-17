@@ -88,7 +88,7 @@ in
 
           "SUPER, a, exec, anki"
           # "SUPER, a, exec, ~/.config/hypr/bin/hyprland-arise --class anki"
-          "SUPER, f, exec, flatpak run io.github.zen_browser.zen"
+          # "SUPER, f, exec, flatpak run io.github.zen_browser.zen"
 
           # "SUPER, f, exec, ~/.config/hypr/bin/hyprland-arise --class firefox"
 

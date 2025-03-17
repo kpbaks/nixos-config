@@ -2,7 +2,7 @@
 # TODO: integrate this: https://github.com/sigoden/argc-completions
 {
   config,
-  lib,
+  # lib,
   pkgs,
   ...
 }:
@@ -25,34 +25,25 @@
   programs.nushell.configFile.text =
     # nu
     ''
+      $env.config.completions.algorithm = "fuzzy"
+      $env.config.render_right_prompt_on_last_line = false
+      $env.config.use_kitty_protocol = true
+      $env.config.highlight_resolved_externals = true
+      $env.config.display_errors.exit_code = true
 
-            $env.config = {
-              color_config: {
-                separator: gray
-                search_result: blue_reverse
-                header: green_bold
-                # header: {fg: bold_black bg: cyan}
-                row_index: header
-                bool: { if $in { "green" } else { "red" } }
-                int: blue
-                float: yellow
-                nothing: dark_red
-                # detect anything that looks like a hex color and display that color
-                string: {|| if $in =~ '^#[a-fA-F\d]+' { $in } else { 'default' } }
-              }
-              use_kitty_protocol: true
-              highlight_resolved_externals: true
-              display_errors: {
-                exit_code: true
-              }
-              render_right_prompt_on_last_line: false
-              completions: {
-                algorithm: fuzzy
-              }
-
-            # edit_mode: vi
-            }
-
+      $env.config.color_config = {
+        separator: gray
+        search_result: blue_reverse
+        header: green_bold
+        # header: {fg: bold_black bg: cyan}
+        row_index: header
+        bool: { if $in { "green" } else { "red" } }
+        int: blue
+        float: yellow
+        nothing: dark_red
+        # detect anything that looks like a hex color and display that color
+        string: {|| if $in =~ '^#[a-fA-F\d]+' { $in } else { 'default' } }
+      }
 
       let mime_to_lang = {
           application/json: json,
@@ -76,7 +67,7 @@
       }
 
       $env.config.show_banner = false
-      $env.config.filesize.metric = true
+      $env.config.filesize.unit = "metric"
       $env.config.color_config.int = { if $in > 0 { "green" } else if $in == 0 { "white" } else { "red" } }
       $env.config.ls = {
         clickable_links: true
@@ -106,22 +97,23 @@
         # TODO: implement
         def modified [] { ${pkgs.git}/bin/git ls-files --others --exclude-standard | lines }
 
-        def "config diff" [] {
-          if $env.KITTY_PID? != null {
-            let default_config = (^mktemp --suffix=.nu)
-            config nu --default | save --force $default_config
-            ${pkgs.kitty}/bin/kitten diff $default_config $nu.config-path
-            rm $default_config
-          } else {
-            config nu --default | ${pkgs.lib.getExe config.programs.vscode.package} --diff - $nu.config-path
-          }
-        }
+        # def "config diff" [] {
+        #   if $env.KITTY_PID? != null {
+        #     let default_config = (^mktemp --suffix=.nu)
+        #     config nu --default | save --force $default_config
+        #     ${pkgs.kitty}/bin/kitten diff $default_config $nu.config-path
+        #     rm $default_config
+        #   } else {
+        #     config nu --default | ${pkgs.lib.getExe config.programs.vscode.package} --diff - $nu.config-path
+        #   }
+        # }
 
         alias ll = ls --long
         alias la = ls --all
         alias lla = ls --long --all
 
-        def --env cdn [] { cd /etc/nixos; ${config.programs.helix.package}/bin/hx flake.nix }
+        # def --env cdn [] { cd /etc/nixos; $t{config.programs.helix.package}/bin/hx flake.nix }
+        def --env cdn [] { cd /etc/nixos }
 
         def --env cdp [] { cd ~/Pictures }
         def --env cdv [] { cd ~/Videos }
@@ -134,11 +126,15 @@
         def --env cddev [] { cd ~/development/own }
 
         # https://www.nushell.sh/blog/2024-05-15-bashisms.html
-        print "!! - Repeat the last command."
-        print "!n - Repeat the nth command from your nushell history."
-        print "!-n - Repeat the nth command from your last history entry."
-        print "!\$ - Get the last spatially separated token from the last command in your history."
-        print "!term - Repeat the last command match a strings beginning."
+        # print "!! - Repeat the last command."
+        # print "!n - Repeat the nth command from your nushell history."
+        # print "!-n - Repeat the nth command from your last history entry."
+        # print "!\$ - Get the last spatially separated token from the last command in your history."
+        # print "!term - Repeat the last command match a strings beginning."
+
+
+        # TODO: parse the format of /etc/fstab
+        # def "from fstab" []: [string -> 
       '';
   };
 

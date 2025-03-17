@@ -167,6 +167,7 @@
       akregator
       kasts
       merkuro
+      itinerary
     ]
     ++ (with pkgs; [
       plasma-panel-colorizer

@@ -14,10 +14,11 @@
       # TODO: override pkgs.vscodium to append flag --disable-workspace-trust
       package = pkgs.vscodium.fhs;
       # package = pkgs.vscodium;
-      enableExtensionUpdateCheck = true;
-      enableUpdateCheck = true;
+      profiles.default.enableExtensionUpdateCheck = true;
+      profiles.default.enableUpdateCheck = true;
       # extensions = with pkgs.vscode-extensions; [
-      extensions = with extensions.vscode-marketplace; [
+      profiles.default.extensions = with extensions.vscode-marketplace; [
+
         ms-dotnettools.csdevkit
         ms-dotnettools.csharp
         ms-dotnettools.vscode-dotnet-runtime
@@ -51,7 +52,7 @@
         # zxh404.vscode-proto3
         # tabnine.tabnine-vscode
       ];
-      userSettings =
+      profiles.default.userSettings =
         let
         in
         # TODO: get to work
@@ -141,7 +142,7 @@
           "security.workspace.trust.enabled" = false;
           # "workbench.colorTheme": "Default Dark Modern",
         };
-      keybindings =
+      profiles.default.keybindings =
         let
           ctrl = key: "ctrl+" + key;
           alt = key: "alt+" + key;

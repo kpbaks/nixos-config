@@ -106,8 +106,6 @@
       #     '';
     };
   };
-  # services.himalaya-watch.enable = config.programs.himalaya.enable;
-  services.himalaya-watch.enable = false;
 
   # FIXME: get to work under wayland and nixos
   # systemd.user.services.birdtray = {

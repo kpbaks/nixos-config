@@ -10,7 +10,7 @@
     powershell
   ];
 
-  programs.vscode.extensions =
+  programs.vscode.profiles.default.extensions =
     let
       extensions = inputs.nix-vscode-extensions.extensions.${pkgs.system};
     in
@@ -22,19 +22,19 @@
     ];
 
   xdg.configFile."powershell/Microsoft.PowerShell_profile.ps1".text =
-    (
-      # powershell
-      ''
-        function which($name) {
-          get-command $name | select-object -ExpandProperty Definition
-        }
 
-        function follow($file) {
-          get-content $file -wait
-        }
+    # powershell
+    ''
+      function which($name) {
+        get-command $name | select-object -ExpandProperty Definition
+      }
 
-        import-module -Name PSReadLine -Scope Global
-      '')
+      function follow($file) {
+        get-content $file -wait
+      }
+
+      import-module -Name PSReadLine -Scope Global
+    ''
     + (
       if config.programs.starship.enable then
         # powershell

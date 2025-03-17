@@ -35,7 +35,7 @@
     ./wl-screenrec.nix
     ./yt-dlp.nix
     # ./zathura.nix
-    # ./yazi
+    ./yazi
     ./zellij.nix
     ./zoxide.nix
     ./lazydocker.nix

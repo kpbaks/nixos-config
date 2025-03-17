@@ -1,17 +1,4 @@
 {
-  config,
-  lib,
-  ...
-}:
-
-let
-in
-# catppuccin-colors = lib.pipe config.flavor [
-#   (builtins.mapAttrs (name: v: ''set -l ${name} (set_color "${v.hex}")''))
-#   builtins.attrValues
-#   lib.concatLines
-# ];
-{
 
   programs.fish.shellInit =
     # catppuccin-colors

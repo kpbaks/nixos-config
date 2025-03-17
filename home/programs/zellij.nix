@@ -7,55 +7,85 @@
   ...
 }:
 
-let
-  plugins =
-    let
-      inherit (pkgs) fetchurl;
-    in
-    {
-      zj-quit = pkgs.fetchurl {
-        url = "https://github.com/cristiand391/zj-quit/releases/download/0.3.0/zj-quit.wasm";
-        hash = "sha256-f1D3cDuLRZ5IqY3IGq6UYSEu1VK54TwmkmwWaxVQD2A=";
-      };
-      room = fetchurl {
-        url = "https://github.com/rvcas/room/releases/download/v1.1.1/room.wasm";
-        hash = lib.fakeHash;
-      };
-    };
-in
+# let
+#   plugins =
+#     let
+#       inherit (pkgs) fetchurl;
+#     in
+#     {
+#       zj-quit = fetchurl {
+#         url = "https://github.com/cristiand391/zj-quit/releases/download/0.3.0/zj-quit.wasm";
+#         hash = "sha256-f1D3cDuLRZ5IqY3IGq6UYSEu1VK54TwmkmwWaxVQD2A=";
+#       };
+#       room = fetchurl {
+#         url = "https://github.com/rvcas/room/releases/download/v1.1.1/room.wasm";
+#         hash = lib.fakeHash;
+#       };
+#     };
+# in
 
 {
 
   programs.zellij.enable = true;
-  home.sessionVariables = {
-    ZELLIJ_AUTO_ATTACH = "true";
-    ZELLIJ_AUTO_EXIT = "false";
-  };
+
   # TODO: how to start zellij with `zellij --layout welcome`
   # TODO: prevent integration if terminal is embedded in another program,
   # ala. in kate or dolphin or vscode
   # `set -q KATE_PID`
   # `set -q VSCODE_INTEGRATION`
+  # TODO: show the session resurrection plugin when starting a new fish process not in zellij
   programs.zellij.enableFishIntegration = false;
   programs.zellij.enableBashIntegration = false;
   programs.zellij.enableZshIntegration = false;
 
   programs.zellij.settings = {
-    default_mode = "pane";
+    # default_mode = "locked";
+    default_mode = "normal";
+    # TODO: create a wrapper script that handles X11/Wayland and MacOS
     copy_command = "${pkgs.wl-clipboard}/bin/wl-copy";
     copy_clipboard = "primary";
     copy_on_selection = true;
+    serialize_pane_viewport = true;
     # layout_dir = "${zellij_dir}/layouts";
     # theme_dir = "${zellij_dir}/themes";
+    # theme = "gruvbox-dark";
+    # theme = "kanagawa";
+    theme = "iceberg-dark";
+    default_layout = "default";
+    # default_layout = "compact";
+    pane_viewport_serialization = true;
 
-    ui.pane_frames.hide_session_name = true;
-    plugins = {
-      zj-quit = {
-        location = "file://${plugins.zj-quit}";
-        confirm_key = "q";
-        cancel_key = "Esc";
-      };
-    };
+    ui.pane_frames.hide_session_name = false;
+    # keybinds = {
+    #   shared_except = {
+    #     _args = [ "locked" ];
+    #     bind = {
+    #       _args = [ "Alt f" ];
+    #       _props = {
+    #         ToggleFloatingPanes = true;
+    #       };
+    #     };
+    #   };
+    # };
+
+    #     shared_except "locked" {
+    #     bind "Ctrl g" { SwitchToMode "Locked"; }
+    #     bind "Ctrl q" { Quit; }
+    #     bind "Alt f" { ToggleFloatingPanes; }
+    #     bind "Alt t" { NewTab; SwitchToMode "Normal"; }
+    #     bind "Alt z" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
+    #     bind "Alt n" { NewPane; }
+    #     bind "Alt i" { MoveTab "Left"; }
+    #     bind "Alt o" { MoveTab "Right"; }
+    #     bind "Alt h" "Alt Left" { MoveFocusOrTab "Left"; }
+    #     bind "Alt l" "Alt Right" { MoveFocusOrTab "Right"; }
+    #     bind "Alt j" "Alt Down" { MoveFocus "Down"; }
+    #     bind "Alt k" "Alt Up" { MoveFocus "Up"; }
+    #     bind "Alt =" "Alt +" { Resize "Increase"; }
+    #     bind "Alt -" { Resize "Decrease"; }
+    #     bind "Alt [" { PreviousSwapLayout; }
+    #     bind "Alt ]" { NextSwapLayout; }
+    # }
 
     # keybinds = {
     #   shared_except = {
@@ -85,36 +115,26 @@ in
   #     }
   # }
 
-  # plugins {
-  #   zj-quit location="file:/path/to/zj-quit.wasm"
-  # }
-  # };
-
-  # programs.zellij.extraConfig = # kdl
+  # xdg.configFile."zellij/layouts/default.kdl".text =
+  #   # kdl
   #   ''
+  #     pane_frames true
+  #     simplified_ui false
 
+  #     layout {
+  #       default_tab_template {
+  #         pane size=1 borderless=true {
+  #           plugin location="zellij:tab-bar"
+  #         }
+
+  #         children
+
+  #         pane size=1 borderless=true {
+  #           plugin location="zellij:status-bar"
+  #         }
+  #       }
+  #     }
   #   '';
-
-  xdg.configFile."zellij/layouts/default.kdl".text =
-    # kdl
-    ''
-      pane_frames true
-      simplified_ui false
-
-      layout {
-        default_tab_template {
-          pane size=1 borderless=true {
-            plugin location="zellij:tab-bar"
-          }
-
-          children
-          
-          pane size=1 borderless=true {
-            plugin location="zellij:status-bar"
-          }
-        }
-      }
-    '';
 
   # TODO: dependent on my pr `feature/query-pane-names`
   # programs.fish.interactiveShellInit =
@@ -200,4 +220,10 @@ in
   #       }
   #     }
   #   '';
+
+  home.sessionVariables = {
+    ZELLIJ_AUTO_ATTACH = "true";
+    ZELLIJ_AUTO_EXIT = "false";
+  };
+
 }

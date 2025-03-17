@@ -11,22 +11,22 @@
       "https://nix-community.cachix.org"
       # "https://insane.cachix.org"
       "https://cachix.cachix.org"
-      "https://hyprland.cachix.org"
+      # "https://hyprland.cachix.org"
       "https://helix.cachix.org"
       "https://yazi.cachix.org"
       "https://cosmic.cachix.org/"
-      "https://cache.garnix.io" # used by `ironbar`
+      # "https://cache.garnix.io" # used by `ironbar`
       "https://watersucks.cachix.org"
     ];
     extra-trusted-public-keys = [
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       # "insane.cachix.org-1:cLCCoYQKkmEb/M88UIssfg2FiSDUL4PUjYj9tdo4P8o="
       "cachix.cachix.org-1:eWNHQldwUO7G2VkjpnjDbWwy4KQ/HNxht7H4SSoMckM="
-      "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+      # "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
       "helix.cachix.org-1:ejp9KQpR1FBI2onstMQ34yogDm4OgU2ru6lIwPvuCVs="
       "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
       "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE="
-      "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
+      # "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
       "watersucks.cachix.org-1:6gadPC5R8iLWQ3EUtfu3GFrVY7X6I4Fwz/ihW25Jbv8="
     ];
   };
@@ -38,17 +38,26 @@
   inputs.zen-browser.url = "github:youwen5/zen-browser-flake";
   inputs.zen-browser.inputs.nixpkgs.follows = "nixpkgs";
 
-  inputs.darkly.url = "github:Bali10050/Darkly";
-  inputs.darkly.inputs.nixpkgs.follows = "nixpkgs";
+  # inputs.steel.url = "github:mattwparas/steel";
+  # inputs.steel.inputs.nixpkgs.follows = "nixpkgs";
 
-  inputs.steel.url = "github:mattwparas/steel";
-  inputs.steel.inputs.nixpkgs.follows = "nixpkgs";
+  inputs.neovim-nightly-overlay = {
+    url = "github:nix-community/neovim-nightly-overlay";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+  inputs.nixvim = {
+    url = "github:nix-community/nixvim";
+    # If you are not running an unstable channel of nixpkgs, select the corresponding branch of nixvim.
+    # url = "github:nix-community/nixvim/nixos-24.11";
 
-  inputs.television.url = "github:alexpasmantier/television";
-  inputs.television.inputs.nixpkgs.follows = "nixpkgs";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
 
-  inputs.nix-weather.url = "github:cafkafk/nix-weather";
-  inputs.nix-weather.inputs.nixpkgs.follows = "nixpkgs";
+  # inputs.television.url = "github:alexpasmantier/television";
+  # inputs.television.inputs.nixpkgs.follows = "nixpkgs";
+
+  # inputs.nix-weather.url = "github:cafkafk/nix-weather";
+  # inputs.nix-weather.inputs.nixpkgs.follows = "nixpkgs";
 
   inputs.ghostty = {
     url = "git+ssh://git@github.com/ghostty-org/ghostty";
@@ -58,30 +67,25 @@
     inputs.nixpkgs-unstable.follows = "nixpkgs";
   };
 
-  inputs.rust-overlay = {
-    url = "github:oxalica/rust-overlay";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
+  # FIXME: why is no `nixos` binary available?
+  # inputs.nixos-cli = {
+  #   url = "github:water-sucks/nixos";
+  #   inputs.nixpkgs.follows = "nixpkgs";
+  # };
 
   # TODO: use
-  inputs.sops-nix = {
-    url = "github:Mic92/sops-nix";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
+  # inputs.sops-nix = {
+  #   url = "github:Mic92/sops-nix";
+  #   inputs.nixpkgs.follows = "nixpkgs";
+  # };
 
-  # FIXME: why is no `nixos` binary available?
-  inputs.nixos-cli = {
-    url = "github:water-sucks/nixos";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
-
-  inputs.agenix = {
-    url = "github:ryantm/agenix";
-    # optional, not necessary for the module
-    inputs.nixpkgs.follows = "nixpkgs";
-    # optionally choose not to download darwin deps (saves some resources on Linux)
-    inputs.darwin.follows = "";
-  };
+  # inputs.agenix = {
+  #   url = "github:ryantm/agenix";
+  #   # optional, not necessary for the module
+  #   inputs.nixpkgs.follows = "nixpkgs";
+  #   # optionally choose not to download darwin deps (saves some resources on Linux)
+  #   inputs.darwin.follows = "";
+  # };
 
   inputs = {
     # nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -109,138 +113,26 @@
       # inputs.home-manager.follows = "home-manager";
     };
 
-    # hyprland = {
-    #   url = "github:hyprwm/Hyprland";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
-
-    hyprland = {
-      type = "git";
-      url = "https://github.com/hyprwm/Hyprland";
-      submodules = true;
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    hyprland-plugins = {
-      url = "github:hyprwm/hyprland-plugins";
-      inputs.hyprland.follows = "hyprland";
-    };
-
-    hyprspace = {
-      url = "github:KZDKM/Hyprspace";
-      # Hyprspace uses latest Hyprland. We declare this to keep them in sync.
-      inputs.hyprland.follows = "hyprland";
-    };
-
-    # # TODO: what do i use this for?
-    # hyprgrass = {
-    #   url = "github:horriblename/hyprgrass";
-    #   inputs.hyprland.follows = "hyprland"; # IMPORTANT
-    # };
-
     helix = {
       url = "github:helix-editor/helix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    simple-completion-language-server = {
-      url = "github:estin/simple-completion-language-server";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     yazi = {
       url = "github:sxyazi/yazi";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    catppuccin.url = "github:catppuccin/nix";
-    nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
+    # catppuccin.url = "github:catppuccin/nix";
+    # nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     stylix = {
       url = "github:danth/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
     };
-    # TODO: use
-    # anyrun.url = "github:Kirottu/anyrun";
-    # anyrun.inputs.nixpkgs.follows = "nixpkgs";
-    # anyrun-nixos-options.url = "github:n3oney/anyrun-nixos-options";
 
-    # TODO: use
-    # ags = {
-    #   url = "github:Aylur/ags";
+    # nix-melt = {
+    #   url = "github:nix-community/nix-melt";
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
-    # atdo.url = "github:kpbaks/atdo";
-    # atdo.inputs.nixpkgs.follows = "nixpkgs";
-    swww = {
-      url = "github:LGFae/swww";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    # umu = {
-    #   url = "git+https://github.com/Open-Wine-Components/umu-launcher/?dir=packaging\/nix&submodules=1";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
-
-    # TODO: checkout
-    # nix-gaming = {
-    #   url = "github:fufexan/nix-gaming";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
-
-    spicetify-nix = {
-      url = "github:Gerg-L/spicetify-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nixvim = {
-      url = "github:nix-community/nixvim";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
-
-    # TODO: try out and setup
-    # https://github.com/Toqozz/wired-notify
-    # wired-notify = {
-    #   url = "github:Toqozz/wired-notify";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
-
-    # TODO: create a similar implementation that is native to `niri`
-    # can use a similar overlay to the print screen feature
-    # Should it be possible to zoom in, while stuff is being rendered?
-    # TODO: upstream to nixpkgs
-    woomer = {
-      url = "github:coffeeispower/woomer";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    ironbar = {
-      url = "github:JakeStanger/ironbar";
-      # url = "github:anant-357/ironbar"; # has "niri workspaces" pr waiting to be merged
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    # TODO: checkout
-    # https://github.com/vinceliuice/grub2-themes
-    # grub2-themes = {
-    #   url = "github:vinceliuice/grub2-themes";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
-
-    zjstatus = {
-      url = "github:dj95/zjstatus";
-
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    walker = {
-      url = "github:abenz1267/walker";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    # rust-overlay = {
-    #   url = "github:oxalica/rust-overlay";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
-
-    nix-melt = {
-      url = "github:nix-community/nix-melt";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
   # inputs.hyprpanel.url = "github:Jas-SinghFSU/HyprPanel";
   #
@@ -261,17 +153,18 @@
       system = "x86_64-linux";
       for-all-systems = nixpkgs.lib.genAttrs [ system ];
       overlays = [
-        inputs.rust-overlay.overlays.default
+        # inputs.rust-overlay.overlays.default
         # inputs.hyprpanel.overlay
         (final: prev: { ghostty = inputs.ghostty.packages.${system}.default; })
         # inputs.wired-notify.overlays.default
         inputs.niri.overlays.niri
-        (final: prev: { woomer = inputs.woomer.packages.${system}.default; })
-        inputs.swww.overlays.default
+        # (final: prev: { woomer = inputs.woomer.packages.${system}.default; })
+        # inputs.swww.overlays.default
         # (final: prev: { swww = inputs.swww.packages.${prev.system}.swww; })
         # (final: prev: { zjstatus = inputs.zjstatus.packages.${prev.system}.default; })
         inputs.yazi.overlays.default
-        (final: prev: { television = inputs.television.packages.${prev.system}.default; })
+        inputs.helix.overlays.default
+        # (final: prev: { television = inputs.television.packages.${prev.system}.default; })
         # inputs.neovim-nightly-overlay.overlay
       ];
 
@@ -282,6 +175,7 @@
       };
     in
     {
+      # TODO: use treefmt.nix
       formatter.${system} = pkgs.nixfmt-rfc-style;
 
       checks = for-all-systems (system: {
@@ -305,6 +199,9 @@
         default = nixpkgs.legacyPackages.${system}.mkShell {
           inherit (self.checks.${system}.pre-commit-check) shellHook;
           buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
+          packages = with pkgs; [
+            update-nix-fetchgit
+          ];
         };
 
       });
@@ -348,27 +245,25 @@
           #   environment.systemPackages = [ inputs.agenix.packages.${system}.default ];
           # }
           inputs.niri.nixosModules.niri
-          {
-            imports = [ inputs.nixos-cli.nixosModules.nixos-cli ];
-            services.nixos-cli = {
-              enable = true;
-              # use_nvd = true;
-              # apply.use_nom = true;
-            };
-          }
-          inputs.catppuccin.nixosModules.catppuccin
+          # {
+          #   imports = [ inputs.nixos-cli.nixosModules.nixos-cli ];
+          #   services.nixos-cli = {
+          #     enable = true;
+          #     # use_nvd = true;
+          #     # apply.use_nom = true;
+          #   };
+          # }
+          # inputs.catppuccin.nixosModules.catppuccin
           # { environment.systemPackages = [ inputs.nix-weather.packages.${system}.nix-weather ]; }
           # { environment.systemPackages = [ inputs.fh.packages.${system}.default ]; }
 
-          {
-            imports = [
-              inputs.nixos-cosmic.nixosModules.default
-            ];
-            services.desktopManager.cosmic.enable = true;
-            services.displayManager.cosmic-greeter.enable = true;
-
-            # services.displayManager.cosmic-greeter.enable = true;
-          }
+          # {
+          #   imports = [
+          #     inputs.nixos-cosmic.nixosModules.default
+          #   ];
+          #   services.desktopManager.cosmic.enable = true;
+          #   services.displayManager.cosmic-greeter.enable = true;
+          # }
           # inputs.nixos-hardware.nixosModules.tuxedo-infinitybook-pro14-gen7
           # inputs.sops-nix.nixosModules.sops
           # (
@@ -447,10 +342,19 @@
               programs.nix-index-database.comma.enable = true;
             }
             { home.packages = [ inputs.zen-browser.packages.${system}.default ]; }
-            { home.packages = [ inputs.steel.packages.${system}.default ]; }
+            # { home.packages = [ inputs.steel.packages.${system}.default ]; }
             # { home.packages = [ inputs.crates-lsp.packages.${system}.default ]; }
           ];
         };
+      };
+
+      # TODO: crazy project idea, but hear me out
+      nixosConfigurations.playstation4 = nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          inherit inputs username;
+        };
+        # system = "aarch64-linux";
+        modules = [ ];
       };
     };
 }

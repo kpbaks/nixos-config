@@ -17,11 +17,12 @@
   programs.fish.package = pkgs.fish;
   programs.fish.preferAbbrs = true;
 
+  # https://github.com/NixOS/nix/blob/1068b9657ff1c4ea629a1a46e07391d16b88ff17/src/nix/develop.cc#L636
   programs.fish.interactiveShellInit = ''
-    ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
-
-    echo "todo checkout \$status_generation"
+    echo "todo: use $NIX_GCROOT as a marker being in a `nix develop` shell, and use it to diff the environment from the \"parent\" shell"
   '';
+  #   echo "todo checkout \$status_generation"
+  # '';
 }
 
 # # Implement keybinds similar to almost all text editors, where e.g.

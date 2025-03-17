@@ -22,6 +22,7 @@
     # terminal = config.programs.foot.package;
     # terminal = config.programs.alacritty.package;
     terminal = pkgs.ghostty;
+    # browser = pkgs.chromium;
     browser = inputs.zen-browser.packages.${pkgs.system}.default;
   };
 }

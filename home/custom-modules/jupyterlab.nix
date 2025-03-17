@@ -1,4 +1,3 @@
-{ ... }:
 {
 
   # TODO: save user settings for jupyter lab

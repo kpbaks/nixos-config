@@ -15,7 +15,7 @@
       terminal = lib.getExe config.default-application.terminal;
       browser = lib.getExe config.default-application.browser;
       # sh = spawn "sh" "-c";
-      fish = spawn "fish" "--no-config" "-c";
+      fish = spawn "${config.programs.fish.package}/bin/fish" "--no-config" "-c";
       # nu = spawn "nu" "-c";
       playerctl = spawn "playerctl";
       # brightnessctl = spawn "brightnessctl";
@@ -134,32 +134,31 @@
       "Mod+9".action = focus-workspace 9;
 
       # "Mod+T".action = focus-or-spawn "foot" "${pkgs.foot}/bin/foot";
-      "Mod+T".action = focus-or-spawn "foot" "${terminal}";
+      "Mod+T".action = focus-or-spawn "ghostty" "${terminal}";
       # "Mod+Y".action = focus-or-spawn "foot" "${pkgs.foot}/bin/foot";
 
-      "Mod+Shift+T".action = spawn terminal "${pkgs.fish}/bin/fish" "--private";
-      "Mod+B".action = focus-or-spawn "${browser}";
+      # "Mod+Shift+T".action = spawn terminal "${pkgs.fish}/bin/fish" "--private";
+      # "Mod+B".action = focus-or-spawn "${browser}";
       # "Mod+B".action = focus-or-spawn "zen-alpha" "flatpak run io.github.zen_browser.zen";
-      "Mod+G".action =
-        focus-or-spawn "org.telegram.desktop" "${pkgs.telegram-desktop}/bin/telegram-desktop";
+      # "Mod+G".action = focus-or-spawn "org.telegram.desktop" "${pkgs.telegram-desktop}/bin/telegram-desktop";
       # S for spotify
-      "Mod+S".action = spawn "spotify";
+      # "Mod+S".action = spawn "spotify";
       # D for discord
-      "Mod+D".action = focus-or-spawn "vesktop" "${pkgs.vesktop}/bin/vesktop";
+      # "Mod+D".action = focus-or-spawn "vesktop" "${pkgs.vesktop}/bin/vesktop";
       # N for notes
-      "Mod+N".action = focus-or-spawn "Logseq" "${pkgs.logseq}/bin/logseq";
+      # "Mod+N".action = focus-or-spawn "Logseq" "${pkgs.logseq}/bin/logseq";
       # "Mod+E".action = run-in-kitty "yazi";
       # TODO: detect the newest file in ~/Downloads and focus it first by doing `yazi $file`
-      "Mod+Y".action = run-with-sh-within-terminal "cd ~/Downloads; yazi";
+      # "Mod+Y".action = run-with-sh-within-terminal "cd ~/Downloads; yazi";
       # E is default on other platforms like Windows, for opening the "file explorer" program
       "Mod+E".action = focus-or-spawn "org.kde.dolphin" "${pkgs.kdePackages.dolphin}/bin/dolphin";
       # P for pdf
       "Mod+P".action = focus-or-spawn "org.kde.okular" "${pkgs.kdePackages.okular}/bin/okular";
-      "Mod+Z".action = focus-or-spawn "dev.zed.Zed" "${lib.getExe config.programs.zed-editor.package}";
+      # "Mod+Z".action = focus-or-spawn "dev.zed.Zed" "${lib.getExe config.programs.zed-editor.package}";
 
       # FIXME: does not work
-      "Mod+A".action =
-        run-in-terminal "${pkgs.alsa-utils}/bin/alsamixer --black-background --mouse --view playback";
+      # "Mod+A".action =
+      #   run-in-terminal "${pkgs.alsa-utils}/bin/alsamixer --black-background --mouse --view playback";
 
       # "Mod+P".action = spawn (
       #   pkgs.lib.getExe scripts.search-clipboard-content-with-browser-search-engine
@@ -252,7 +251,7 @@
       # "Mod+Comma".action = run-with-fish-within-terminal "hx ~/dotfiles/{flake,configuration}.nix";
       # "Mod+Period".action = spawn "${pkgs.swaynotificationcenter}/bin/swaync-client" "--toggle-panel";
       "Mod+Period".action =
-        focus-or-spawn "org.kde.plasma.emojier" "${pkgs.plasma-desktop}/bin/plasma-emojier";
+        focus-or-spawn "org.kde.plasma.emojier" "${pkgs.kdePackages.plasma-desktop}/bin/plasma-emojier";
       # TODO: color picker keybind
 
       "Mod+M".action = focus-or-spawn "thunderbird" "${pkgs.thunderbird}/bin/thunderbird";
@@ -274,9 +273,9 @@
       "Mod+U".action = focus-workspace-down;
       "Mod+I".action = focus-workspace-up;
 
-      "Print".action = screenshot;
-      "Ctrl+Print".action = screenshot-screen;
-      "Alt+Print".action = screenshot-window;
+      "Print".action = screenshot; # { show-pointer = false; };
+      # "Ctrl+Print".action = screenshot-screen { write-to-disk = true; };
+      "Alt+Print".action = screenshot-window; # { write-to-disk = true; };
 
       # // Switches focus between the current and the previous workspace.
       "Mod+Tab".action = focus-workspace-previous;

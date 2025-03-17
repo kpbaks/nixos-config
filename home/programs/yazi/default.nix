@@ -3,46 +3,39 @@
 # https://github.com/Mellbourn/ls-colors.yazi
 { pkgs, ... }:
 let
-  scripts.yazi-downloads =
-    pkgs.writers.writeFishBin "yd" { } # fish
-      ''
-        block --global
-        cd ~/Downloads; or return
-
-        function most-recent
-            set -l latest_mtime 0
-            set -l latest_file
-            for f in *
-                set -l mtime (path mtime $f)
-                if test $mtime -gt $latest_mtime
-                    set latest_mtime $mtime
-                    set latest_file $f
-                end
-            end
-
-            echo $latest_file
-        end
-
-        # Find most recent file
-        set -l file (most-recent)
-        command yazi $file
-        # inputs.yazi.packages.${pkgs.system}.default;
-      '';
+  inherit (pkgs) fetchFromGitHub;
 in
 {
   imports = [
-    # ./folder-rules.nix
+    ./confirm-quit.nix
+    ./folder-rules.nix
+    ./goto-project-root-dir.nix
     # ./file-navigation-wraparound.nix
     # ./linemode.nix
   ];
 
+  # TODO: add pr to add a `programs.yazi.extraPackages` option
+  home.packages = with pkgs; [
+    p7zip # opt dependency of `yazi`
+    ueberzugpp # opt dependency of `yazi`
+    exiftool # needed for `yazi` functionality
+    ouch # needed by "ouch.yazi
+  ];
+
   programs.yazi =
     let
-      plugins-repo = pkgs.fetchFromGitHub {
+      yazi-plugins = fetchFromGitHub {
         owner = "yazi-rs";
         repo = "plugins";
-        rev = "a8421d98bbea11bee242883f2f7420e5ca498b3f";
-        hash = "sha256-0RZHBF2J2jMbCHcM71lHdn99diDr0zrMiorFgtVL5pI=";
+        rev = "ceb053febb836dfd48200038d010ab9bc9d9c43f";
+        hash = "sha256-yBcbvzWU2FI7vkeqL7+ZIoQboybaPIiH4fV9yMqdHlM=";
+      };
+
+      ouch-yazi = fetchFromGitHub {
+        owner = "ndtoan96";
+        repo = "ouch.yazi";
+        rev = "ce6fb75431b9d0d88efc6ae92e8a8ebb9bc1864a";
+        hash = "sha256-oUEUGgeVbljQICB43v9DeEM3XWMAKt3Ll11IcLCS/PA=";
       };
       # kdeconnect-yazi = pkgs.fetchFromGitHub {
       #   owner = "kpbaks";
@@ -51,22 +44,11 @@ in
       #   hash = "sha256-sr92pLVzY/f+MnhhAEbdefz99QdlZRN3x+yQFtXUMD8=";
       # };
 
-      starship-yazi = pkgs.fetchFromGitHub {
-        owner = "Rolv-Apneseth";
-        repo = "starship.yazi";
-        rev = "77a65f5a367f833ad5e6687261494044006de9c3";
-        hash = "sha256-sAB0958lLNqqwkpucRsUqLHFV/PJYoJL2lHFtfHDZF8=";
-      };
     in
     {
-      enable = false;
+      enable = true;
       # https://yazi-rs.github.io/docs/quick-start#shell-wrapper
-      # enableFishIntegration = true;
       shellWrapperName = "y";
-      # catppuccin.enable = false;
-      # TODO: add to overlay
-      package = pkgs.yazi;
-      # package = inputs.yazi.packages.${pkgs.system}.default;
       settings = {
         manager = {
           ratio = [
@@ -80,76 +62,62 @@ in
           sort_by = "natural";
           sort_dirs_first = true;
         };
-        # which = {sort_by = true;};
 
-        preview = {
-          max_width = 1000;
-          max_height = 1000;
+        plugin = {
+          prepend_fetchers = [
+            {
+              id = "git";
+              name = "*";
+              run = "git";
+            }
+            {
+              id = "git";
+              name = "*/";
+              run = "git";
+            }
+          ];
+          prepend_previewers =
+            map
+              (mime: {
+                inherit mime;
+                run = "ouch";
+              })
+              [
+                "application/*zip"
+                "application/x-tar"
+                "application/x-bzip2"
+                "application/x-7z-compressed"
+                "application/x-rar"
+                "application/x-xz"
+              ];
         };
-
-        plugin.prepend_fetchers = [
-          {
-            id = "git";
-            name = "*";
-            run = "git";
-          }
-          {
-            id = "git";
-            name = "*/";
-            run = "git";
-          }
-        ];
-
       };
 
       plugins = {
-        chmod = "${plugins-repo}/chmod.yazi";
-        full-border = "${plugins-repo}/full-border.yazi";
-        max-preview = "${plugins-repo}/max-preview.yazi";
-        git = "${plugins-repo}/git.yazi";
-        no-status = "${plugins-repo}/no-status.yazi";
+        chmod = "${yazi-plugins}/chmod.yazi";
+        full-border = "${yazi-plugins}/full-border.yazi";
+        max-preview = "${yazi-plugins}/max-preview.yazi";
+        git = "${yazi-plugins}/git.yazi";
+        vcs-files = "${yazi-plugins}/vcs-files.yazi";
+        no-status = "${yazi-plugins}/no-status.yazi";
         # TODO: setup this plug
-        mime-ext = "${plugins-repo}/mime-ext.yazi";
-        smart-filter = "${plugins-repo}/smart-filter.yazi";
-        jump-to-char = "${plugins-repo}/jump-to-char.yazi";
-        starship = "${starship-yazi}";
+        mime-ext = "${yazi-plugins}/mime-ext.yazi";
+        smart-filter = "${yazi-plugins}/smart-filter.yazi";
+        jump-to-char = "${yazi-plugins}/jump-to-char.yazi";
+        ouch = "${ouch-yazi}";
+        # starship = "${starship-yazi}";
         # kdeconnect = "${kdeconnect-yazi}";
       };
 
       initLua =
         # lua
         ''
-                      require("full-border"):setup {
-                          -- Available values: ui.Border.PLAIN, ui.Border.ROUNDED
-                          type = ui.Border.ROUNDED,
-                      }
-                      require("git"):setup()
-                      require("no-status"):setup()
-                      require("kdeconnect"):setup {
-                        device = "c439e91904ce0298"
-                      }
-
-                      require("starship"):setup()
-                      -- starship:setup({ config_file = "/home/rolv/.config/starship_secondary.toml" })
-
-          --            Status:children_add(function()
-          --          	local h = cx.active.current.hovered
-          --          	if h == nil or ya.target_family() ~= "unix" then
-          --          		return ui.Line {}
-          --          	end
-          --
-          --          	return ui.Line {
-          --          		ui.Span(ya.user_name(h.cha.uid) or tostring(h.cha.uid)):fg("magenta"),
-          --          		ui.Span(":"),
-          --          		ui.Span(ya.group_name(h.cha.gid) or tostring(h.cha.gid)):fg("magenta"),
-          --          		ui.Span(" "),
-          --          	}
-          --          end, 500, Status.RIGHT)
-          --
-          --          -- https://yazi-rs.github.io/docs/dds#session.lua
-          --          require("session"):setup {
-          --          	sync_yanked = true,
-          --          }
+          require("full-border"):setup {
+              -- Available values: ui.Border.PLAIN, ui.Border.ROUNDED
+              type = ui.Border.ROUNDED,
+          }
+          require("git"):setup()
+          require("no-status"):setup()
         '';
 
       keymap =
@@ -184,7 +152,7 @@ in
                 desc = "Open selected files with `ripdrag`";
               }
               {
-                run = "arrow 999999999";
+                run = "arrow bot";
                 on = [
                   "g"
                   "e"
@@ -214,7 +182,7 @@ in
               (cd "Do" "~/development/own")
               (cd "Df" "~/development/forks")
               (cd "Dc" "~/development/cloned")
-              # (cd "y" "~/.config/yazi")
+              (cd "y" "~/.config/yazi")
 
               {
                 on = [ "F" ];
@@ -239,47 +207,36 @@ in
               {
                 on = [
                   "g"
-                  "r"
+                  "c"
                 ];
-                # FIXME: does nothing
-                run = ''
-                  shell 'ya pub dds-cd --str "$(git rev-parse --show-toplevel)"' --confirm
-                '';
-                desc = "cd back to the root of the current git repository";
+                run = "plugin vcs-files";
+                desc = "Show Git changed files";
               }
             ];
         };
     };
 
-  home.packages =
-    builtins.attrValues scripts
-    ++ (with pkgs; [
-      p7zip # opt dependency of `yazi`
-      ueberzugpp # opt dependency of `yazi`
-      exiftool # needed for `yazi` functionality
-    ]);
-
   # https://yazi-rs.github.io/docs/quick-start#shell-wrapper
-  programs.fish.functions.y =
-    # fish
-    ''
-        set -l latest_mtime 0
-        set -l latest_file
-        for f in *
-            set -l mtime (path mtime $f)
-            if test $mtime -gt $latest_mtime
-                set latest_mtime $mtime
-                set latest_file $f
-            end
-        end
+  # programs.fish.functions.y =
+  #   # fish
+  #   ''
+  #       set -l latest_mtime 0
+  #       set -l latest_file
+  #       for f in *
+  #           set -l mtime (path mtime $f)
+  #           if test $mtime -gt $latest_mtime
+  #               set latest_mtime $mtime
+  #               set latest_file $f
+  #           end
+  #       end
 
-      	set tmp (mktemp -t "yazi-cwd.XXXXXX")
-      	${pkgs.yazi}/bin/yazi $argv --cwd-file="$tmp" $latest_file
-      	if set cwd (command cat -- "$tmp"); and [ -n "$cwd" ]; and [ "$cwd" != "$PWD" ]
-      		builtin cd -- "$cwd"
-      	end
-      	command rm -f -- "$tmp"
-    '';
+  #     	set tmp (mktemp -t "yazi-cwd.XXXXXX")
+  #     	${pkgs.yazi}/bin/yazi $argv --cwd-file="$tmp" $latest_file
+  #     	if set cwd (command cat -- "$tmp"); and [ -n "$cwd" ]; and [ "$cwd" != "$PWD" ]
+  #     		builtin cd -- "$cwd"
+  #     	end
+  #     	command rm -f -- "$tmp"
+  #   '';
 
   # programs.nushell.extraConfig =
   #   # nu
@@ -296,13 +253,13 @@ in
   #   '';
 
   # TODO: check if this is already added when enabling `programs.yazi.enableFishIntegration`
-  programs.fish.interactiveShellInit = # fish
-    ''
-      # Change Yazi's CWD to PWD on subshell exit
-      if test -n $YAZI_ID
-      	trap 'ya pub dds-cd --str "$PWD"' EXIT
-      end
-    '';
+  # programs.fish.interactiveShellInit = # fish
+  #   ''
+  #     # Change Yazi's CWD to PWD on subshell exit
+  #     if test -n $YAZI_ID
+  #     	trap 'ya pub dds-cd --str "$PWD"' EXIT
+  #     end
+  #   '';
 
   # programs.bash.shellInit = ;
   # function y() {
@@ -314,3 +271,29 @@ in
   # 	rm -f -- "$tmp"
   # }
 }
+
+# scripts.yazi-downloads =
+#   pkgs.writers.writeFishBin "yd" { } # fish
+#     ''
+#       block --global
+#       cd ~/Downloads; or return
+
+#       function most-recent
+#           set -l latest_mtime 0
+#           set -l latest_file
+#           for f in *
+#               set -l mtime (path mtime $f)
+#               if test $mtime -gt $latest_mtime
+#                   set latest_mtime $mtime
+#                   set latest_file $f
+#               end
+#           end
+
+#           echo $latest_file
+#       end
+
+#       # Find most recent file
+#       set -l file (most-recent)
+#       command yazi $file
+#       # inputs.yazi.packages.${pkgs.system}.default;
+#     '';

@@ -3,7 +3,7 @@
 {
   imports = [ inputs.nixvim.homeManagerModules.nixvim ];
 
-  programs.nixvim.enable = false;
+  programs.nixvim.enable = true;
   programs.nixvim.package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
   programs.nixvim.extraPackages = with pkgs; [
     gnumake
@@ -95,17 +95,17 @@
         end
       '';
     }
-    {
-      event = [ "VimEnter" ];
-      group = "custom";
-      callback.__raw = ''
-        function()
-        MiniMap.open()
+    # {
+    #   event = [ "VimEnter" ];
+    #   group = "custom";
+    #   callback.__raw = ''
+    #     function()
+    #     MiniMap.open()
 
-        end
+    #     end
 
-      '';
-    }
+    #   '';
+    # }
   ];
 
   # TODO: make a keybind `<leader>a` that check if there is a code action available for the cursor position, and opens a panel to select a handler
@@ -235,13 +235,14 @@
   programs.nixvim.plugins.treesitter = {
     enable = true;
     settings = {
-      auto_install = false;
+      auto_install = true;
       ensure_installed = [
         "bash"
         "c"
         "diff"
         "html"
         "css"
+        "nu"
 
         "lua"
         "luadoc"
@@ -268,34 +269,34 @@
     };
   };
 
-  programs.nixvim.plugins.luasnip.enable = true;
-  programs.nixvim.extraLuaPackages = ps: [
-    # Required by luasnip
-    ps.jsregexp
-  ];
+  # programs.nixvim.plugins.luasnip.enable = true;
+  # programs.nixvim.extraLuaPackages = ps: [
+  #   # Required by luasnip
+  #   ps.jsregexp
+  # ];
 
-  programs.nixvim.plugins.cmp = {
-    enable = true;
-    autoEnableSources = true;
-    settings.sources = [
-      { name = "nvim_lsp"; }
-      { name = "path"; }
-      { name = "buffer"; }
-    ];
-    settings.completion.completeopt = "menu,menuone,noinsert";
-    settings.mapping = {
-      "<C-n>" = "cmp.mapping.select_next_item()";
-      "<C-p>" = "cmp.mapping.select_prev_item()";
-      "<C-y>" = "cmp.mapping.confirm { select = true }";
-      "<C-Space>" = "cmp.mapping.complete {}";
+  # programs.nixvim.plugins.cmp = {
+  #   enable = true;
+  #   autoEnableSources = true;
+  #   settings.sources = [
+  #     { name = "nvim_lsp"; }
+  #     { name = "path"; }
+  #     { name = "buffer"; }
+  #   ];
+  #   settings.completion.completeopt = "menu,menuone,noinsert";
+  #   settings.mapping = {
+  #     "<C-n>" = "cmp.mapping.select_next_item()";
+  #     "<C-p>" = "cmp.mapping.select_prev_item()";
+  #     "<C-y>" = "cmp.mapping.confirm { select = true }";
+  #     "<C-Space>" = "cmp.mapping.complete {}";
 
-    };
-  };
+  #   };
+  # };
 
-  programs.nixvim.plugins.diffview = {
-    enable = true;
-    enhancedDiffHl = true;
-  };
+  # programs.nixvim.plugins.diffview = {
+  #   enable = true;
+  #   enhancedDiffHl = true;
+  # };
 
   programs.nixvim.plugins.flash = {
     enable = true;
@@ -343,7 +344,7 @@
   programs.nixvim.plugins.notify.enable = true;
 
   programs.nixvim.plugins.none-ls.enable = true;
-  programs.nixvim.plugins.crates-nvim.enable = true;
+  programs.nixvim.plugins.crates.enable = true;
   programs.nixvim.plugins.todo-comments = {
     enable = true;
     settings.signs = true;
@@ -376,6 +377,6 @@
 
   # programs.nixvim.extraConfigLuaPost = # lua
   #   ''
-  #     local 
+  #     local
   #   '';
 }

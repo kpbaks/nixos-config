@@ -746,47 +746,47 @@ function fish_user_key_bindings
     # commandline --selection-end
 
     # bind \e, "$EDITOR $__fish_config_dir/config.fish; commandline -f repaint"
-    bind \e, "__edit_config; commandline -f repaint"
+    # bind \e, "__edit_config; commandline -f repaint"
 end
 
-function __edit_config_and_source_modified_files
-    block --local
-    pushd $__fish_config_dir
-    set -l mtime_db
-    set -l mtimes_before
-    set -l files_before
-    path filter -f config.fish conf.d/*.fish \
-        | while read f
-        # set -a mtime_db $f (path mtime $f)
-        set -a mtimes_before (path mtime $f)
-        set -a files_before $f
-    end
+# function __edit_config_and_source_modified_files
+#     block --local
+#     pushd $__fish_config_dir
+#     set -l mtime_db
+#     set -l mtimes_before
+#     set -l files_before
+#     path filter -f config.fish conf.d/*.fish \
+#         | while read f
+#         # set -a mtime_db $f (path mtime $f)
+#         set -a mtimes_before (path mtime $f)
+#         set -a files_before $f
+#     end
 
-    $EDITOR config.fish
+#     $EDITOR config.fish
 
-    set -l mtimes_after
-    set -l files_after
-    path filter -f config.fish conf.d/*.fish \
-        | while read f
-        # set -a mtime_db $f (path mtime $f)
-        set -a mtimes_after (path mtime $f)
-        set -a files_after $f
-    end
-
-
-    # TODO: check if any relevant files have been modified, and
-    # `source` them again
-    popd
-end
+#     set -l mtimes_after
+#     set -l files_after
+#     path filter -f config.fish conf.d/*.fish \
+#         | while read f
+#         # set -a mtime_db $f (path mtime $f)
+#         set -a mtimes_after (path mtime $f)
+#         set -a files_after $f
+#     end
 
 
-function fish_in_quote -d "Test if the commandline cursor is within a quoted string"
+#     # TODO: check if any relevant files have been modified, and
+#     # `source` them again
+#     popd
+# end
 
-end
 
-function fish_in_comment -d "Test if the commandline cursor is within a line comment"
+# function fish_in_quote -d "Test if the commandline cursor is within a quoted string"
 
-end
+# end
+
+# function fish_in_comment -d "Test if the commandline cursor is within a line comment"
+
+# end
 
 function __bind_resolve_absolute_path_to_binary
     # TODO: do it for all programs in the job/pipeline

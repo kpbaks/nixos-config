@@ -47,9 +47,11 @@ let
     pkgs.writers.writeNuBin "plugins" { } # nu
       ''
         # echo "github:"
+        # TODO: make revs be a hyperlink to the repo at the commit
         let github_plugins = ('${builtins.toJSON github-plugins}' | from json)
+
         $github_plugins
-        | move owner repo --before hash
+        | move owner repo rev --before hash
         | update repo {|row|
           let url = $"https://github.com/($row.owner)/($row.repo)"
           $url | ansi link --text $row.repo

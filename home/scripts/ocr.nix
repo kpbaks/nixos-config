@@ -56,6 +56,7 @@ in
   };
 
   programs.niri.settings.binds = with config.lib.niri.actions; {
-    "Mod+O".action = spawn (lib.getExe script);
+    # Same keybind as Windows PowerToys
+    "Mod+Shift+T".action = spawn (lib.getExe script);
   };
 }

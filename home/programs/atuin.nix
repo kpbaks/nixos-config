@@ -15,7 +15,9 @@
   # TODO: 4. Add pr to search for specific status code e.g. `$?=139` to search for all segfaults
   # TODO: 5. Add pr to enable case insensitive search, or see if it already can be configured
   programs.atuin.enable = true;
-  programs.atuin.enableFishIntegration = true;
+  programs.atuin.enableFishIntegration = false;
+  programs.atuin.enableNushellIntegration = false;
+
   programs.atuin.flags = [
     # "--disable-up-arrow"
     # "--disable-ctrl-r"

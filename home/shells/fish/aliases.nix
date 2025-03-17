@@ -1,5 +1,10 @@
-{ lib, pkgs, ... }:
+{
+  config,
+  lib,
+  ...
+}:
 let
+  eza = "${config.programs.eza.package}/bin/eza";
   eza-common-opts = builtins.concatStringsSep " " [
     "--icons"
     "--group-directories-first"
@@ -15,10 +20,9 @@ let
 in
 {
 
-  # TODO: enforce these with `lib.mkForce`
   programs.fish.shellAliases = lib.mkForce {
-    ls = ''${pkgs.eza}/bin/eza ${eza-common-opts} $argv'';
-    ll = ''${pkgs.eza}/bin/eza --long ${eza-common-opts} $argv'';
-    la = ''${pkgs.eza}/bin/eza --almost-all ${eza-common-opts} $argv'';
+    ls = ''${eza} ${eza-common-opts} $argv'';
+    ll = ''${eza} ${eza-common-opts} --long $argv'';
+    la = ''${eza} ${eza-common-opts} --almost-all $argv'';
   };
 }

@@ -1,3 +1,3 @@
 {
-  programs.fish.interactiveShellInit = builtins.readFile ./keybinds.fish;
+  # programs.fish.interactiveShellInit = builtins.readFile ./keybinds.fish;
 }

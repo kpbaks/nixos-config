@@ -49,11 +49,11 @@
   #     }
   #   '';
   services.swayosd = {
-    enable = false;
-    topMargin = 0.5; # center
+    enable = true;
+    topMargin = 0.20;
     # display = monitors.laptop;
-    display = "eDP-1";
-    stylePath = "${config.xdg.configHome}/swayosd/style.css";
+    # display = "eDP-1";
+    # stylePath = "${config.xdg.configHome}/swayosd/style.css";
   };
 
   home.packages = [ pkgs.swayosd ];

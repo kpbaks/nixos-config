@@ -8,5 +8,6 @@
     ./openscad.nix
     ./gitu.nix
     ./blender.nix
+    ./sublime-merge.nix
   ];
 }

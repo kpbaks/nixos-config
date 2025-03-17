@@ -7,6 +7,8 @@
     ];
     hidden = true;
     extraOptions = [
+      "--follow"
+      "--hyperlink"
       # "--absolute-path"
     ];
   };

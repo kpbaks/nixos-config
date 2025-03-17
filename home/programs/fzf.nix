@@ -17,9 +17,9 @@
       # "--pointer='|>'"
       "--pointer='=>'"
       "--marker='✔'"
-      # TODO: use catppuccin colors
       # TODO: change cursor icon
     ];
+    enableFishIntegration = false;
   };
   # TODO: integrate with border.fish
   # EXIT STATUS

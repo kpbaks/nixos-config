@@ -2,8 +2,9 @@
   imports = [
     ./bash.nix
     ./fish
-    ./ion.nix
+    # ./ion.nix
     ./nushell
-    ./powershell.nix
+    # ./powershell.nix
+    ./zsh.nix
   ];
 }
