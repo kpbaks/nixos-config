@@ -8,6 +8,8 @@
   # TODO: checkout https://github.com/azzamsa/zman
   # TODO: checkout https://github.com/6543/batmon/
   home.packages = with pkgs; [
+    podman-compose
+    podman-desktop
     kraft
     bloaty
     serpl
@@ -143,8 +145,6 @@
     # inkscape
     # gimp
     # dogdns # rust alternative to dig
-    # TODO: use home-manager module when ready
-    zed-editor
     # TODO: integrate with `cmake.fish`
     upx
     ripdrag # drag and drop files from the terminal

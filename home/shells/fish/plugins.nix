@@ -14,16 +14,10 @@ let
   nixpkgs-plugins = [
     # "grc"
     "autopair"
+    "bass"
     "done"
     "fishtape"
   ];
-  scripts.update-plugin-hashes =
-    pkgs.writers.writeFishBin "home-manager.fish.update-plugin-hashes" { }
-      # fish
-      ''
-        ${builtins.toJSON github-plugins} | ${pkgs.jaq}/bin/jaq
-          # ${pkgs.nurl}/bin/nurl
-      '';
 
   fetch-from-github =
     {
@@ -68,7 +62,7 @@ let
 
         # TODO: add subcommand check to see if a newer commit is available
         # $github_plugins
-        # | par-each {|p| 
+        # | par-each {|p|
         # }
 
         # http get https://api.github.com/repos/kpbaks/zellij.fish/commits?per_page=1 | get 0.sha

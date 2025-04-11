@@ -7,6 +7,7 @@
     ./foot.nix
     # ./gnome-terminal.nix
     ./ghostty.nix
+    ./contour.nix
     # ./ptyxis.nix
   ];
 }

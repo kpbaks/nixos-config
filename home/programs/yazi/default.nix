@@ -10,6 +10,7 @@ in
     ./confirm-quit.nix
     ./folder-rules.nix
     ./goto-project-root-dir.nix
+    ./pkg-config.nix
     # ./file-navigation-wraparound.nix
     # ./linemode.nix
   ];
@@ -27,8 +28,8 @@ in
       yazi-plugins = fetchFromGitHub {
         owner = "yazi-rs";
         repo = "plugins";
-        rev = "ceb053febb836dfd48200038d010ab9bc9d9c43f";
-        hash = "sha256-yBcbvzWU2FI7vkeqL7+ZIoQboybaPIiH4fV9yMqdHlM=";
+        rev = "273019910c1111a388dd20e057606016f4bd0d17";
+        hash = "sha256-80mR86UWgD11XuzpVNn56fmGRkvj0af2cFaZkU8M31I=";
       };
 
       ouch-yazi = fetchFromGitHub {
@@ -93,6 +94,9 @@ in
         };
       };
 
+      # TODO: change home-manager docs to specify that it should be dir with a `main.lua`
+      # file and not a `init.lua`
+      # see: https://home-manager-options.extranix.com/?query=yazi&release=master
       plugins = {
         chmod = "${yazi-plugins}/chmod.yazi";
         full-border = "${yazi-plugins}/full-border.yazi";

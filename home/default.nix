@@ -1,7 +1,6 @@
 {
   config,
   pkgs,
-  inputs,
   ...
 }:
 {
@@ -19,7 +18,7 @@
     # ./kde-plasma
     ./launchers
     ./modules
-    ./nixvim.nix
+    # ./nixvim.nix
     ./notification-daemons
     ./packages.nix
     ./pgp.nix
@@ -122,7 +121,7 @@
 
   # custom-modules/gitu.nix
 
-  programs.nix-your-shell.enable = true;
+  # programs.nix-your-shell.enable = true;
 
   programs.kubecolor = {
     enable = false;

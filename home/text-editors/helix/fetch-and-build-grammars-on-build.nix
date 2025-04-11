@@ -6,6 +6,7 @@
 }:
 {
   # TODO: propose upstream for inclusion into home-manager
+  # NOTE: idea already proposed before, but rejected as not planned https://github.com/nix-community/home-manager/issues/5218
   home.activation.helix-fetch-and-build-grammars =
     let
       hx = lib.getExe config.programs.helix.package;

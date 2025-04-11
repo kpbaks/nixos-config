@@ -13,23 +13,20 @@ in
     package = pkgs.espanso-wayland;
 
     configs = {
-      # show_notifications = true;
-      # vscode = {
-      #   filter_title = "Visual Studio Code$";
-      #   backend = "Clipboard";
-      # };
-
-      # default = {
-      #   backend = "Auto";
-      #   auto_restart = true;
-      #   show_icon = true;
-      #   show_notifications = true;
-      #   preserve_clipboard = true;
-      #   undo_backspace = true;
-      #   toggle_key = "ALT";
-      #   search_shortcut = "ALT+SHIFT+ENTER";
-      #   # search_shortcut = "ALT+SPACE"; # default
-      # };
+      default = {
+        backend = "Auto";
+        auto_restart = true;
+        # https://espanso.org/docs/configuration/options/#customizing-the-toggle-key
+        toggle_key = "ALT";
+        # toggle_key = "ALT";
+        # search_shortcut = "ALT+SHIFT+ENTER";
+        search_shortcut = "off";
+        search_trigger = "off";
+        show_icon = true;
+        show_notifications = true;
+        backspace_limit = 10;
+        undo_backspace = true;
+      };
     };
     matches.base.matches = with config.personal; [
       (match-with-prefix "tuta" tutamail)

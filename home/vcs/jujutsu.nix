@@ -10,6 +10,14 @@
       snapshot = {
         auto-track = "none()";
       };
+      aliases.init = [
+        "git"
+        "init"
+      ];
+      ui.default-command = [
+        "log"
+        "--reversed"
+      ];
     };
   };
 }

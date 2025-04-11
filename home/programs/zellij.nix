@@ -1,3 +1,4 @@
+# TODO: disable alt+i and alt+o, as I use them in helix
 {
   self,
   config,
@@ -34,7 +35,7 @@
   # `set -q KATE_PID`
   # `set -q VSCODE_INTEGRATION`
   # TODO: show the session resurrection plugin when starting a new fish process not in zellij
-  programs.zellij.enableFishIntegration = false;
+  programs.zellij.enableFishIntegration = true;
   programs.zellij.enableBashIntegration = false;
   programs.zellij.enableZshIntegration = false;
 
@@ -50,7 +51,8 @@
     # theme_dir = "${zellij_dir}/themes";
     # theme = "gruvbox-dark";
     # theme = "kanagawa";
-    theme = "iceberg-dark";
+    # theme = "iceberg-dark";
+    theme = "night-owl";
     default_layout = "default";
     # default_layout = "compact";
     pane_viewport_serialization = true;
@@ -222,8 +224,8 @@
   #   '';
 
   home.sessionVariables = {
-    ZELLIJ_AUTO_ATTACH = "true";
-    ZELLIJ_AUTO_EXIT = "false";
+    # ZELLIJ_AUTO_ATTACH = "true";
+    # ZELLIJ_AUTO_EXIT = "false";
   };
 
 }

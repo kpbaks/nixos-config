@@ -5,8 +5,11 @@
   imports = [
     ./forges
     ./lazygit.nix
+    ./subcommands
     ./ab.nix
     ./git-glossary.nix
+    ./templatedir.nix
+    # ./git-semver-tags.nix
   ];
 
   home.packages = with pkgs; [
@@ -18,22 +21,22 @@
     # git-gui
     # tk # needed by `git citool`
     # ghostie
-    github-backup
-    github-to-sqlite
+    # github-backup
+    # github-to-sqlite
     glab
-    serie # rich git commit graph terminal
+    # serie # rich git commit graph terminal
     git-interactive-rebase-tool
     # git-branchless
-    git-brunch
-    git-branchstack
+    # git-brunch
+    # git-branchstack
     # git-bars
-    gitleaks
-    commitizen
-    git-workspace
-    git-absorb
-    lighttpd # needed by `git instaweb`
-    dependabot-cli
-    git-doc
+    # gitleaks
+    # commitizen
+    # git-workspace
+    # git-absorb
+    # lighttpd # needed by `git instaweb`
+    # dependabot-cli
+    # git-doc
     sublime-merge
   ];
 

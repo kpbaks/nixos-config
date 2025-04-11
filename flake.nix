@@ -1,7 +1,4 @@
 {
-  # TODO(package):
-  # - https://github.com/siddrs/tokyo-night-sddm
-
   description = "@kpbaks' NixOS and home-manager configuration";
 
   # TODO(learn): what is the difference between `*` and `extra-*` options?
@@ -41,17 +38,17 @@
   # inputs.steel.url = "github:mattwparas/steel";
   # inputs.steel.inputs.nixpkgs.follows = "nixpkgs";
 
-  inputs.neovim-nightly-overlay = {
-    url = "github:nix-community/neovim-nightly-overlay";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
-  inputs.nixvim = {
-    url = "github:nix-community/nixvim";
-    # If you are not running an unstable channel of nixpkgs, select the corresponding branch of nixvim.
-    # url = "github:nix-community/nixvim/nixos-24.11";
+  # inputs.neovim-nightly-overlay = {
+  #   url = "github:nix-community/neovim-nightly-overlay";
+  #   inputs.nixpkgs.follows = "nixpkgs";
+  # };
+  # inputs.nixvim = {
+  #   url = "github:nix-community/nixvim";
+  #   # If you are not running an unstable channel of nixpkgs, select the corresponding branch of nixvim.
+  #   # url = "github:nix-community/nixvim/nixos-24.11";
 
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
+  #   inputs.nixpkgs.follows = "nixpkgs";
+  # };
 
   # inputs.television.url = "github:alexpasmantier/television";
   # inputs.television.inputs.nixpkgs.follows = "nixpkgs";
@@ -175,7 +172,6 @@
       };
     in
     {
-      # TODO: use treefmt.nix
       formatter.${system} = pkgs.nixfmt-rfc-style;
 
       checks = for-all-systems (system: {
@@ -190,6 +186,7 @@
             check-json.enable = true;
             check-yaml.enable = true;
             lychee.enable = true;
+            typos.enable = true;
             # trufflehog.enable = true;
           };
         };
@@ -232,7 +229,7 @@
         };
         modules = [
           ./configuration.nix
-
+          # ./k3s.nix
           {
             # https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md#default-configuration--who-needs-configuration
             # NixOS configuration.
@@ -255,7 +252,7 @@
           # }
           # inputs.catppuccin.nixosModules.catppuccin
           # { environment.systemPackages = [ inputs.nix-weather.packages.${system}.nix-weather ]; }
-          # { environment.systemPackages = [ inputs.fh.packages.${system}.default ]; }
+          { environment.systemPackages = [ inputs.fh.packages.${system}.default ]; }
 
           # {
           #   imports = [

@@ -141,6 +141,7 @@
   };
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  # boot.kernelPackages = pkgs.linuxPackages_6_13;
   # boot.kernelPackages = pkgs.linuxPackages_zen;
   # boot.kernelPackages = pkgs.linuxPackages_6_12;
 
@@ -489,7 +490,7 @@
     wayland-utils
     alsa-utils # `alsamixer`
     # fh # flakehub cli
-    adbfs-rootless # TODO: only if adb is enabled
+    # adbfs-rootless # TODO: only if adb is enabled
 
     # TODO: checkout and experiment with (tir 10 sep 21:58:53 CEST 2024)
     # TODO: a laptop does not have numa
@@ -498,7 +499,7 @@
     # numatop
     inetutils
     # inputs.nixos-cli.packages.${system}.default
-    scrcpy # TODO: only if adb is enabled
+    # scrcpy # TODO: only if adb is enabled
 
     # distrobox
     libinput
@@ -526,7 +527,7 @@
     # btrfs-progs # Tools to interact with btrfs file system partitions
     udev
     systemctl-tui
-    systeroid # A more powerful alternative to sysctl(8) with a terminal user interface 🐧
+    # systeroid # A more powerful alternative to sysctl(8) with a terminal user interface 🐧
     kmon # tui to view state of loaded kernel modules
     lshw # list hardware
     pciutils # `lscpi`
@@ -1075,7 +1076,7 @@
   #
 
   programs.obs-studio = {
-    enable = true;
+    enable = false;
     enableVirtualCamera = true;
   };
 

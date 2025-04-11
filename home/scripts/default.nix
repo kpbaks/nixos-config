@@ -36,6 +36,8 @@ let
     ./just-a-chill-guy.nix
     ./issue.nix
     ./whichie.nix
+    ./ls-pkg-config-path.nix
+    # ./version-bump.nix
     # ./sync-fork.nix
     # ./lg.nix
     # ./tokei-pie.nix

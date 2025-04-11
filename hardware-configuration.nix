@@ -7,15 +7,22 @@
   pkgs,
   modulesPath,
   ...
-}: {
+}:
+{
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
 
-  boot.initrd.availableKernelModules = ["xhci_pci" "thunderbolt" "nvme" "usb_storage" "sd_mod"];
-  boot.initrd.kernelModules = [];
-  boot.kernelModules = ["kvm-intel"];
-  boot.extraModulePackages = [];
+  boot.initrd.availableKernelModules = [
+    "xhci_pci"
+    "thunderbolt"
+    "nvme"
+    "usb_storage"
+    "sd_mod"
+  ];
+  boot.initrd.kernelModules = [ ];
+  boot.kernelModules = [ "kvm-intel" ];
+  boot.extraModulePackages = [ ];
 
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/629538ab-a34c-441d-a379-1cca6d799075";
@@ -25,7 +32,10 @@
   fileSystems."/boot" = {
     device = "/dev/disk/by-uuid/52D0-5E93";
     fsType = "vfat";
-    options = ["fmask=0022" "dmask=0022"];
+    options = [
+      "fmask=0022"
+      "dmask=0022"
+    ];
   };
 
   fileSystems."/mnt/ssd1" = {
@@ -34,7 +44,7 @@
   };
 
   swapDevices = [
-    {device = "/dev/disk/by-uuid/aaefd6d2-58e3-4b3a-b229-14f56d772ff8";}
+    { device = "/dev/disk/by-uuid/aaefd6d2-58e3-4b3a-b229-14f56d772ff8"; }
   ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
@@ -47,4 +57,32 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+
+  # Nvidia Configuration
+  services.xserver.videoDrivers = [ "nvidia" ];
+  hardware.graphics.enable = true;
+  hardware.nvidia.modesetting.enable = true;
+  hardware.nvidia-container-toolkit.enable = true;
+  hardware.nvidia.powerManagement.enable = true;
+  hardware.nvidia.powerManagement.finegrained = true;
+  hardware.nvidia.dynamicBoost.enable = true;
+  hardware.nvidia.gsp.enable = true; # supported by the discrete GPU in my laptop, "GeForce RTX 3060 Mobile / Max-Q"
+  hardware.nvidia.open = false; # nouveau makes my laptop fans run on full throttle 😭
+  hardware.nvidia.prime = {
+    sync.enable = lib.mkForce false;
+    offload = rec {
+      enable = lib.mkForce true;
+      enableOffloadCmd = enable; # adds `nvidia-offload` to `environment.systemPackages`
+    };
+
+    # NOTE: ids found with `lspci | grep VGA`
+    nvidiaBusId = "PCI:01:00:0";
+    intelBusId = "PCI:00:02:0";
+  };
+
+  # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
+  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
+  # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.beta;
+  # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
+
 }

@@ -5,7 +5,7 @@
     ./atuin.nix
     ./bacon.nix
     ./bat.nix
-    ./beeper.nix
+    # ./beeper.nix
     ./bluetoothctl.nix
     ./broot
     ./carapace.nix

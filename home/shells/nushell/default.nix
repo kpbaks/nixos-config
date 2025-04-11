@@ -21,7 +21,7 @@
   ];
 
   programs.starship.enableNushellIntegration = false;
-
+  # https://github.com/nushell/nushell/blob/f33a26123c9d903f6f9e00eb18903d6aed6fad51/crates/nu-utils/src/default_files/doc_config.nu
   programs.nushell.configFile.text =
     # nu
     ''
@@ -77,6 +77,11 @@
       $env.config.table = {
         mode: rounded
         header_on_separator: true
+        # footer_mode: auto
+        footer_inheritance: true # TODO(pr): only use if output table does not fit within terminal window
+        padding: {left: 0 right: 0}
+        index_mode: auto
+        # abbreviated_row_count: 10
       }
       # TODO: finish this
       $env.config.hooks.command_not_found = [
@@ -85,9 +90,30 @@
         # git@codeberg.org:kpbaks/permalink-ls.git
         }
       ]
+
+
+      # TODO: figure out how to make a fg/bg toggle keybind
+      # $env.config.keybinds = [
+      #   {
+      #     name: ctrl-z
+      #     modifier: control
+      #     keycode: char_z
+      #     mode: emacs
+      #     event: { send: }
+      #   }
+      # ]
     '';
+  # https://github.com/nushell/nushell/tree/main/crates/nu-utils/src/default_files
   programs.nushell = {
     enable = true;
+    shellAliases = {
+      g = "git";
+      ll = "ls -l";
+      la = "ls -a";
+      lla = "ls -al";
+      fg = "job unfreeze"; # 🤤
+      jobs = "job list";
+    };
     extraConfig =
       # nu
       ''
@@ -108,9 +134,6 @@
         #   }
         # }
 
-        alias ll = ls --long
-        alias la = ls --all
-        alias lla = ls --long --all
 
         # def --env cdn [] { cd /etc/nixos; $t{config.programs.helix.package}/bin/hx flake.nix }
         def --env cdn [] { cd /etc/nixos }
@@ -134,7 +157,7 @@
 
 
         # TODO: parse the format of /etc/fstab
-        # def "from fstab" []: [string -> 
+        # def "from fstab" []: [string ->
       '';
   };
 

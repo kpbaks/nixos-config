@@ -1,4 +1,9 @@
-{ pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   ghostty-shaders = pkgs.fetchFromGitHub {
     owner = "hackr-sh";
@@ -6,17 +11,19 @@ let
     rev = "3f458157b0d7b9e70eeb19bd27102dc9f8dae80c";
     hash = "sha256-N6MP9QX/80ppg+TdmxmMVYsoeguicRIXfPHyoMGt92s=";
   };
+  boo = pkgs.writeScriptBin "boo" "${config.programs.ghostty.package}/bin/ghostty +boo";
 in
 # https://ghostty.org/docs/help/terminfo#copy-ghostty's-terminfo-to-a-remote-machine
 {
   programs.ghostty = {
     enable = true;
+    enableFishIntegration = true;
     package = pkgs.ghostty;
     settings = {
 
       auto-update = "check";
       auto-update-channel = "tip";
-      bold-is-bright = true;
+      bold-is-bright = false;
       linux-cgroup = "always";
 
       # window-theme = dark
@@ -30,7 +37,8 @@ in
       # adw-toolbar-style = "raised-border";
       gtk-titlebar = true;
 
-      background-opacity = 0.95;
+      # background-opacity = 0.95;
+      background-opacity = 1;
       background-blur = false;
 
       cursor-style = "bar";
@@ -61,8 +69,9 @@ in
       # theme = GruvboxLight
 
       # theme = "Builtin Pastel Dark";
-      theme = "iceberg-dark";
-      # theme = "dark:iceberg-dark,light:iceberg-light";
+      # theme = "iceberg-dark";
+      # theme = "0x96f";
+      theme = "dark:iceberg-dark,light:iceberg-light";
       # theme = "shadow";
       # theme = "dark:Kanagawa Wave,light:GruvboxLight";
 
@@ -74,11 +83,32 @@ in
       # custom-shader = "${ghostty-shaders}/crt.glsl";
       focus-follows-mouse = true;
 
-      keybind = [
-        "global:ctrl+enter=toggle_tab_overview"
-        "global:f11=toggle_fullscreen"
-      ];
-
+      # https://ghostty.org/docs/config/keybind
+      keybind =
+        [
+          "ctrl+enter=toggle_tab_overview"
+          "f11=toggle_fullscreen"
+          "ctrl+shift+w=close_surface"
+        ]
+        ++ lib.optionals config.programs.zellij.enable [
+          "ctrl+shift+t=unbind" # spawn tab
+          "ctrl+shift+w=unbind" # close tab
+          "ctrl+shift+n=unbind" # open new window
+          "ctrl+page_up=unbind"
+          "ctrl+page_down=unbind"
+          "ctrl+tab=unbind"
+          "ctrl+shift+tab=unbind"
+          "ctrl+shift+o=unbind" # open vertical split
+          "ctrl+shift+e=unbind" # open horizontal split
+          "ctrl+comma=unbind" # open ghostty config
+          "ctrl+shift+comma=unbind" # reload ghostty config
+          "ctrl+alt+left=unbind"
+          "ctrl+shift+a=unbind" # select all text
+          "ctrl+shift+left=unbind"
+          "ctrl+shift+right=unbind"
+          "ctrl+shift+j=unbind" # write screen contents to tmp file
+          "alt+1=unbind"
+        ];
     };
 
     themes = {
@@ -110,4 +140,8 @@ in
       };
     };
   };
+
+  home.packages = [
+    boo
+  ];
 }
