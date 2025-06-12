@@ -5,6 +5,7 @@
 }:
 {
   imports = [
+    ./quickshell
     ./bars
     ./browsers
     ./calendar.nix
@@ -15,7 +16,8 @@
     ./environment-variables.nix
     ./fonts.nix
     # ./git.nix
-    # ./kde-plasma
+    # TODO move under ./desktop-environments
+    ./kde-plasma
     ./launchers
     ./modules
     # ./nixvim.nix
@@ -48,11 +50,11 @@
 
   news.display = "notify";
 
-  nix.gc = {
-    automatic = true;
-    frequency = "weekly";
-    options = null;
-  };
+  # nix.gc = {
+  #   automatic = true;
+  #   frequency = "weekly";
+  #   options = null;
+  # };
 
   systemd.user.startServices = "sd-switch";
 
@@ -69,35 +71,36 @@
     enableBashIntegration = true;
   };
 
+  # TODO: use systemd env var activation condition to activate on niri
   services.network-manager-applet.enable = false;
 
-  gtk.enable = true;
+  # gtk.enable = true;
 
-  gtk.theme = {
-    # name = "adw-gtk3";
-    name = "Adwaita";
-    package = pkgs.adw-gtk3;
-  };
+  # gtk.theme = {
+  #   # name = "adw-gtk3";
+  #   name = "Adwaita";
+  #   package = pkgs.adw-gtk3;
+  # };
 
-  gtk.gtk2.extraConfig = ''gtk-application-prefer-dark-theme = 1'';
+  # gtk.gtk2.extraConfig = ''gtk-application-prefer-dark-theme = 1'';
 
-  gtk.gtk3.extraConfig = {
-    gtk-application-prefer-dark-theme = 1;
-  };
+  # gtk.gtk3.extraConfig = {
+  #   gtk-application-prefer-dark-theme = 1;
+  # };
 
-  gtk.gtk4.extraConfig = {
-    gtk-application-prefer-dark-theme = 1;
-  };
+  # gtk.gtk4.extraConfig = {
+  #   gtk-application-prefer-dark-theme = 1;
+  # };
 
-  gtk.gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
+  # gtk.gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
 
-  qt.enable = true;
+  # qt.enable = true;
   # qt.style.name = "kvantum";
   # qt.platformTheme.name = "kvantum";
   # qt.style.catppuccin.enable = false;
   # catppuccin.kvantum.enable = false;
-  qt.style.name = "breeze";
-  qt.platformTheme.name = "kde";
+  # qt.style.name = "breeze";
+  # qt.platformTheme.name = "kde";
 
   # qt = {
   #   style.package = [
@@ -117,7 +120,7 @@
   # services.poweralertd.enable = osConfig.services.upower.enable;
   # services.poweralertd.enable = true;
 
-  programs.openscad.enable = true; # custom-modules/openscad.nix
+  programs.openscad.enable = false; # custom-modules/openscad.nix
 
   # custom-modules/gitu.nix
 
@@ -134,4 +137,12 @@
     enableFishIntegration = true;
     enableNushellIntegration = true;
   };
+
+  programs.numbat = {
+    enable = true;
+  };
+
+  programs.zotero.enable = true;
+  programs.neohtop.enable = true;
+  programs.calibre.enable = true;
 }

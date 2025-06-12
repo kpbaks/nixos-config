@@ -2,6 +2,7 @@
   imports = [
     ./portal.nix
     ./mime.nix
+    ./desktop-entries.nix
   ];
 
   xdg.enable = true;

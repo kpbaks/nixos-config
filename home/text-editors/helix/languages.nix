@@ -1,14 +1,9 @@
-{ config, pkgs, ... }:
-let
-
-  # TODO: upstream to helix
-  tree-sitter-roc = pkgs.fetchFromGitHub {
-    owner = "faldor20";
-    repo = "tree-sitter-roc";
-    rev = "ef46edd0c03ea30a22f7e92bc68628fb7231dc8a";
-    hash = "sha256-H76cnMlBT1Z/9WXAdoVslImkyy38uCqum9qEnH+Ics8=";
-  };
-in
+{
+  config,
+  inputs,
+  pkgs,
+  ...
+}:
 {
   programs.helix.extraPackages = [ pkgs.nil ];
   programs.helix.languages = {
@@ -223,6 +218,14 @@ in
           ];
         }
         {
+          name = "rust";
+          language-servers = [
+            "rust-analyzer"
+            "typos-lsp"
+            "ast-grep"
+          ];
+        }
+        {
           name = "toml";
           auto-format = true;
           # formatter = {
@@ -276,5 +279,5 @@ in
     ];
   };
 
-  xdg.configFile."helix/runtime/queries/roc".source = "${tree-sitter-roc}/queries";
+  xdg.configFile."helix/runtime/queries/roc".source = "${inputs.tree-sitter-roc}/queries";
 }

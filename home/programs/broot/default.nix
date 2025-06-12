@@ -1,27 +1,23 @@
 { lib, pkgs, ... }:
 {
-
   programs.broot = {
     enable = true;
     enableFishIntegration = true;
-    settings = {
-      modal = true;
+    settings = rec {
+      modal = false;
       # icon_theme = "vscode";
       icon_theme = "nerdfont";
       default_flags = "-gh"; # show (h)idden files and status of files related to (g)it
       show_selection_mark = true;
-      lines_before_match_in_preview = 1;
-      lines_after_match_in_preview = 1;
+      lines_before_match_in_preview = 2;
+      lines_after_match_in_preview = lines_before_match_in_preview;
       # TODO: fetch github file extension colors and use here
       # https://dystroy.org/broot/conf_file/#colors-by-file-extension
       ext-colors = { } // (import ./github-language-colors.nix);
       # ext-colors = {
 
       # };
-
-      # TODO: create syntax_theme for catppuccin, and sumbit pr to broot to bundle them with it.
-
-      enable_kitty_keyboard = lib.mkForce true;
+      enable_kitty_keyboard = lib.mkForce false;
       capture_mouse = true;
       transformers = [
         # Beutify JSON

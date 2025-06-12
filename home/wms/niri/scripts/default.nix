@@ -1,9 +1,9 @@
-{ lib, ... }:
+{ config, lib, ... }:
 {
   # NOTE: returns all files, not just `.nix` files
   # imports = lib.filesystem.listFilesRecursive ./.;
   imports = [
-
+    ./niri-pick-color.nix
     ./show-outputs.nix
     ./notify-when-keyboard-layout-changes.nix
   ];

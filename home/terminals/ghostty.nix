@@ -1,20 +1,25 @@
 {
   config,
+  inputs,
   lib,
   pkgs,
   ...
 }:
 let
-  ghostty-shaders = pkgs.fetchFromGitHub {
-    owner = "hackr-sh";
-    repo = "ghostty-shaders";
-    rev = "3f458157b0d7b9e70eeb19bd27102dc9f8dae80c";
-    hash = "sha256-N6MP9QX/80ppg+TdmxmMVYsoeguicRIXfPHyoMGt92s=";
-  };
+  # ghostty-shaders = pkgs.fetchFromGitHub {
+  #   owner = "hackr-sh";
+  #   repo = "ghostty-shaders";
+  #   rev = "3f458157b0d7b9e70eeb19bd27102dc9f8dae80c";
+  #   hash = "sha256-N6MP9QX/80ppg+TdmxmMVYsoeguicRIXfPHyoMGt92s=";
+  # };
   boo = pkgs.writeScriptBin "boo" "${config.programs.ghostty.package}/bin/ghostty +boo";
 in
+
 # https://ghostty.org/docs/help/terminfo#copy-ghostty's-terminfo-to-a-remote-machine
 {
+
+  xdg.configFile."ghostty/themes/Eldritch".source = "${inputs.eldritch-theme-ghostty}/Eldritch";
+
   programs.ghostty = {
     enable = true;
     enableFishIntegration = true;
@@ -46,8 +51,8 @@ in
       mouse-shift-capture = true;
       font-size = 16;
 
-      # font-family = "Iosevka Nerd Font Mono";
-      font-family = "JetBrainsMono Nerd Font Mono";
+      font-family = "Iosevka Nerd Font Mono";
+      # font-family = "JetBrainsMono Nerd Font Mono";
 
       mouse-scroll-multiplier = 2;
 
@@ -71,7 +76,9 @@ in
       # theme = "Builtin Pastel Dark";
       # theme = "iceberg-dark";
       # theme = "0x96f";
-      theme = "dark:iceberg-dark,light:iceberg-light";
+      # theme = "dark:iceberg-dark,light:iceberg-light";
+      # theme = "dark:BlueDolphin,light:Builtin Solarized Light";
+      theme = "Eldritch";
       # theme = "shadow";
       # theme = "dark:Kanagawa Wave,light:GruvboxLight";
 

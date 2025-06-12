@@ -1,15 +1,4 @@
-{ pkgs, ... }:
-let
-  inherit (pkgs) fetchFromGitHub;
-  carbon = fetchFromGitHub {
-    owner = "rishikanthc";
-    repo = "carbon-helix";
-    rev = "3e024cb337de09f874579ef8dd5364b300405bb7";
-    hash = "sha256-R+EhV25GRp/470kU7iQXELyYJbqn1Hu3LPVsGKgi5F0=";
-  };
-in
 {
-  programs.helix.themes.carbon = with builtins; fromTOML (readFile "${carbon}/carbon.toml");
   # programs.helix.settings.theme = "catppuccin_mocha";
   # programs.helix.settings.theme = "ao";
   # programs.helix.settings.theme = "pop-dark";
@@ -21,5 +10,6 @@ in
   # programs.helix.settings.theme = "kaolin-dark";
   # programs.helix.settings.theme = "gruber-darker";
   # programs.helix.settings.theme = "carbon";
-  programs.helix.settings.theme = "iceberg-dark";
+  # programs.helix.settings.theme = "iceberg-dark";
+  programs.helix.settings.theme = "focus_nova";
 }

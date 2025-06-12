@@ -17,6 +17,7 @@
 
   # Modify service definition to enable in a tiling WM like niri, but
   # disable in when using KDE Plasma.
+  # [ref:set_XDG_CURRENT_DESKTOP_to_niri]
   systemd.user.services.wlsunset = {
     User.ConditionEnvironment = "XDG_CURRENT_DESKTOP=niri";
   };

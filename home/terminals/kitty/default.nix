@@ -16,7 +16,7 @@
   # home.file.".config/kitty/catppuccin-latte.conf".source = ./extra/kitty/catppuccin-latte.conf;
   # home.file.".config/kitty/catppuccin-macchiato.conf".source = ./extra/kitty/catppuccin-macchiato.conf;
   programs.kitty = {
-    enable = true;
+    enable = false;
     # catppuccin.enable = false;
     environment = {
       # LS_COLORS = "1";
@@ -24,6 +24,8 @@
     font.name = "JetBrainsMono Nerd Font Mono";
     # font.name = "Iosevka Nerd Font Mono";
     font.size = 18;
+    themeFile = "Eldritch-dark";
+    enableGitIntegration = true;
     # https://sw.kovidgoyal.net/kitty/actions/
     keybindings = {
       "ctrl+c" = "copy_or_interrupt";

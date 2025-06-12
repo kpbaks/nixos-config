@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, ... }:
 let
   remaining-column-width-proportion =
     1.0 - config.programs.niri.settings.layout.default-column-width.proportion;
@@ -25,7 +25,7 @@ in
       # FIXME: does not match private browsing in firefox
       matches = [
         {
-          app-id = "^firefox$";
+          app-id = browser;
           title = ".*Private Browsing$";
         }
       ];
@@ -70,7 +70,8 @@ in
         { app-id = "^org.freedesktop.impl.portal.desktop.kde$"; }
       ];
 
-      default-column-width.proportion = remaining-column-width-proportion;
+      # default-column-width.proportion = remaining-column-width-proportion;
+      open-floating = true;
     }
 
     {
@@ -96,6 +97,40 @@ in
         y = 32;
         relative-to = "bottom-left";
       };
+    }
+    {
+      matches = [
+        { title = "^Extension: (Bitwarden Password Manager).+"; }
+      ];
+      open-floating = true;
+      open-focused = true;
+      block-out-from = "screencast";
+    }
+    {
+      matches = [
+        {
+          app-id = "^org.telegram.desktop$";
+          at-startup = true;
+        }
+        {
+          app-id = "^vesktop$";
+          at-startup = true;
+        }
+      ];
+      open-on-workspace = "chat";
+    }
+    {
+      matches = [
+        {
+          app-id = "^dev.zed.Zed$";
+          at-startup = true;
+        }
+        {
+          app-id = "^org.kate.Kate$";
+          at-startup = true;
+        }
+      ];
+      open-on-workspace = "development";
     }
   ];
 }

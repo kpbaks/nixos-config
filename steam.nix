@@ -9,8 +9,7 @@
   environment.systemPackages = with pkgs; [
     steamcmd
     # steam-tui
-    gamescope
-    adwsteamgtk # TODO: how to apply?
+    # adwsteamgtk # TODO: how to apply?
   ];
 
   programs.steam = {
@@ -27,12 +26,6 @@
 
   # specialisation.gaming.configuration = {
   #   system.nixos.tags = [ "gaming" ];
-  programs.coolercontrol.nvidiaSupport = true;
-  programs.coolercontrol.enable = true;
-
-  # };
-
-  services.sunshine = {
-    enable = false;
-  };
+  programs.coolercontrol.enable = false;
+  services.sunshine.enable = false;
 }

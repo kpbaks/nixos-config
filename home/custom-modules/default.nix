@@ -9,5 +9,6 @@
     ./gitu.nix
     ./blender.nix
     ./sublime-merge.nix
+    ./glow.nix
   ];
 }

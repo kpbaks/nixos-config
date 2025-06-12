@@ -1,0 +1,3 @@
+{
+  programs.vesktop.enable = true;
+}

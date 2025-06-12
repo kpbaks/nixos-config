@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   inputs,
   username,
@@ -12,7 +13,8 @@
     ./networking.nix
     ./zsa.nix
     ./wacom-intuos.nix
-    # ./steam.nix
+    ./power-management.nix
+    ./steam.nix
     # ./hdmi-cec.nix
     # ./tuxedo-laptop-second-nvme-drive.nix
   ];
@@ -78,8 +80,8 @@
   system.stateVersion = "23.11"; # Did you read the comment?
 
   # Allow unfree packages e.g. closed-source nvidia drivers
-  nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.allowBroken = false;
+  # nixpkgs.config.allowUnfree = true;
+  # nixpkgs.config.allowBroken = false;
 
   # Needed by `nixd` lsp
   nix.nixPath = [ "nixpkgs=${inputs.nixpkgs}" ];
@@ -177,10 +179,13 @@
     # "quiet"
     "splash"
     "boot.shell_on_fail"
-    "loglevel=3"
     "rd.systemd.show_status=true"
     "rd.udev.log_level=3"
     "udev.log_priority=3"
+
+    "audit=off" # disable noisy audit and audit log
+    # "mitigations=off" # might be a security issue, but slight performance gain :D
+    "nowatchdog"
   ];
 
   # Hide the OS choice for bootloaders.
@@ -244,6 +249,7 @@
   ];
   # programs.direnv.enable = true;
 
+  # TODO: why enabled?
   hardware.i2c.enable = true;
 
   hardware.tuxedo-drivers.enable = true;
@@ -264,10 +270,9 @@
 
   # FIXME: 'evdi' not found
   boot.kernelModules = [
+    # TODO: create a hardware. module for this and upstream
     "hid-playstation" # needed for bluetooth connectivity to playstation 4 and 5 dualshock controllers, ref: https://www.phoronix.com/news/Sony-DualShock4-PlayStation-Drv
     "evdi"
-    "snd-aloop" # needed for `droidcam`
-    "v4l2loopback"
     "kvm-intel" # support for hardware virtualisation with Intel CPUs
     # "kvm-amd"
     # "tuxedo_keyboard"
@@ -278,6 +283,7 @@
   #   # "tuxedo_keyboard.color_left=0xff0a0a"
   # ];
 
+  programs.droidcam.enable = false;
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
@@ -302,10 +308,11 @@
   programs.appimage.enable = true;
   programs.appimage.binfmt = true;
   programs.appimage.package = pkgs.appimage-run.override {
-    extraPkgs = pkgs: [
-      pkgs.ffmpeg
-      pkgs.imagemagick
-    ];
+    extraPkgs =
+      pkgs: with pkgs; [
+        ffmpeg
+        imagemagick
+      ];
   };
   environment.variables = {
     # EDITOR = "hx";
@@ -364,7 +371,7 @@
   # services.xserver.desktopManager.gnome.enable = true;
   # services.xserver.displayManager.gdm.enable = true;
 
-  services.xserver.desktopManager.gnome.enable = false;
+  services.desktopManager.gnome.enable = true;
   # Exclude applications installed with Gnome
   environment.gnome.excludePackages = with pkgs; [
     gnome-tour
@@ -388,12 +395,12 @@
   #   ${pkgs.lib.getBin pkgs.xorg.xrandr}/bin/xrandr --setprovideroutputsource 2 0
   # '';
 
-  nixpkgs.config.packageOverrides = pkgs: {
-    # Needed for `wl-screenrec`
-    # https://github.com/intel/intel-hybrid-driver
-    # `intel-hybrid-driver` is deprecated
-    # intel-vaapi-driver = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
-  };
+  # nixpkgs.config.packageOverrides = pkgs: {
+  #   # Needed for `wl-screenrec`
+  #   # https://github.com/intel/intel-hybrid-driver
+  #   # `intel-hybrid-driver` is deprecated
+  #   # intel-vaapi-driver = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
+  # };
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
@@ -417,7 +424,7 @@
   # Enable sound with pipewire.
   # sound.enable = true;
   services.pulseaudio.enable = false;
-  nixpkgs.config.pulseaudio = true;
+  # nixpkgs.config.pulseaudio = true;
   services.pulseaudio.extraModules = [ pkgs.pulseaudio-modules-bt ];
   services.pulseaudio.package = pkgs.puleaudioFull;
 
@@ -450,16 +457,13 @@
         "storage"
         "i2c-dev"
       ]
-      ++ (if config.virtualisation.podman.enable then [ "podman" ] else [ ])
+      ++ (lib.optional config.virtualisation.podman.enable "podman")
       ++ (
         # https://nixos.wiki/wiki/Android
-        if config.programs.adb.enable then
-          [
-            "adbusers"
-            "kvm"
-          ]
-        else
-          [ ]
+        lib.optionals config.programs.adb.enable [
+          "adbusers"
+          "kvm"
+        ]
       )
     );
     packages = [ ]; # managed by home-manager, see ./home.nix
@@ -475,6 +479,7 @@
     nerd-fonts.sauce-code-pro
     nerd-fonts.commit-mono
     nerd-fonts.iosevka
+    nerd-fonts.fantasque-sans-mono
     cantarell-fonts
     font-awesome
   ];
@@ -663,8 +668,8 @@
   };
 
   programs.niri.enable = true;
-  programs.niri.package = pkgs.niri;
-  # programs.niri.package = pkgs.niri-unstable;
+  # programs.niri.package = pkgs.niri;
+  programs.niri.package = pkgs.niri-unstable;
 
   # hardware.system76.power-daemon.enable = true;
   services.system76-scheduler.enable = true;
@@ -730,48 +735,6 @@
   #   excalidraw.enable = true;
   # };
 
-  services.thermald.enable = true;
-  services.auto-cpufreq.enable = false;
-  services.auto-cpufreq.settings = {
-    battery = {
-      governor = "powersave";
-      turbo = "never";
-    };
-    charger = {
-      governor = "performance";
-      turbo = "auto";
-    };
-  };
-
-  services.power-profiles-daemon.enable = false;
-  powerManagement.enable = true;
-  # Disabled because I used it infrequently, and because it slows down boot time with about 3 seconds.
-  # Use `systemd-analyse` to get start timings of services
-  powerManagement.powertop.enable = false;
-
-  # services.tlp.enable = true;
-
-  # # TODO: check out services.auto-cpufreq
-  services.tlp = {
-    enable = true;
-    settings = {
-      CPU_SCALING_GOVERNOR_ON_AC = "performance";
-      CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
-
-      CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
-      CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
-
-      CPU_MIN_PERF_ON_AC = 0;
-      CPU_MAX_PERF_ON_AC = 100;
-      CPU_MIN_PERF_ON_BAT = 0;
-      CPU_MAX_PERF_ON_BAT = 20;
-
-      # Optional helps save long term battery health
-      START_CHARGE_THRESH_BAT0 = 20; # 20 and bellow it starts to charge
-      STOP_CHARGE_THRESH_BAT0 = 80; # 80 and above it stops charging
-    };
-  };
-
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
@@ -780,6 +743,7 @@
 
   # It is annoying to sometimes reboot/shutdown and having to wait 2 ENTIRE minutes, which is the default,
   # for Systemd to wait patiently for a program to terminate.
+  # FIXME: this is not always respected it seems. Figure out why, and how to fix it
   systemd.extraConfig = ''
     DefaultTimeoutStopSec=15s
   '';
@@ -1044,7 +1008,7 @@
   #   # ignoreLid = false;
   # };
 
-  programs.bandwhich.enable = false;
+  programs.bandwhich.enable = true;
 
   services.osquery.enable = false;
   services.osquery.flags = { };
@@ -1087,4 +1051,14 @@
 
   # TODO: wrap .desktop file Exec entry in a call to run0 or kdialog with sudo to run as root
   programs.sniffnet.enable = true;
+
+  networking.hosts = {
+    "127.0.0.1" = [
+      "reddit.com"
+      "instagram.com"
+    ];
+  };
+
+  services.desktopManager.cosmic.enable = false;
+  services.displayManager.cosmic-greeter.enable = false;
 }

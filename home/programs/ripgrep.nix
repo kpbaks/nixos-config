@@ -1,4 +1,3 @@
-{ config, ... }:
 {
   programs.ripgrep = {
     enable = true;
@@ -8,12 +7,12 @@
         hex2ripgrep-color =
           hex:
           let
-            ss = builtins.substring;
-            hex' = ss 1 6 hex; # strip leading `#` e.g. "#aabbee" -> "aabbee"
+            inherit (builtins) substring;
+            hex' = substring 1 6 hex; # strip leading `#` e.g. "#aabbee" -> "aabbee"
             # extract each channel into a 2 char string
-            r = ss 0 2 hex';
-            g = ss 2 2 hex';
-            b = ss 4 2 hex';
+            r = substring 0 2 hex';
+            g = substring 2 2 hex';
+            b = substring 4 2 hex';
           in
           builtins.concatStringsSep "," (
             map (channel: "0x${channel}") [
@@ -30,16 +29,16 @@
         "--max-columns-preview"
         # Add my 'web' type.
         "--type-add"
-        "web:*.{html,css,js}*"
+        "web:*.{html,css,js}"
         # Search hidden files/directories by default
-        "--hidden"
+        # "--hidden"
         # "--hyperlink-format=default"
         "--hyperlink-format=kitty"
         # Set the colors.
         # "--colors=line:fg:${hex2ripgrep-color teal.hex}"
         # "--colors=column:fg:${hex2ripgrep-color maroon.hex}"
         # "--colors=path:fg:${hex2ripgrep-color sky.hex}"
-        "--colors=match:none"
+        "--colors=match:fg:red"
         # "--colors=match:bg:${hex2ripgrep-color peach.hex}"
         # "--colors=match:fg:${hex2ripgrep-color crust.hex}"
         "--colors=match:style:bold"
@@ -47,5 +46,9 @@
         "--smart-case"
         "--pcre2-unicode"
       ];
+  };
+
+  programs.ripgrep-all = {
+    enable = true;
   };
 }

@@ -1,21 +1,28 @@
-{ osConfig, pkgs, ... }:
+{
+  lib,
+  osConfig,
+  pkgs,
+  ...
+}:
 {
 
   programs.obs-studio.enable = osConfig.programs.obs-studio.enable;
-  programs.obs-studio.plugins = with pkgs.obs-studio-plugins; [
-    # waveform
-    wlrobs
-    obs-vaapi
-    droidcam-obs
-    # obs-gstreamer
-    # input-overlay
-    # obs-shaderfilter
-    # obs-vintage-filter
-    # obs-composite-blur
-    # obs-source-switcher
-    # obs-gradient-source
-    # obs-pipewire-audio-capture
-  ];
+  programs.obs-studio.plugins =
+    with pkgs.obs-studio-plugins;
+    [
+      # waveform
+      wlrobs
+      obs-vaapi
+      # obs-gstreamer
+      # input-overlay
+      # obs-shaderfilter
+      # obs-vintage-filter
+      # obs-composite-blur
+      # obs-source-switcher
+      # obs-gradient-source
+      # obs-pipewire-audio-capture
+    ]
+    ++ lib.optional osConfig.programs.droidcam.enable pkgs.obs-obs-studio-plugins.droidcam-obs;
   # xdg.configFile."obs-studio/themes" = {
   #   source =
   #     (pkgs.fetchFromGitHub {

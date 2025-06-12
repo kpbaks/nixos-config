@@ -1,31 +1,38 @@
 # TODO: see if this can be added: https://pre-commit.com/#automatically-enabling-pre-commit-on-repositories
 # If it works then upstream a home-manager option for it.
-{ config, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   imports = [
     ./forges
     ./lazygit.nix
     ./subcommands
-    ./ab.nix
+    ./git-ab.nix
     ./git-glossary.nix
     ./templatedir.nix
+    ./mergiraf.nix
     # ./git-semver-tags.nix
   ];
 
   home.packages = with pkgs; [
     # gitbutler
-    gitoxide
+    # gitoxide
     delta
-    ghorg
-    gitflow
+    difftastic
+    mergiraf
+    # ghorg
+    # gitflow
     # git-gui
     # tk # needed by `git citool`
     # ghostie
     # github-backup
     # github-to-sqlite
-    glab
     # serie # rich git commit graph terminal
-    git-interactive-rebase-tool
+    # git-interactive-rebase-tool
     # git-branchless
     # git-brunch
     # git-branchstack
@@ -37,8 +44,10 @@
     # lighttpd # needed by `git instaweb`
     # dependabot-cli
     # git-doc
-    sublime-merge
+    # sublime-merge
   ];
+
+  programs.git.mergiraf.enable = true;
 
   # TODO: create wrapper script that uses `kitty` for diff program, if `git diff` is called in a kitty window,
   # and uses difftastic otherwise.
@@ -86,9 +95,13 @@
       diff.colorMoved = "plain";
       diff.mnemonicPrefix = true;
       diff.renames = true;
-      push.default = "simple";
-      push.autoSetupRemote = true;
-      push.followTags = true;
+      push = {
+        autoSetupRemote = true;
+        default = "nothing";
+        followTags = true;
+        negotiate = true;
+      };
+
       fetch.prune = true; # always behave as if `--prune` was set
       fetch.pruneTags = true;
       fetch.recurseSubmodules = "on-demand";
@@ -125,21 +138,37 @@
       blame.ignoreRevsFile = ".git-blame-ignore-revs";
     };
 
+    # TODO: how to handle subshells across shells e.g. `$(...)` in bash and `()` in fish
     aliases = rec {
       ls = "log --graph --oneline";
-      ll = "${ls} --all";
+      la = "${ls} --all";
       wta = "worktree add";
       wtl = "worktree list";
       wtr = "worktree remove";
       unstage = "reset HEAD --";
+      # downloads commits and trees while fetching blobs on-demand
+      # this is better than a shallow git clone --depth=1 for many reasons
+      clone-partial = "clone --filter=blob:none";
       # fixup = "!git log -n 50 --pretty=format:'%h %s' --no-merges | fzf | cut -c -7 | xargs -o git commit --fixup"
       # https://jordanelver.co.uk/blog/2020/06/04/fixing-commits-with-git-commit-fixup-and-git-rebase-autosquash/
       # fixup = "!${config.programs.git.package}/bin/git log -n 50 --pretty=format:'%h %s' --no-merges | ${config.programs.fzf.package}/bin/fzf --ansi";
+      track-untracked = "add --intent-to-add (git ls-files --others --exclude-standard)";
     };
     attributes = [ "*.pdf diff=pdf" ];
-    delta.enable = false;
-    difftastic = {
+    delta = {
       enable = true;
+      options = {
+        decorations = {
+          commit-decoration-style = "bold yellow box ul";
+          file-decoration-style = "none";
+          file-style = "bold yellow ul";
+        };
+        features = "decorations";
+        whitespace-error-style = "22 reverse";
+      };
+    };
+    difftastic = {
+      enable = false;
       display = "side-by-side-show-both";
     };
 
@@ -164,13 +193,12 @@
   programs.git-credential-oauth.enable = false;
 
   # TODO: upstream a module
-  xdg.configFile."ghorg/config.yaml".source = (pkgs.formats.yaml { }).generate "ghorg-config" {
+  # xdg.configFile."ghorg/config.yaml".source = (pkgs.formats.yaml { }).generate "ghorg-config" {
 
-  };
+  # };
+  # home.sessionVariables.GHORG_COLOR = "enabled";
 
-  home.sessionVariables.GHORG_COLOR = "enabled";
-
-  programs.git-worktree-switcher.enable = true;
+  programs.git-worktree-switcher.enable = false;
 
   # programs.gitu = {
   #   enable = true;

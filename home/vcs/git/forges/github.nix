@@ -1,7 +1,7 @@
 { pkgs, ... }:
 {
   home.packages = with pkgs; [
-    dependabot-cli
+    # dependabot-cli
   ];
 
   programs.gh = {

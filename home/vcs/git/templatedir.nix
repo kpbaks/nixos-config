@@ -10,6 +10,33 @@
 let
   templateDir = "${config.xdg.dataHome}/git/templateDir";
   git = lib.getExe config.programs.git.package;
+
+  git-install-global-templatedir-hooks =
+    pkgs.writers.writeFishBin "git-install-global-templatedir-hooks" { }
+      # fish
+      ''
+        ${git} rev-parse --show-toplevel 2> /dev/null | read toplevel
+        if test $pipestatus[1] -ne 0
+          printf "%serror%s: not inside a git repository\n" (set_color red --bold) (set_color normal) >&2
+          exit 1
+        end
+
+        if argparse f/force -- $argv
+          exit 2
+        end
+
+        for hook in ${templateDir}/hooks/*
+          set -l git_event (path basename $hook)
+          if test $toplevel/.git/hooks/$git_event; and not set -q _flag_force
+           echo "skipping ..."
+           continue
+          end
+
+          cp $hook $toplevel/.git/hooks/$git_event
+          # TODO: print ansi link to git docs
+          echo "installed $git_event hook"
+        end
+      '';
 in
 {
   # https://git-scm.com/docs/git-init#Documentation/git-init.txt-codeinittemplateDircode
@@ -24,13 +51,17 @@ in
         pkgs.writers.writeFish "post-checkout"
           # fish
           ''
-            # Check if the user has any stashes, which originates from this branch
-            # If they do, then remind the user about them
+            # - Check if this branch is behind its merge-base, and hint to the user to do a rebase
+            # - Check if this branch has a remote, and let the user know of it
+            # - Check if the user has any stashes, which originates from this branch
+            #   If they do, then remind the user about them
             ${git} stash list
 
           '';
     };
 
+    # IDEA: turn into a rust program
+    # in rust program assert that $args[0] is .git/hooks/pre-push
     # inspiration: https://github.com/CompSciLauren/awesome-git-hooks/blob/master/pre-push-hooks/prevent-bad-push.hook
     # https://git-scm.com/docs/githooks#_pre_push
     "git/templateDir/hooks/pre-push" = {
@@ -64,6 +95,11 @@ in
               echo "remote_object_name: $remote_object_name"
             end
 
+            # TODO: check for new tags, that are to be pushed. if any of them match a semver version
+            # tag, then check if the commit they are pointing to also contains a diff of a "known" project file e.g.
+            # pyproject.toml or Cargo.toml, and check the version written in that file and commit, to see if it matches.
+            # At times I forget to update the project file, when I do a new tag
+
             # exit 1 # Prevent `git push` from completing
             exit 0 # Allow push
           '';
@@ -71,4 +107,6 @@ in
     # TODO: prepare-commit-msg
     # https://github.com/CompSciLauren/awesome-git-hooks/blob/master/prepare-commit-msg-hooks/include-git-diff-name-status.hook
   };
+
+  home.packages = [ git-install-global-templatedir-hooks ];
 }

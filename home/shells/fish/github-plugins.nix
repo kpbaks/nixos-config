@@ -1,34 +1,34 @@
 [
-  {
-    owner = "kpbaks";
-    repo = "nix_command_not_found.fish";
-    rev = "d52d0e56b359bbd8d507b6d8650dfe3487d000ff";
-    hash = "sha256-VWQIeKcXyAJrxi797Vir5dnNpwJjjAdHgwFkroNspxU=";
-  }
+  # {
+  #   owner = "kpbaks";
+  #   repo = "nix_command_not_found.fish";
+  #   rev = "d52d0e56b359bbd8d507b6d8650dfe3487d000ff";
+  #   hash = "sha256-VWQIeKcXyAJrxi797Vir5dnNpwJjjAdHgwFkroNspxU=";
+  # }
   # {
   #   owner = "kpbaks";
   #   repo = "merger.fish";
   #   rev = "2a4eb9accceac18569b7aef4cb1efefd16d15007";
   #   hash = "sha256-RG8XJq6MRGiHGKsVBwjdd3oDQmT5Gb+GpYhwg7Q9hdo=";
   # }
-  {
-    owner = "kpbaks";
-    repo = "private_mode.fish";
-    rev = "ac8066b19c3946d75def8b1405f270f3c0d4ef94";
-    hash = "sha256-MLHFZ6DzdnX7Ipy9+J8598OFiZZw08wKythtz7+1c+M=";
-  }
+  # {
+  #   owner = "kpbaks";
+  #   repo = "private_mode.fish";
+  #   rev = "ac8066b19c3946d75def8b1405f270f3c0d4ef94";
+  #   hash = "sha256-MLHFZ6DzdnX7Ipy9+J8598OFiZZw08wKythtz7+1c+M=";
+  # }
   # {
   #   owner = "kpbaks";
   #   repo = "border.fish"; # TODO: change to borderline.fish
   #   rev = "a16e8e611420b24a2c06d71ffe80c0f8f03514ef";
   #   hash = "sha256-X4Viw9JcLDDTFepaTE2jq09hQCJlo0Nlqa5ga/ygwdA=";
   # }
-  {
-    owner = "kpbaks";
-    repo = "git.fish";
-    rev = "a2f98fd10c6a92195fe7b599a942ef7faa63bbce";
-    hash = "sha256-U//CCVAdd32OMDqj/KpUkdcTbunaqMefbntMPmt95hY=";
-  }
+  # {
+  #   owner = "kpbaks";
+  #   repo = "git.fish";
+  #   rev = "a2f98fd10c6a92195fe7b599a942ef7faa63bbce";
+  #   hash = "sha256-U//CCVAdd32OMDqj/KpUkdcTbunaqMefbntMPmt95hY=";
+  # }
 
   # {
   #   owner = "kpbaks";
@@ -124,12 +124,12 @@
   #   hash = "sha256-05g7VVMBZgKnMe9+0t+qiMdxa4EBrd70CwZMQXkM+Gg=";
   # }
 
-  {
-    owner = "kpbaks";
-    repo = "ctrl-z.fish";
-    rev = "689d60cb9706d2a19cb65286c2dea488b3293807";
-    hash = "sha256-OaCMGsIP6wsbzgCNqQR1FOERL+k1ShAjOOg3T9Wln3k=";
-  }
+  # {
+  #   owner = "kpbaks";
+  #   repo = "ctrl-z.fish";
+  #   rev = "689d60cb9706d2a19cb65286c2dea488b3293807";
+  #   hash = "sha256-OaCMGsIP6wsbzgCNqQR1FOERL+k1ShAjOOg3T9Wln3k=";
+  # }
   # {
   #   owner = "kpbaks";
   #   repo = "countdown.fish";
@@ -148,10 +148,10 @@
   #   rev = "3164d61992daeaf3d58779e5e2b76b9345aad14f";
   #   hash = "sha256-mLfrDlCSB0Yavj1gyRsQTn1h8Xx1QpAxRxnhzhtUAQQ=";
   # }
-  {
-    owner = "kpbaks";
-    repo = "nix.fish";
-    rev = "9ad6884f213bd8463fdb6468f8a16134ee5d77f7";
-    hash = "sha256-uNDDWidE/laUlunX5JH6Fn6pBk6cmWTs3M4Yul3Jy+g=";
-  }
+  # {
+  #   owner = "kpbaks";
+  #   repo = "nix.fish";
+  #   rev = "9ad6884f213bd8463fdb6468f8a16134ee5d77f7";
+  #   hash = "sha256-uNDDWidE/laUlunX5JH6Fn6pBk6cmWTs3M4Yul3Jy+g=";
+  # }
 ]

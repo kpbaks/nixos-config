@@ -1,23 +1,27 @@
 {
+  lib,
   pkgs,
   ...
 }:
 let
-  setcursor =
+  abbrs =
     attrs:
     builtins.mapAttrs (
-      k: v:
+      _: v:
       if builtins.isAttrs v then
         v
-      else
+      else if builtins.isString v && lib.strings.hasInfix "%" v then
         {
           setCursor = true;
           expansion = v;
         }
+      else
+        { expansion = v; }
     ) attrs;
 in
 {
-  programs.fish.shellAbbrs = setcursor {
+  programs.fish.shellAbbrs = abbrs {
+    cmdl = "commandline";
     bn = "path basename";
     dn = "path dirname";
     fcc = "fish_clipboard_copy";

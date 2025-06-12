@@ -1,0 +1,5 @@
+
+
+[keys.normal]
+"]"."'" = "@<space>'<C-n><ret>"
+"["."'" = "@<space>'<C-p><ret>"

@@ -10,7 +10,7 @@
     config = {
       strict_env = true;
       warn_timeout = "0"; # "0" will disable the message.
-      hide_env_diff = false;
+      hide_env_diff = true;
       # TODO: it is not clear from the docs what kind of formats
       # are valid. These should be documented.
       # Used here: https://github.com/direnv/direnv/blob/b76e297d5cbf0ec11e5d2320b2c89a981fb2b628/internal/cmd/log.go#L34-L47

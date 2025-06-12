@@ -5,6 +5,6 @@
     # ./ion.nix
     ./nushell
     # ./powershell.nix
-    ./zsh.nix
+    # ./zsh.nix
   ];
 }

@@ -19,7 +19,7 @@
         | lines
         | parse "{key}: {value}"
         | update value { into int }
-        | transpose --as-record --header-row  
+        | transpose --as-record --header-row
       }
 
       def "nix config show" [] {
@@ -59,12 +59,24 @@
           match $row.type {
             "github" => {
               let parsed = $row.flakeref | parse "github:{owner}/{repo}"
-              let url = $"https://github.com/($parsed.owner)/($parsed.repo)" 
+              let url = $"https://github.com/($parsed.owner)/($parsed.repo)"
               $url | ansi link --text $row.flakeref
             }
             _ => $row.flakeref
           }
         }
+      }
+
+      # TODO: parse the name column and extract a corporation name like "Intel Corporation"
+      def lspci []: nothing -> table<pciid: string, bus: int, device: int, function: int, type: string, name: string> {
+        ${pkgs.pciutils}/bin/lspci
+        | parse --regex '^(?<bus>\d+):(?<device>\d+).(?<function>\d+) (?<type>[^:]+):(?<name>.+)'
+        | insert pciid { $"0000:($in.bus):($in.device).($in.function)" }
+        | update bus { into int }
+        | update device { into int }
+        | update function { into int }
+        | move pciid --before bus
+        | sort-by type
       }
     '';
 }

@@ -16,12 +16,14 @@
       browser = lib.getExe config.default-application.browser;
       # sh = spawn "sh" "-c";
       fish = spawn "${config.programs.fish.package}/bin/fish" "--no-config" "-c";
+      sh = spawn "sh" "-c";
       # nu = spawn "nu" "-c";
       playerctl = spawn "playerctl";
       # brightnessctl = spawn "brightnessctl";
       # wpctl = spawn "wpctl"; # wireplumber
       # bluetoothctl = spawn "bluetoothctl";
-      swayosd-client = spawn "swayosd-client";
+      # swayosd-client = spawn "${config.services.swayosd.package}/bin/swayosd-client";
+      swayosd-client = spawn "${pkgs.swayosd}/bin/swayosd-client";
       run-flatpak = spawn "flatpak" "run";
       # browser = spawn "${pkgs.firefox}/bin/firefox";
       # browser = run-flatpak "io.github.zen_browser.zen";
@@ -132,6 +134,7 @@
       "Mod+7".action = focus-workspace 7;
       "Mod+8".action = focus-workspace 8;
       "Mod+9".action = focus-workspace 9;
+      "Mod+0".action = focus-workspace 10;
 
       # "Mod+T".action = focus-or-spawn "foot" "${pkgs.foot}/bin/foot";
       "Mod+T".action = focus-or-spawn "ghostty" "${terminal}";
@@ -168,10 +171,15 @@
 
       # (pkgs.lib.getExe bluetoothctl-init-script);
       "f11".action = fullscreen-window;
+      "f3" = {
+        # action = run-in-terminal "htop";
+        action = spawn "ghostty" "-e" "htop";
+        hotkey-overlay.title = "Open HTOP";
+      };
       # "Shift+f11".action = spawn (pkgs.lib.getExe scripts.wb-toggle-visibility-or-spawn);
       # "Mod+f11".action = spawn (pkgs.lib.getExe scripts.wb-toggle-visibility);
-      # "Mod+Shift+E".action = quit;
-      # "Mod+Ctrl+Shift+E".action = quit {skip-confirmation = true;};
+      "Mod+Q".action = close-window;
+      "Mod+Shift+Q".action.quit.skip-confirmation = true;
 
       # "Mod+Y".action = spawn "${pkgs.firefox}/bin/firefox" "https://youtube.com";
       # "Mod+Y".action = browser "https://youtube.com";
@@ -225,8 +233,7 @@
       "Mod+Shift+Ctrl+L".action = move-column-to-monitor-right;
 
       "Mod+Shift+Slash".action = show-hotkey-overlay;
-      "Mod+Q".action = close-window;
-      "Mod+V".action = spawn "${pkgs.copyq}/bin/copyq" "menu";
+      # "Mod+V".action = spawn "${pkgs.copyq}/bin/copyq" "menu";
       "Mod+Shift+M".action = maximize-column;
 
       # "Mod+K".action = spawn "${pkgs.kdePackages.kdeconnect-kde}/bin/kdeconnect-app";
@@ -289,7 +296,17 @@
       # "Mod+Return".action = fish "${pkgs.procps}/bin/pkill walker; or ${pkgs.walker}/bin/walker";
       # "Mod+Slash".action = fish "${pkgs.procps}/bin/pkill walker; or ${pkgs.walker}/bin/walker";
       # "Mod+Slash".action = spawn "${pkgs.walker}/bin/walker";
-      "Mod+Slash".action = spawn "${config.programs.fuzzel.package}/bin/fuzzel";
+      "Mod+Slash" =
+        let
+          fuzzel = "${config.programs.fuzzel.package}/bin/fuzzel";
+          pkill = "${pkgs.procps}/bin/pkill";
+        in
+        {
+          # Hit "Mod+Slash" again to hide/close fuzzel again
+          action = sh "${pkill} fuzzel || ${fuzzel}";
+          hotkey-overlay.title = "Toggle fuzzel (App launcher and fuzzy finder)";
+          repeat = false;
+        };
 
       "Mod+Shift+P".action = power-off-monitors;
       # Mod+R { switch-preset-column-width; }
@@ -299,6 +316,17 @@
       #   Mod+C { center-column; }
       # "Mod+Shift+R".action = reset-window-height;
       "Mod+C".action = center-column;
+
+      "Mod+W".action = toggle-column-tabbed-display;
+
+      "Mod+Shift+Tab" = {
+        action = toggle-overview;
+      };
+
+      "Mod+Return" = {
+        action = toggle-overview;
+      };
+
       # "Mod+Z".action = center-column; # kinda like `zz` in helix
       # "Mod+Z".action = spawn (pkgs.lib.getExe pkgs.woomer);
       # "Mod+Z".action

@@ -93,15 +93,15 @@
 
 
       # TODO: figure out how to make a fg/bg toggle keybind
-      # $env.config.keybinds = [
-      #   {
-      #     name: ctrl-z
-      #     modifier: control
-      #     keycode: char_z
-      #     mode: emacs
-      #     event: { send: }
-      #   }
-      # ]
+      $env.config.keybinds = [
+        # {
+        #   name: ctrl-z
+        #   modifier: control
+        #   keycode: char_z
+        #   mode: emacs
+        #   event: { send: }
+        # }
+      ]
     '';
   # https://github.com/nushell/nushell/tree/main/crates/nu-utils/src/default_files
   programs.nushell = {

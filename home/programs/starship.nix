@@ -1,5 +1,4 @@
 # TODO: try out https://starship.rs/presets/jetpack
-{ lib, ... }:
 {
   programs.starship = {
     enable = true;

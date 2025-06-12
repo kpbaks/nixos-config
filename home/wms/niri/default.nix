@@ -2,6 +2,7 @@
   config,
   inputs,
   lib,
+  osConfig,
   pkgs,
   ...
 }:
@@ -12,6 +13,8 @@
     ./window-rules.nix
     ./binds.nix
     ./outputs.nix
+    ./event-stream-handler.nix
+    ./niriswitcher.nix
   ];
 
   # `niri` does not have built-in Xwayland support
@@ -39,10 +42,10 @@
       xwayland-run
       # FIXME: crashes when starting as a systemd service
       xwayland-satellite
-      wlrctl
-      wlr-which-key
-      wlr-randr
-      wlr-layout-ui
+      # wlrctl
+      # wlr-which-key
+      # wlr-randr
+      # wlr-layout-ui
       # pkgs.catppuccin-fcitx5
       # catppuccin-cursor
       # pkgs.catppuccin-cursors.${config.}
@@ -54,16 +57,32 @@
   # https://github.com/YaLTeR/niri/wiki/Example-systemd-Setup
   # xdg.configFile."systemd/user/niri.service.wants";
   programs.niri.enable = true;
+  # FIXME: this is a hack, it should use the one in ny nixos configuration
+  programs.niri.package = pkgs.niri-unstable;
+  # programs.niri.package = osConfig.programs.niri.package;
   programs.niri.settings.prefer-no-csd = true;
   programs.niri.settings.screenshot-path = "${config.home.homeDirectory}/Pictures/screenshots/screenshot-%Y-%m-%d %H-%M-%S.png";
-  programs.niri.settings.hotkey-overlay.skip-at-startup = false;
-  programs.niri.settings.workspaces."main" = {
-    open-on-output = "eDP-1"; # laptop screen
+  programs.niri.settings.hotkey-overlay.skip-at-startup = true;
+  programs.niri.settings.workspaces = {
+    main = {
+      open-on-output = "eDP-1"; # laptop screen
+    };
+    chat = { };
+    development = { };
+    gaming = { };
   };
 
-  programs.niri.settings.input.focus-follows-mouse = {
-    enable = true;
-    max-scroll-amount = "5%";
+  programs.niri.settings = {
+    input.focus-follows-mouse = {
+      enable = true;
+      max-scroll-amount = "5%";
+    };
+    # My Wacom Intuos tablet
+    # tablet = {
+    #   enable = true;
+    #   left-handed = true;
+    #   # // calibration-matrix 1.0 0.0 0.0 0.0 1.0 0.0
+    # };
   };
 
   programs.niri.settings.input.touchpad.dwt = true; # "disable when typing"
@@ -74,11 +93,14 @@
 
   programs.niri.settings.environment = {
     # DISPLAY = null;
-    DISPLAY = ":0";
+    DISPLAY = null;
     MOZ_ENABLE_WAYLAND = "1";
+
+    ELECTRON_OZONE_PLATFORM_HINT = "auto"; # For Electron >= 28.0
     NIXOS_OZONE_WL = "1";
     QT_QPA_PLATFORM = "wayland";
     QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
+    # [tag:set_XDG_CURRENT_DESKTOP_to_niri]
     XDG_CURRENT_DESKTOP = "niri";
     XDG_SESSION_TYPE = "wayland";
   };
@@ -92,21 +114,24 @@
   programs.niri.settings.input.workspace-auto-back-and-forth = true;
   programs.niri.settings.input.keyboard.xkb = {
     layout = "us,dk";
-    variant = "colemak_dh_ortho"; # FIXME: xkbcommon does not regognize this value
+    # variant = "colemak_dh_ortho"; # FIXME: xkbcommon does not regognize this value
 
     # options = "grp:win_space_toggle,compose:ralt,ctrl:nocaps";
     options = "compose:ralt,ctrl:nocaps";
   };
 
   programs.niri.settings.layout = {
-    gaps = 12; # px
-    struts = {
-      left = 0;
-      right = 0;
-      top = 0;
-      bottom = 0;
-    };
+    gaps = 8; # px
+    # struts = {
+    #   left = 16;
+    #   right = 16;
+    #   top = 16;
+    #   bottom = 16;
+    # };
     center-focused-column = "on-overflow";
+    default-column-display = "tabbed";
+    empty-workspace-above-first = true;
+    always-center-single-column = true;
     # center-focused-column = "never";
     # center-focused-column = "always";
     preset-column-widths = [
@@ -134,31 +159,19 @@
   programs.niri.settings.spawn-at-startup =
     map (s: { command = pkgs.lib.strings.splitString " " s; })
       [
+        "${lib.getExe config.default-application.terminal}"
+        "${lib.getExe config.default-application.browser}"
+        # TODO: does not show-up
+        "${pkgs.telegram-desktop}/bin/telegram-desktop -startintray"
         # "ironbar"
         # "${pkgs.swww}/bin/swww-daemon"
-        "${pkgs.copyq}/bin/copyq"
+        # "${pkgs.copyq}/bin/copyq"
         # "${pkgs.eww}/bin/eww daemon"
         # "${pkgs.birdtray}/bin/birdtray"
         "${pkgs.wluma}/bin/wluma"
-        # TODO: does not show-up
-        # "${pkgs.telegram-desktop}/bin/telegram-desktop -startintray"
         # FIXME: does not work
         # "${pkgs.obs-studio}/bin/obs --minimize-to-tray"
       ];
-
-  programs.niri.settings.animations.screenshot-ui-open = {
-    easing = {
-      curve = "ease-out-quad";
-      duration-ms = 200;
-    };
-  };
-  programs.niri.settings.animations.workspace-switch = {
-    spring = {
-      damping-ratio = 1.0;
-      epsilon = 1.0e-4;
-      stiffness = 1000;
-    };
-  };
 
   # TODO: experiment with this
   # programs.niri.settings.animations.shaders = {
@@ -228,4 +241,16 @@
   #   Install.WantedBy = [ "graphical-session.target" ];
   #   Service.ExecStart = "${pkgs.birdtray}/bin/birdtray";
   # };
+
+  xdg.desktopEntries = {
+    power-off-monitors = {
+      name = "niri - Power off monitors";
+      exec = lib.getExe (
+        pkgs.writeShellScriptBin "niri-power-off-monitors" ''${config.programs.niri.package}/bin/niri msg action power-off-monitors''
+      );
+      terminal = false;
+      type = "Application";
+      categories = [ "System" ];
+    };
+  };
 }

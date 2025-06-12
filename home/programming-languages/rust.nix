@@ -51,6 +51,7 @@ let
     cargo-cache
     cargo-wizard
     cargo-outdated
+    # cargo-pgo
   ];
 in
 {

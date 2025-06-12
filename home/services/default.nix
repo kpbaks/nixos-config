@@ -1,15 +1,16 @@
 {
   imports = [
-    ./conky.nix
+    # ./conky.nix
     ./darkman.nix
     ./espanso.nix
-    ./glance.nix
-    ./swayidle.nix
+    # ./glance.nix
+    # ./swayidle.nix
     ./swayosd.nix
     ./udiskie.nix
     ./wlsunset.nix
     ./wluma.nix
-    ./pueue.nix
+    # ./pueue.nix
+    ./copyq.nix
   ];
 
   services.trayscale.enable = false;

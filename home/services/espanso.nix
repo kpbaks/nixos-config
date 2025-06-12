@@ -14,7 +14,8 @@ in
 
     configs = {
       default = {
-        backend = "Auto";
+        backend = "auto";
+        # backend = "inject";
         auto_restart = true;
         # https://espanso.org/docs/configuration/options/#customizing-the-toggle-key
         toggle_key = "ALT";

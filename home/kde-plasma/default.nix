@@ -14,6 +14,7 @@
     ./konsole.nix
     ./okular.nix
     ./kdeconnect.nix
+    ./kcm.nix
     # ./klipper.nix
 
   ];
@@ -168,10 +169,11 @@
       kasts
       merkuro
       itinerary
+      kolourpaint
     ]
     ++ (with pkgs; [
       plasma-panel-colorizer
-      libsForQt5.plasma-bigscreen
+      # libsForQt5.plasma-bigscreen
     ]);
 
   # TODO: verify if this make the browser integration work with zen-browser
@@ -184,7 +186,5 @@
         name = "org.kde.plasma.browser_integration";
         path = "${pkgs.kdePackages.plasma-browser-integration}/bin/plasma-browser-integration-host";
         type = "stdio";
-
       };
-
 }

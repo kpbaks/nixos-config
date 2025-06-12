@@ -4,15 +4,6 @@
   pkgs,
   ...
 }:
-let
-  # catppuccin-konsole = pkgs.fetchFromGitHub {
-  #   owner = "catppuccin";
-  #   repo = "konsole";
-  #   rev = "3b64040e3f4ae5afb2347e7be8a38bc3cd8c73a8";
-  #   hash = "sha256-d5+ygDrNl2qBxZ5Cn4U7d836+ZHz77m6/yxTIANd9BU=";
-  # };
-
-in
 # user-defined-stylesheet-path = "konsole/stylesheets/default.css"; # relative to ~/.config/
 {
   programs.konsole.enable = true;

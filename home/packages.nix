@@ -8,30 +8,31 @@
   # TODO: checkout https://github.com/azzamsa/zman
   # TODO: checkout https://github.com/6543/batmon/
   home.packages = with pkgs; [
-    podman-compose
-    podman-desktop
-    kraft
-    bloaty
-    serpl
-    topiary
-    aha
-    binsider
+    # inputs.patchy.packages.${pkgs.system}.default
+    # podman-compose
+    # podman-desktop
+    # kraft
+    # bloaty
+    # serpl
+    # topiary
+    # aha
+    # binsider
     # lutri
     # serial-studio
-    net-snmp
-    flameshot
+    # net-snmp
+    # flameshot
     # affine
-    markdownlint-cli
-    markdown-anki-decks
-    markdown-link-check
-    markdown-oxide
-    dive
+    # markdownlint-cli
+    # markdown-anki-decks
+    # markdown-link-check
+    # markdown-oxide
+    # dive
     # TODO: try out, might be useful for work
     # logstash
     # logstash-contrib
-    ripsecrets
-    gitleaks
-    cfonts
+    # ripsecrets
+    # gitleaks
+    # cfonts
     # zbar # `zbarimg` and `zbarcam`, utilities to work with qr codes
     # nodePackages_latest.fkill-cli
     # tparse
@@ -47,11 +48,11 @@
     # tea # gitea cli
     # codeberg-cli
     # eww
-    ripgrep-all # `rga`
-    cmd-wrapped
+
+    # cmd-wrapped
     # superfile # `spf`
-    completely
-    complgen
+    # completely
+    # complgen
     # TODO: package this for nixpkgs
     # csvtk # https://github.com/shenwei356/csvtk
     # datamash
@@ -60,7 +61,7 @@
     # kdeplasma-addons
     # davinci-resolve
     # kdenlive
-    video-trimmer
+    # video-trimmer
     # identity
     # image-analyzer
     # kaf
@@ -77,19 +78,19 @@
     desktop-file-utils # https://www.freedesktop.org/wiki/Software/desktop-file-utils/
     # vhs
     # ruby_3_3
-    swappy
-    grim
+    # swappy
+    # grim
     # tesseract
-    legit
-    pstree
-    dprint
+    # legit
+    # pstree
+    # dprint
     # brotab
-    nb
+    # nb
     wl-clipboard
     # wl-clipboard-rs
     # erdtree
     # process-compose # Like `docker-compose` for ordinary processes
-    wtype # xdotool for wayland
+    # wtype # xdotool for wayland
     # jetbrains-toolbox
     # jetbrains.rider
     # jetbrains.rust-rover
@@ -102,12 +103,10 @@
     # trippy # provides `trip` binary
     # viddy # A modern watch command. Time machine and pager etc.
     # tabview
-    rustscan # portscanner like `nmap`
+    # rustscan # portscanner like `nmap`
     # ollama
     # ollama-cuda
     # ollama-rocm
-    # calibre
-    # calibre-web
     # soco-cli # cli tools to interact with sonos devices
     # delta # FIXME: does not compile tor 15 aug 15:31:05 CEST 2024
     # helvum # GTK-based patchbay for pipewire
@@ -115,28 +114,28 @@
     # rerun # FIXME: does not compile
     # logseq
     # smassh # TUI based typing test application inspired by MonkeyType
-    kondo # cleans dependencies and build artifacts from your projects.
+    # kondo # cleans dependencies and build artifacts from your projects.
     # TODO: integrate with helix
     # tickrs #  Realtime ticker data in your terminal 📈
     # ticker #  Terminal stock ticker with live updates and position tracking
     # mop #  Stock market tracker for hackers.
     # newsflash # rss reader
-    wl-color-picker
+    # wl-color-picker
     # element
     # element-desktop
-    gping
+    # gping
     resvg
-    miller
-    csview
+    # miller
+    # csview
     # pympress
     # mission-center
     # mkchromecast
-    samply
-    sad
-    sd
+    # samply
+    # sad
+    # sd
     # ungoogled-chromium
     # vivaldi
-    asciigraph
+    # asciigraph
     imagemagick
     # c3c
     # lychee
@@ -146,12 +145,12 @@
     # gimp
     # dogdns # rust alternative to dig
     # TODO: integrate with `cmake.fish`
-    upx
-    ripdrag # drag and drop files from the terminal
+    # upx
+    # ripdrag # drag and drop files from the terminal
     # caddy # Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS
     # charm-freeze
-    pastel
-    vivid
+    # pastel
+    # vivid
     # wdisplays
     # nwg-dock
     # nwg-drawer
@@ -163,55 +162,54 @@
     # appflowy # open source alternative to notion
     # macchina # neofetch like program
     # neovim-remote # TODO: create `darkman` script to toggle light/dark mode with `set background=dark`
-    lurk # like `strace` but with colors
+    # lurk # like `strace` but with colors
     # kdiff3
     # meld
     # spotify-player
     # micro
-    procs
+    # procs
     # jitsi
     # jitsi-meet
     # clipse # tui clipbard manager
     # gnomeExtensions.pano # fancy clipboard manager
     devenv
-    ffmpeg
-    ffmpegthumbnailer
-    libwebp # why do 'r/wallpaper' upload all its images in `webp`
+    # ffmpeg
+    # ffmpegthumbnailer
+    # libwebp # why do 'r/wallpaper' upload all its images in `webp`
     # tabnine
     # grit
-    d2
-    graphviz
-    aria
+    # d2
+    # graphviz
+    # aria
     # wofi
     # rofi-emoji-wayland # `rofimoji`
     # rofi-wayland
-    pavucontrol # audio sink gui
+    # pavucontrol # audio sink gui
     # overskride # bluetooth gui
     # wf-recorder # wayland screen recorder
     # wl-screenrec # wayland screen recorder
     # ianny
     # wluma
     # wlsunset # set screen gamma (aka. night light) based on time of day
-    pdf2svg
-    poppler_utils # pdf utilities
+    # pdf2svg
+    # poppler_utils # pdf utilities
     # webcord # fork of discord, with newer electron version, to support screen sharing
-    vesktop # Vesktop is a custom Discord App aiming to give you better performance and improve linux support
-    hyprshot # screenshot tool defoo to integrate with hyprland
-    grim # wayland screenshot tool
-    slurp # wayland tool to make a screen selection
+    # hyprshot # screenshot tool defoo to integrate with hyprland
+    # grim # wayland screenshot tool
+    # slurp # wayland tool to make a screen selection
     # udiskie # daemon used to automatically mount external drives like USBs
     # flameshot
     brightnessctl # control screen brightness
     # discord
     telegram-desktop # messaging client
     # spotify # music player
-    # zotero # citation/bibliography manager
     # copyq # clipboard manager
     libnotify # for `notify-send`
     # TODO: use one of these
-    swaylock
+    # swaylock
+    # TODO: wrap hyprpicker to be invoked as `hyprpicker --autocopy --render-inactive --format=hex`
     hyprpicker # wlroots-compatible wayland color picker
-    pamixer # control audio levels
+    # pamixer # control audio levels
     playerctl # media player controller
     timg # terminal image viewer
     # swaynotificationcenter # wayland notification daemon
@@ -224,44 +222,44 @@
     just # command runner
     # kate # text editor
     duf # disk usage viewer
+    dysk
     du-dust # calculate directory sizes. `du` replacement
     # eza # `ls` replacement
     tokei # count SLOC in a directory
-    hexyl # hex editor
-    numbat # scientific units calculator repl
-    fd # `find` replacement
-    jaq # `jq` replacement
-    jd-diff-patch # diff json objects
-    jnv # interactive JSON filter using `jq`
-    jless # interactive JSON viewer
-    jqp # `jq` expr editor
-    fx # interactive JSON pager
-    yq-go # `jq` but for yaml
-    htmlq # `jq` but for html
+    # hexyl # hex editor
+    # fd # `find` replacement
+    # jaq # `jq` replacement
+    # jd-diff-patch # diff json objects
+    # jnv # interactive JSON filter using `jq`
+    # jless # interactive JSON viewer
+    # jqp # `jq` expr editor
+    # fx # interactive JSON pager
+    # yq-go # `jq` but for yaml
+    # htmlq # `jq` but for html
     # bun # javascript runtime and dev tool
-    fastfetch # a faster neofetch
+    # fastfetch # a faster neofetch
     # TODO: use in `git.fish`
-    onefetch # git repo fetch
+    # onefetch # git repo fetch
     zip
     unzip
     file
     # anki # flashcard app
-    mpv # media player
+    # mpv # media player
     # bitwarden # password manager
     # bitwarden-cli # bitwarden cli
     # pass # password manager
-    pre-commit # git hook manager
+    # pre-commit # git hook manager
     glow # terminal markdown viewer
     # mdcat # terminal markdown viewer
-    hyperfine # powerful cli benchmark tool
+    # hyperfine # powerful cli benchmark tool
     # nickel # configuration language
     # nls # nickel language server
     # gcc
     # rclone # rsync for cloud storage
     # croc # easily and securely transfer files and folders from one computer to another
     # sshx
-    gnuplot # plotting utility
-    vulkan-tools # vulkan utilities
+    # gnuplot # plotting utility
+    # vulkan-tools # vulkan utilities
 
     # brotab
 
@@ -277,9 +275,8 @@
     # zulip-term
 
     # spacedrive
-    typos
+    # typos
     taplo
-    harper
-    kdePackages.itinerary
+    # harper
   ];
 }

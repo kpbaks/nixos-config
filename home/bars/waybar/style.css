@@ -1,7 +1,46 @@
 * {
+  min-height: 0;
+  padding: 0.1rem;
   font-family: JetBrains Nerd Font Mono;
   font-size: 14px;
   font-feature-settings: "tnum";
+}
+
+#mode,
+#clock,
+#battery {
+  padding: 0 10px;
+}
+
+#clock,
+#battery,
+#cpu,
+#memory,
+#disk,
+#temperature,
+#backlight,
+#network,
+#pulseaudio,
+#wireplumber,
+#custom-media,
+#tray,
+#mode,
+#idle_inhibitor,
+#scratchpad,
+#mpd {
+  margin: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
+  color: #000000;
+}
+
+/* window#waybar { */
+/* background-color: red; */
+/* } */
+
+window#waybar {
+  background: rgba(255, 255, 255, 0.5);
+  color: rgb(0, 0, 0);
 }
 
 #workspaces button {
@@ -12,23 +51,23 @@
   outline: 2px solid red;
 }
 
-#window {
-  border-radius: 20px;
-  padding-left: 10px;
-  padding-right: 10px;
-}
+/* #window { */
+/* border-radius: 20px; */
+/* padding-left: 10px; */
+/* padding-right: 10px; */
+/* } */
 
-window#waybar.Alacritty {
-  background-color: #111111;
-  color: #ffffff;
-}
+/* window#waybar.Alacritty { */
+/* background-color: #111111; */
+/* color: #ffffff; */
+/* } */
 
-window#waybar.chromium-browser {
-  background-color: #eeeeee;
-  color: #000000;
-}
+/* window#waybar.chromium-browser { */
+/* background-color: #eeeeee; */
+/* color: #000000; */
+/* } */
 
 /* make window module transparent when no windows present */
-window#waybar.empty #window {
-  background-color: transparent;
-}
+/* window#waybar.empty #window { */
+/* background-color: transparent; */
+/* } */

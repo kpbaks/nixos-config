@@ -1,8 +1,8 @@
 {
   imports = [
-    ./forgejo.nix
+    # ./forgejo.nix
     ./github.nix
-    ./gitlab.nix
+    # ./gitlab.nix
     ./codeberg.nix
   ];
 }

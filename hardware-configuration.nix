@@ -61,11 +61,29 @@
   # Nvidia Configuration
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.graphics.enable = true;
-  hardware.nvidia.modesetting.enable = true;
-  hardware.nvidia-container-toolkit.enable = true;
-  hardware.nvidia.powerManagement.enable = true;
-  hardware.nvidia.powerManagement.finegrained = true;
-  hardware.nvidia.dynamicBoost.enable = true;
+  hardware.nvidia = {
+    modesetting.enable = true;
+    powerManagement = {
+      enable = true;
+      finegrained = true;
+    };
+    # package = config.boot.kernelPackages.nvidiaPackages.stable;
+    # package = config.boot.kernelPackages.nvidiaPackages.latest;
+    # package = config.boot.kernelPackages.nvidiaPackages.beta;
+    # package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
+    # NOTE: approach copied from here: https://github.com/colemickens/nixcfg/blob/cdd9929d5d36ce5b4d64cf80bdeb1df3f2cba332/mixins/nvidia.nix#L3-L30
+    package =
+      let
+        beta = config.boot.kernelPackages.nvidiaPackages.beta;
+        stable = config.boot.kernelPackages.nvidiaPackages.stable;
+      in
+      if (lib.versionOlder beta.version stable.version) then stable else beta;
+  };
+
+  # hardware.nvidia-container-toolkit.enable = false;
+  # hardware.nvidia.powerManagement.enable = false;
+  # hardware.nvidia.powerManagement.finegrained = false;
+  # hardware.nvidia.dynamicBoost.enable = true;
   hardware.nvidia.gsp.enable = true; # supported by the discrete GPU in my laptop, "GeForce RTX 3060 Mobile / Max-Q"
   hardware.nvidia.open = false; # nouveau makes my laptop fans run on full throttle 😭
   hardware.nvidia.prime = {
@@ -79,10 +97,5 @@
     nvidiaBusId = "PCI:01:00:0";
     intelBusId = "PCI:00:02:0";
   };
-
-  # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
-  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
-  # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.beta;
-  # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
 
 }

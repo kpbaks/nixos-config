@@ -1,7 +1,7 @@
 # TODO: integrate https://github.com/imsi32/yatline.yazi
 # https://github.com/ndtoan96/ouch.yazi
 # https://github.com/Mellbourn/ls-colors.yazi
-{ pkgs, ... }:
+{ inputs, pkgs, ... }:
 let
   inherit (pkgs) fetchFromGitHub;
 in
@@ -25,19 +25,19 @@ in
 
   programs.yazi =
     let
-      yazi-plugins = fetchFromGitHub {
-        owner = "yazi-rs";
-        repo = "plugins";
-        rev = "273019910c1111a388dd20e057606016f4bd0d17";
-        hash = "sha256-80mR86UWgD11XuzpVNn56fmGRkvj0af2cFaZkU8M31I=";
-      };
+      # yazi-plugins = fetchFromGitHub {
+      #   owner = "yazi-rs";
+      #   repo = "plugins";
+      #   rev = "273019910c1111a388dd20e057606016f4bd0d17";
+      #   hash = "sha256-80mR86UWgD11XuzpVNn56fmGRkvj0af2cFaZkU8M31I=";
+      # };
 
-      ouch-yazi = fetchFromGitHub {
-        owner = "ndtoan96";
-        repo = "ouch.yazi";
-        rev = "ce6fb75431b9d0d88efc6ae92e8a8ebb9bc1864a";
-        hash = "sha256-oUEUGgeVbljQICB43v9DeEM3XWMAKt3Ll11IcLCS/PA=";
-      };
+      # ouch-yazi = fetchFromGitHub {
+      #   owner = "ndtoan96";
+      #   repo = "ouch.yazi";
+      #   rev = "ce6fb75431b9d0d88efc6ae92e8a8ebb9bc1864a";
+      #   hash = "sha256-oUEUGgeVbljQICB43v9DeEM3XWMAKt3Ll11IcLCS/PA=";
+      # };
       # kdeconnect-yazi = pkgs.fetchFromGitHub {
       #   owner = "kpbaks";
       #   repo = "kdeconnect.yazi";
@@ -98,17 +98,17 @@ in
       # file and not a `init.lua`
       # see: https://home-manager-options.extranix.com/?query=yazi&release=master
       plugins = {
-        chmod = "${yazi-plugins}/chmod.yazi";
-        full-border = "${yazi-plugins}/full-border.yazi";
-        max-preview = "${yazi-plugins}/max-preview.yazi";
-        git = "${yazi-plugins}/git.yazi";
-        vcs-files = "${yazi-plugins}/vcs-files.yazi";
-        no-status = "${yazi-plugins}/no-status.yazi";
+        chmod = "${inputs.yazi-plugins}/chmod.yazi";
+        full-border = "${inputs.yazi-plugins}/full-border.yazi";
+        max-preview = "${inputs.yazi-plugins}/max-preview.yazi";
+        git = "${inputs.yazi-plugins}/git.yazi";
+        vcs-files = "${inputs.yazi-plugins}/vcs-files.yazi";
+        no-status = "${inputs.yazi-plugins}/no-status.yazi";
         # TODO: setup this plug
-        mime-ext = "${yazi-plugins}/mime-ext.yazi";
-        smart-filter = "${yazi-plugins}/smart-filter.yazi";
-        jump-to-char = "${yazi-plugins}/jump-to-char.yazi";
-        ouch = "${ouch-yazi}";
+        mime-ext = "${inputs.yazi-plugins}/mime-ext.yazi";
+        smart-filter = "${inputs.yazi-plugins}/smart-filter.yazi";
+        jump-to-char = "${inputs.yazi-plugins}/jump-to-char.yazi";
+        ouch = "${inputs.ouch-yazi}";
         # starship = "${starship-yazi}";
         # kdeconnect = "${kdeconnect-yazi}";
       };

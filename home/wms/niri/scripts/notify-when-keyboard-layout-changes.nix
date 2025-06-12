@@ -5,7 +5,8 @@
   ...
 }:
 let
-  niri = lib.getExe config.programs.niri.package;
+  # niri = lib.getExe config.programs.niri.package;
+  niri = "niri";
   script =
     pkgs.writers.writeFishBin "niri-notify-when-keyboard-layout-changes" { }
       # fish

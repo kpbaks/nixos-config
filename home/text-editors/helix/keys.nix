@@ -1,12 +1,3 @@
-{ config, ... }:
-let
-  left-bracket = command: [
-    command
-    # "align_view_center"
-  ];
-  right-bracket = left-bracket;
-
-in
 {
   programs.helix.settings.keys = {
 
@@ -15,6 +6,10 @@ in
     # };
 
     normal = {
+      "A-y" = [ "yank_joined" ];
+      # "A-y" = ''@"%Pyu'';
+      # "A-Y" = ''@"%P<space>Yu'';
+
       H = [
         "jump_backward"
         "align_view_center"
@@ -30,6 +25,18 @@ in
         "save_selection" # Make it possible to go back immediatly with `<c-o>`
         "goto_word"
       ];
+      # Idea is to always have plenty of space to actually read the popup
+      # This way is a bit disruptive. Would be better with a dedicated option
+      # that would take into account if we need to scroll the view to see all the
+      # contents of the popup. And if so what is the minimum scroll + some configurable vertical bottom margin
+      # to use.
+      # TODO: suggest idea upstream in an issue.
+      space.k = [
+        "align_view_top" # `zt`
+        "hover" # `<space>k`
+      ];
+
+      space.F = "file_picker_in_current_buffer_directory";
 
       # ret = [ "select_references_to_symbol_under_cursor" ];
       # y.d = [ ":yank-diagnostic" ];

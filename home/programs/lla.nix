@@ -2,6 +2,7 @@
 {
   home.packages = with pkgs; [ lla ];
 
+  # TODO: upstream module
   xdg.configFile."lla/config.toml".source = (pkgs.formats.toml { }).generate "lla-config" {
     default_sort = "name";
     default_format = "default";

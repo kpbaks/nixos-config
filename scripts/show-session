@@ -1,0 +1,41 @@
+set -l reset (set_color normal)
+set -l red (set_color red)
+set -l blue (set_color blue)
+set -l green (set_color green)
+set -l yellow (set_color yellow)
+set -l cyan (set_color cyan)
+set -l magenta (set_color magenta)
+set -l bold (set_color --bold)
+
+set -l properties
+set -l values
+loginctl show-session | while read -d = property value
+  set -a properties $property
+  set -a values $value
+end
+
+set -l length_of_longest_property 0
+for p in $properties
+  set length_of_longest_property (math "max $length_of_longest_property,$(string length $p)")
+end
+
+for i in (seq (count $properties))
+  set -l p $properties[$i]
+  set -l v $values[$i]
+  set -l rpad (math "$length_of_longest_property - $(string length $p)")
+  set rpad (string repeat --count $rpad ' ')
+
+  set -l v_color $reset
+  if test $v = yes
+    set v_color $green
+  else if test $v = no
+    set v_color $red
+  else if string match --regex --quiet '^\d+$' -- $v
+    set v_color $magenta
+  else if string match --regex --quiet '^\d+(s|min)$' -- $v
+    set v_color $yellow
+  end
+
+  printf '%s%s%s%s = %s%s%s\n' $bold $p $reset $rpad $v_color $v $reset
+end
+

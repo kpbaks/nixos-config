@@ -1,4 +1,8 @@
-# TODO: maybe configure a remote to your default hosting site, and username?
+# TODO: extract into its own project `git-init+`
+# TODO: refactor to use nushell to be cross-platform with support for Windows
+# TODO: have a wrapper version `git new+ <dir>` that takes a directory that it creates, and then run `git init+` in
+# TODO: if some of the files already exist, then respect that and ignore them i.e. be idempotent
+#       Take inspiration from `bevy new` in how to present the output and handle files that already exist
 {
   config,
   lib,
@@ -22,17 +26,6 @@ let
           exit 2
         end
 
-        if not argparse v/verbose -- $argv
-          # TODO: add small hint of how to use
-          exit 2
-        end
-
-        # Variables set by `argparse` are bound to local scope, but we need to check
-        # for it in a nested function `run`, so we set a global variable instead
-        if set -q _flag_verbose
-          set -g verbose
-        end
-
         set -g runs 0
         if not set -q runs_total
           set -g runs_total (string match --all --regex "^\s*run " <(status filename) | count)
@@ -42,18 +35,15 @@ let
 
         function run
           set runs (math "$runs + 1")
-          if set -qg verbose
-            # printf (printf "[%%s%%%dd%%s/%%s] " $digit_width) (set_color blue) (set_color normal) $runs $runs_total
-            printf (printf "[%%%dd/%%d] " $digit_width) $runs $runs_total
-            # set_color --dim
-            # set_color --bold
-            echo $argv | fish_indent --ansi
-            # `fish_indent --ansi` will inject an escape sequence to clear formatting so we can latch onto it to clear up dimming
-            set_color --dim --italics
-          end
+          printf "[%s%*d%s/%s] " (set_color blue) $digit_width $runs (set_color normal) $runs_total
+          # set_color --dim
+          # set_color --bold
+          echo $argv | fish_indent --ansi
+          # `fish_indent --ansi` will inject an escape sequence to clear formatting so we can latch onto it to clear up dimming
+          set_color --dim --italics
           eval $argv
           set_color normal
-          set -qg verbose; and printf "\n"
+          printf "\n"
         end
 
         # TODO: respect init.defaultObjectFormat
@@ -66,66 +56,56 @@ let
         # https://github.com/azu/license-generator
         run ${lib.getExe pkgs.license-go} -o LICENSE mit
 
-        set -l project_name (path basename $PWD)
-        printf '# %s\n' $project_name > README.md
-        run 'echo "0.1.0" > VERSION'
+        printf '# %s\n' (path basename $PWD) > README.md
+        echo "0.1.0" > VERSION
         ${echo} '# https://git-scm.com/docs/gitignore' >> .gitignore
         # TODO: use git config locally to have git blame use the file
         run ${git} config blame.ignoreRevsFile .git-blame-ignore-revs
         ${echo} '# https://git-scm.com/docs/git-blame#Documentation/git-blame.txt-blameignoreRevsFile' >> .git-blame-ignore-revs
         ${echo} '# example usage: https://github.com/NixOS/nixpkgs/blob/master/.git-blame-ignore-revs' >> .git-blame-ignore-revs
-        ${echo} '# https://git-scm.com/docs/gitattributes' >> .git-attributes
-        ${echo} '# https://git-scm.com/book/ms/v2/Customizing-Git-Git-Attributes' >> .git-attributes
-        ${echo} '# https://github.com/gitattributes/gitattributes' >> .git-attributes
+        ${echo} '# https://git-scm.com/docs/gitattributes' >> .gitattributes
+        ${echo} '# https://git-scm.com/book/ms/v2/Customizing-Git-Git-Attributes' >> .gitattributes
+        ${echo} '# https://github.com/gitattributes/gitattributes' >> .gitattributes
+        # TODO: generate .mailmap file
+        # TODO: respect `mailmap.file` and `mailmap.blob` git config options
+        echo "# https://git-scm.com/docs/gitmailmap" >> .mailmap
 
         run ${git-cliff} --init
         run ${touch} typos.toml
+        curl -sSL https://raw.githubusercontent.com/lycheeverse/lychee/refs/heads/master/lychee.example.toml > lychee.toml
 
-        # TODO: add pre-commit hooks that i want to use for every project
+        echo "# example from: https://docs.helix-editor.com/languages.html" >> .editorconfig
+        curl -sSL https://editorconfig.org/#example-file | ${lib.getExe pkgs.htmlq} --text ".highlight > pre:nth-child(1)" | string replace --all --regex '^([^#].+)' '# $1' >> .editorconfig
+
+        mkdir -p .helix
+        touch .helix/{config,languages}.toml
+        echo "# https://docs.helix-editor.com/configuration.html" >> .helix/config.toml
+        echo "# https://docs.helix-editor.com/languages.html" >> .helix/languages.toml
+        echo "/.helix/" >> .gitignore
 
         # TODO: handle if flakes and experimental commands are not enabled
-        # TODO: maybe use https://docs.rs/crate/minijinja-cli/latest to use a template approach
-        # run nix flake init
-        echo "{
-          description = \"$project_name\";
-          inputs = {
-            nixpkgs.url = \"github:NixOS/nixpkgs/nixpkgs-unstable\";
-            pre-commit-hooks = {
-              url = \"github:cachix/git-hooks.nix\";
-              inputs.nixpkgs.follows = \"nixpkgs\";
-            };
-          };
-          outputs = {
-            self,
-            nixpkgs,
-            pre-commit-hooks,
-          }:
-          let
-            system = \"${pkgs.system}\";
-            pkgs = import nixpkgs {inherit system;};
-          in
-          {
-            devShells.\''${system}.default = pkgs.mkShell {
-              name = \"$project_name\";
-              packages = with pkgs; [];
-            };
+        # TODO: use a better template with devShells a function to run for all systems etc.
+        run nix flake init --template templates#templates.trivial
+        echo "# https://direnv.net/man/direnv-stdlib.1.html
 
-            formatter.\''${system} = pkgs.nixfmt-rfc-style;
-          };
-        }" > flake.nix
+        if has nix; then
+          use flake
+        fi
 
-        run '${echo} "use flake" >> .envrc'
-
-        ${git} add flake.* .envrc
-        # TODO: use installed
-
-        # ${bat} (path filter -f * .*)
+        # Used for developer local `direnv` customization that should not
+        # be upstreamed to a public forge to be shared with others.
+        # E.g. loading security sensitive environment variables
+        source_env_if_exists .envrc.local
+        " >> .envrc
+        echo "/.envrc.local" >> .gitignore
 
         run "PAGER= ${git} config --local --list | ${column} --table --separator ="
+        run ${git} add --intent-to-add (${git} ls-files --others --exclude-standard)
         # run direnv allow
         run ${git} status --short
 
-        exit 0
+        # TODO: notify user which `init.templateDir` comes from
+        run ${eza} .git/hooks --long
 
         # run ${eza} --long --all --git
       '';
@@ -133,5 +113,4 @@ in
 
 {
   home.packages = [ git-init-plus ];
-
 }

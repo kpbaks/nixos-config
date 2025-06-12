@@ -5,7 +5,8 @@
   ...
 }:
 let
-  niri = "${config.programs.niri.package}/bin/niri";
+  # niri = "${config.programs.niri.package}/bin/niri";
+  niri = "niri";
   # catppuccin-colors = lib.pipe config.flavor [
   #   (builtins.mapAttrs (name: v: ''const ${name}: string = "${v.hex}"''))
   #   builtins.attrValues
@@ -74,7 +75,7 @@ let
 
        # rm $svg_file
 
-             
+
        # end | resvg --resources-dir . - $png_path
 
        # timg --center $png_path

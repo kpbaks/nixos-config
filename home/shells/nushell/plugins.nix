@@ -15,12 +15,10 @@ let
     # "net"
     "query"
   ];
-  # plugin_binaries = map (p: "nu_plugin_${p}") plugin_names;
-  nu_plugin_add_statements = map (
-    p: "plugin add ${lib.getExe pkgs.nushellPlugins.${p}}"
-  ) plugin_names;
+  plugins = map (name: pkgs.nushellPlugins.${name}) plugin_names;
+  nu_plugin_add_statements = map (p: "plugin add ${lib.getExe p}") plugins;
 in
 {
   programs.nushell.extraConfig = lib.concatLines nu_plugin_add_statements;
-  home.packages = map (p: pkgs.nushellPlugins.${p}) plugin_names;
+  home.packages = plugins;
 }

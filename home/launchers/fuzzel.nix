@@ -15,26 +15,40 @@
         # terminal = "${pkgs.kitty}/bin/kitty";
         terminal = "${lib.getExe config.default-application.terminal}";
         font = "JetBrainsMono Nerd Font Mono";
-        dpi-aware = "yes";
+        dpi-aware = "auto";
         use-bold = true;
         icons-enabled = true;
         # fuzzy = true;
         match-counter = true;
-        match-mode = "fuzzy";
+        match-mode = "fzf";
         show-actions = true;
         placeholder = "Search ";
         hide-before-typing = "no";
         anchor = "center";
-        lines = 12;
-        width = 40; # in characters
-        horizontal-pad = 60; # px
-        vertical-pad = 20; # px
+        lines = 16;
+        width = 64; # in characters
+        horizontal-pad = 40; # px
+        vertical-pad = 40; # px
         inner-pad = 20; # px
+        fields = "filename,name,generic,keywords";
       };
       border.width = 2; # px
       border.radius = 10; # px
       # All colors are in RGBA format
-      colors.background-color = lib.mkForce "000000ff";
+      colors = {
+        background = "212337ff";
+        border = "323449ff";
+        text = "ebfafaff";
+        # prompt = "";
+        # placeholder = "";
+        # input = "";
+        # match = "";
+        # selection = "";
+        # selection-text = "";
+        # selection-match = "";
+        # counter = "";
+      };
+      # colors.background-color = lib.mkForce "000000ff";
       # colors =
       #   let
       #     hex2fuzzel-color = hex: "${builtins.substring 1 6 hex}ff";

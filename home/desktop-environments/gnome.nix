@@ -9,6 +9,17 @@ let
   cfg = osConfig.services.xserver.desktopManager.gnome;
 in
 {
+  home.packages =
+    with pkgs.gnomeExtensions;
+    [
+      forge
+      fuzzy-app-search
+      tweaks-in-system-menu
+      clipboard-indicator
+    ]
+    ++ (with pkgs; [
+    ]);
+
   # home.packages =
   #   if cfg.enable then
   #     [

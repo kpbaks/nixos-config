@@ -11,7 +11,6 @@
       # "https://hyprland.cachix.org"
       "https://helix.cachix.org"
       "https://yazi.cachix.org"
-      "https://cosmic.cachix.org/"
       # "https://cache.garnix.io" # used by `ironbar`
       "https://watersucks.cachix.org"
     ];
@@ -22,67 +21,10 @@
       # "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
       "helix.cachix.org-1:ejp9KQpR1FBI2onstMQ34yogDm4OgU2ru6lIwPvuCVs="
       "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
-      "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE="
       # "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
       "watersucks.cachix.org-1:6gadPC5R8iLWQ3EUtfu3GFrVY7X6I4Fwz/ihW25Jbv8="
     ];
   };
-
-  inputs.pre-commit-hooks.url = "github:cachix/git-hooks.nix";
-  inputs.fh.url = "https://flakehub.com/f/DeterminateSystems/fh/*.tar.gz";
-
-  inputs.impermanence.url = "github:nix-community/impermanence";
-  inputs.zen-browser.url = "github:youwen5/zen-browser-flake";
-  inputs.zen-browser.inputs.nixpkgs.follows = "nixpkgs";
-
-  # inputs.steel.url = "github:mattwparas/steel";
-  # inputs.steel.inputs.nixpkgs.follows = "nixpkgs";
-
-  # inputs.neovim-nightly-overlay = {
-  #   url = "github:nix-community/neovim-nightly-overlay";
-  #   inputs.nixpkgs.follows = "nixpkgs";
-  # };
-  # inputs.nixvim = {
-  #   url = "github:nix-community/nixvim";
-  #   # If you are not running an unstable channel of nixpkgs, select the corresponding branch of nixvim.
-  #   # url = "github:nix-community/nixvim/nixos-24.11";
-
-  #   inputs.nixpkgs.follows = "nixpkgs";
-  # };
-
-  # inputs.television.url = "github:alexpasmantier/television";
-  # inputs.television.inputs.nixpkgs.follows = "nixpkgs";
-
-  # inputs.nix-weather.url = "github:cafkafk/nix-weather";
-  # inputs.nix-weather.inputs.nixpkgs.follows = "nixpkgs";
-
-  inputs.ghostty = {
-    url = "git+ssh://git@github.com/ghostty-org/ghostty";
-    # inputs.nixpkgs-stable.follows = "nixpkgs-unstable";
-    # inputs.nixpkgs-unstable.follows = "nixpkgs-unstable";
-    inputs.nixpkgs-stable.follows = "nixpkgs";
-    inputs.nixpkgs-unstable.follows = "nixpkgs";
-  };
-
-  # FIXME: why is no `nixos` binary available?
-  # inputs.nixos-cli = {
-  #   url = "github:water-sucks/nixos";
-  #   inputs.nixpkgs.follows = "nixpkgs";
-  # };
-
-  # TODO: use
-  # inputs.sops-nix = {
-  #   url = "github:Mic92/sops-nix";
-  #   inputs.nixpkgs.follows = "nixpkgs";
-  # };
-
-  # inputs.agenix = {
-  #   url = "github:ryantm/agenix";
-  #   # optional, not necessary for the module
-  #   inputs.nixpkgs.follows = "nixpkgs";
-  #   # optionally choose not to download darwin deps (saves some resources on Linux)
-  #   inputs.darwin.follows = "";
-  # };
 
   inputs = {
     # nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -104,11 +46,6 @@
       url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixos-cosmic = {
-      url = "github:lilyinstarlight/nixos-cosmic";
-      inputs.nixpkgs.follows = "nixpkgs";
-      # inputs.home-manager.follows = "home-manager";
-    };
 
     helix = {
       url = "github:helix-editor/helix";
@@ -118,6 +55,23 @@
       url = "github:sxyazi/yazi";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    ghostty = {
+      url = "git+ssh://git@github.com/ghostty-org/ghostty";
+      # inputs.nixpkgs-stable.follows = "nixpkgs-unstable";
+      # inputs.nixpkgs-unstable.follows = "nixpkgs-unstable";
+    };
+    ghostty-shaders = {
+      url = "github:hackr-sh/ghostty-shaders";
+      flake = false;
+    };
+    eldritch-theme-ghostty = {
+      url = "github:eldritch-theme/ghostty";
+      flake = false;
+    };
+    # eldritch-theme-kitty = {
+    #   url = "github:eldritch-theme/kitty";
+    #   flake = false;
+    # };
     # catppuccin.url = "github:catppuccin/nix";
     # nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     stylix = {
@@ -125,6 +79,68 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
+
+    pre-commit-hooks.url = "github:cachix/git-hooks.nix";
+    fh.url = "https://flakehub.com/f/DeterminateSystems/fh/*.tar.gz";
+    # inputs.patchy.url = "github:NikitaRevenco/patchy/main";
+    impermanence.url = "github:nix-community/impermanence";
+    zen-browser.url = "github:youwen5/zen-browser-flake";
+    zen-browser.inputs.nixpkgs.follows = "nixpkgs";
+
+    quickshell = {
+      url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # TODO: use
+    # inputs.sops-nix = {
+    #   url = "github:Mic92/sops-nix";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
+
+    # inputs.agenix = {
+    #   url = "github:ryantm/agenix";
+    #   # optional, not necessary for the module
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    #   # optionally choose not to download darwin deps (saves some resources on Linux)
+    #   inputs.darwin.follows = "";
+    # };
+
+    yazi-plugins = {
+      url = "github:yazi-rs/plugins";
+      flake = false;
+    };
+    ouch-yazi = {
+      url = "github:ndtoan96/ouch.yazi";
+      flake = false;
+    };
+    tree-sitter-roc = {
+      url = "github:faldor20/tree-sitter-roc";
+      flake = false;
+    };
+
+    nix_command_not_found_fish = {
+      url = "github:kpbaks/nix_command_not_found.fish";
+      flake = false;
+    };
+    private_mode_fish = {
+      url = "github:kpbaks/private_mode.fish";
+      flake = false;
+    };
+    git_fish = {
+      url = "github:kpbaks/git.fish";
+      flake = false;
+    };
+    ctrl_z_fish = {
+      url = "github:kpbaks/ctrl-z.fish";
+      flake = false;
+    };
+    nix_fish = {
+      url = "github:kpbaks/nix.fish";
+      flake = false;
+    };
+
+    # nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
 
     # nix-melt = {
     #   url = "github:nix-community/nix-melt";
@@ -152,9 +168,11 @@
       overlays = [
         # inputs.rust-overlay.overlays.default
         # inputs.hyprpanel.overlay
-        (final: prev: { ghostty = inputs.ghostty.packages.${system}.default; })
+        # (final: prev: { ghostty = inputs.ghostty.packages.${system}.default; })
+        inputs.ghostty.overlays.releasefast
         # inputs.wired-notify.overlays.default
         inputs.niri.overlays.niri
+        (final: prev: { niri = final.niri-unstable; })
         # (final: prev: { woomer = inputs.woomer.packages.${system}.default; })
         # inputs.swww.overlays.default
         # (final: prev: { swww = inputs.swww.packages.${prev.system}.swww; })
@@ -169,6 +187,10 @@
         inherit system overlays;
         config.allowUnfree = true;
         config.allowBroken = false;
+        config.permittedInsecurePackages = [
+          "olm-3.2.16"
+          #   "electron-27.3.11"
+        ];
       };
     in
     {
@@ -198,50 +220,37 @@
           buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
           packages = with pkgs; [
             update-nix-fetchgit
+            # Needed for the various *.css files used
+            vscode-langservers-extracted
           ];
         };
-
       });
 
-      # TODO: setup raspberrypi
-      # TODO: setup nextcloud
-      nixosConfigurations."raspberry-pi" = nixpkgs.lib.nixosSystem {
-        specialArgs = {
-          inherit inputs username;
-        };
-        system = "aarch64-linux";
-        modules = [
-          ./hosts/raspberry-pi.nix
-          inputs.nixos-hardware.nixosModules.raspberry-pi-4
-          (
-            { modulesPath, ... }:
-            {
-              imports = [ (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix") ];
-            }
-          )
-        ];
-      };
-
       nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
-        inherit system;
+        inherit pkgs system;
         specialArgs = {
           inherit inputs username;
         };
         modules = [
+          ./modules/nixos
           ./configuration.nix
-          # ./k3s.nix
           {
             # https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md#default-configuration--who-needs-configuration
-            # NixOS configuration.
             nix.nixPath = [ "nixpkgs=${inputs.nixpkgs}" ];
           }
-          # inputs.stylix.nixosModules.stylix # provide theming for system level programs such as bootloaders, splash screens, and display managers
+          inputs.niri.nixosModules.niri
+
+          # ./k3s.nix
+          # {
+          #   imports = [
+          #     inputs.nix-flatpak.nixosModules.nix-flatpak
+          #   ];
+          # }
           # inputs.sops-nix.nixosModules.sops
           # {
           #   imports = [ inputs.agenix.nixosModules.default ];
           #   environment.systemPackages = [ inputs.agenix.packages.${system}.default ];
           # }
-          inputs.niri.nixosModules.niri
           # {
           #   imports = [ inputs.nixos-cli.nixosModules.nixos-cli ];
           #   services.nixos-cli = {
@@ -252,15 +261,7 @@
           # }
           # inputs.catppuccin.nixosModules.catppuccin
           # { environment.systemPackages = [ inputs.nix-weather.packages.${system}.nix-weather ]; }
-          { environment.systemPackages = [ inputs.fh.packages.${system}.default ]; }
-
-          # {
-          #   imports = [
-          #     inputs.nixos-cosmic.nixosModules.default
-          #   ];
-          #   services.desktopManager.cosmic.enable = true;
-          #   services.displayManager.cosmic-greeter.enable = true;
-          # }
+          # { environment.systemPackages = [ inputs.fh.packages.${system}.default ]; }
           # inputs.nixos-hardware.nixosModules.tuxedo-infinitybook-pro14-gen7
           # inputs.sops-nix.nixosModules.sops
           # (
@@ -282,6 +283,7 @@
             inherit inputs username;
           };
           modules = [
+            ./modules/home
             ./home
             {
 
@@ -290,14 +292,19 @@
               # TODO: sync with `configuration.nix`
               home.stateVersion = "24.05";
               home.enableDebugInfo = false;
-
+              home.preferXdgDirectories = true;
+              # home.sessionSearchVariables = {
+              #   MANPATH = [
+              #     "\${xdg.configHome}/.local/share/man"
+              #   ];
+              # };
               # Let Home Manager install and manage itself.
               programs.home-manager.enable = true;
-              nixpkgs.config.allowUnfree = true;
-              nixpkgs.config.permittedInsecurePackages = [
-                "olm-3.2.16"
-                "electron-27.3.11"
-              ];
+              # nixpkgs.config.allowUnfree = true;
+              # nixpkgs.config.permittedInsecurePackages = [
+              #   "olm-3.2.16"
+              #   "electron-27.3.11"
+              # ];
             }
             # (
             #   { config, ... }:
@@ -332,13 +339,35 @@
             #   };
             # }
 
+            # (
+            #   {
+            #     config,
+            #     pkgs,
+            #     ...
+            #   }:
+            #   {
+            #     imports = [ inputs.stylix.homeModules.stylix ]; # provide theming for system level programs such as bootloaders, splash screens, and display managers
+
+            #     stylix = {
+            #       enable = true;
+            #       # https://nix-community.github.io/stylix/tricks.html#dynamic-wallpaper-generation-based-on-selected-theme
+            #       image = config.lib.stylix.pixel "base0A";
+            #       base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-latte.yaml";
+            #       # image = pkgs.fetchurl {
+            #       #   url = "https://preview.redd.it/character-visuals-original-illustration-by-shadow-v0-t7xz7a27w74f1.jpeg?width=1080&crop=smart&auto=webp&s=1679feb9b3954ff8ebab129beb8e8f8cd4a713f7";
+            #       #   hash = lib.fakeHash;
+            #       # };
+            #       targets.console.enable = true; # Linux kernel console
+            #       polarity = "dark";
+            #     };
+            #   }
+            # )
             {
               imports = [
                 inputs.nix-index-database.hmModules.nix-index
               ];
               programs.nix-index-database.comma.enable = true;
             }
-            { home.packages = [ inputs.zen-browser.packages.${system}.default ]; }
             # { home.packages = [ inputs.steel.packages.${system}.default ]; }
             # { home.packages = [ inputs.crates-lsp.packages.${system}.default ]; }
           ];
@@ -353,5 +382,25 @@
         # system = "aarch64-linux";
         modules = [ ];
       };
+      # TODO: setup raspberrypi
+      # TODO: setup nextcloud
+      nixosConfigurations.raspberry-pi = nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          inherit inputs username;
+        };
+        system = "aarch64-linux";
+        modules = [
+          ./hosts/raspberry-pi.nix
+          inputs.nixos-hardware.nixosModules.raspberry-pi-4
+          (
+            { modulesPath, ... }:
+            {
+              imports = [ (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix") ];
+            }
+          )
+        ];
+      };
+
     };
+
 }

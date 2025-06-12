@@ -1,0 +1,31 @@
+{
+  "layer": "top",
+  "modules-left": [
+    "niri/language",
+    "niri/workspaces"
+  ],
+  "modules-center": [
+    "niri/window"
+  ],
+  "modules-right": [
+    "battery",
+    "clock"
+  ],
+  "battery": {
+    "format": "{capacity}% {icon}",
+    "format-icons": [
+      "",
+      "",
+      "",
+      "",
+      ""
+    ]
+  },
+  "clock": {
+    "format-alt": "{:%a, %d. %b  %H:%M}"
+  },
+  "niri/language": {
+    "format-en": "English (US) 🇺🇸",
+    "format-dk": "Danish 🇩🇰",
+  }
+}

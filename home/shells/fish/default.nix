@@ -7,6 +7,7 @@
     ./functions.nix
     ./plugins.nix
     ./keybinds.nix
+    ./themes.nix
     ./colors.nix
   ];
   home.packages = with pkgs; [

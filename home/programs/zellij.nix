@@ -35,9 +35,19 @@
   # `set -q KATE_PID`
   # `set -q VSCODE_INTEGRATION`
   # TODO: show the session resurrection plugin when starting a new fish process not in zellij
-  programs.zellij.enableFishIntegration = true;
+  programs.zellij.enableFishIntegration = false;
   programs.zellij.enableBashIntegration = false;
   programs.zellij.enableZshIntegration = false;
+
+  # eval (/nix/store/xpqw2pmjdpsh2kcyxka4m2rpcikf93j7-zellij-0.42.2/bin/zellij setup --generate-auto-start fish | string collect)
+
+  programs.fish.interactiveShellInit =
+    lib.optionalString (!config.programs.zellij.enableFishIntegration)
+      ''
+        if set -q XDG_CURRENT_DESKTOP; and test $XDG_CURRENT_DESKTOP != niri
+          eval (${config.programs.zellij.package}/bin/zellij setup --generate-auto-start fish | string collect)
+        end
+      '';
 
   programs.zellij.settings = {
     # default_mode = "locked";
@@ -47,12 +57,14 @@
     copy_clipboard = "primary";
     copy_on_selection = true;
     serialize_pane_viewport = true;
+    show_startup_tips = false;
     # layout_dir = "${zellij_dir}/layouts";
     # theme_dir = "${zellij_dir}/themes";
     # theme = "gruvbox-dark";
     # theme = "kanagawa";
     # theme = "iceberg-dark";
-    theme = "night-owl";
+    # theme = "night-owl";
+    # theme = "tokyo-night-light";
     default_layout = "default";
     # default_layout = "compact";
     pane_viewport_serialization = true;

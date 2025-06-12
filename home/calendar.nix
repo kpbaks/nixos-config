@@ -4,7 +4,7 @@
   accounts.calendar.basePath = config.home.homeDirectory + "/.calendars";
   accounts.calendar.accounts = {
     personal = {
-      khal.enable = true;
+      khal.enable = config.programs.khal.enable;
       khal.color = "yellow";
       primary = true;
       remote = {
@@ -18,7 +18,7 @@
   };
 
   programs.khal = {
-    enable = true;
+    enable = false;
     locale =
       let
         monday = 0;

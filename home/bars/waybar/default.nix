@@ -1,111 +1,124 @@
-{ config, pkgs, ... }:
-let
-
-  # TODO: present more nicely maybe with the `tabulate` package
-  # scripts.wb-reload = pkgs.writers.writeBashBin "wb-reload" ''
-  #   if ! ${pkgs.procps}/bin/pkill -USR2 waybar; then
-  #     ${pkgs.libnotify}/bin/notify-send --transient "waybar" "waybar is not running"
-  #     ${pkgs.waybar}/bin/waybar 2>/dev/null >&2 &; disown
-  #   fi
-  # '';
-
-  # scripts.wb-toggle-visibility = pkgs.writers.writeBashBin "wb-toggle-visibility" ''
-  #   if ! ${pkgs.procps}/bin/pkill -USR1 waybar; then
-  #     # ${pkgs.libnotify}/bin/notify-send --transient --category= "waybar" "waybar is not running"
-  #     ${pkgs.libnotify}/bin/notify-send --transient "waybar" "waybar is not running"
-  #   fi
-  # '';
-
-  # scripts.wb-toggle-visibility-or-spawn =
-  #   pkgs.writers.writeFishBin "waybar.toggle-visibility-or-spawn" { }
-  #     # fish
-  #     ''
-  #       set -l waybar_pids (${pkgs.procps}/bin/pgrep waybar)
-
-  #       ${pkgs.procps}/bin/pkill -USR1 waybar; and return
-
-  #       # Check if waybar is installed as a systemd service
-  #       for scope in "" --user
-  #         ${pkgs.systemd}/bin/systemctl $scope status waybar.service
-  #         switch $status
-  #           case 3 # Exists but is not running
-  #             # TODO: there is a chance it is not enabled
-  #             ${pkgs.systemd}/bin/systemctl $scope start waybar.service
-  #             return
-  #           case 4 # Does not exist
-  #         end
-  #       end
-
-  #       # ${pkgs.waybar}/bin/waybar
-  #       ${pkgs.waybar}/bin/waybar 2>/dev/null >&2 &; disown
-  #       # end
-  #         # if ! ${pkgs.procps}/bin/pkill -USR1 waybar; then
-  #         #   # ${pkgs.libnotify}/bin/notify-send --transient --category= "waybar" "waybar is not running"
-  #         #   ${pkgs.libnotify}/bin/notify-send --transient "waybar" "waybar is not running"
-  #         # fi
-  #     '';
-
-in
-# scripts.wb-watch-config-and-reload = pkgs.writers.writeBashBin "wb-watch-config-and-reload" ''
-#   if ${pkgs.procps}/bin/pgrep waybar; then
-#     ${pkgs.watchexec}/bin/watchexec --watch ${config.home.homeDirectory}/.config/waybar ${pkgs.lib.getExe scripts.wb-reload}
-#   else
-#     ${pkgs.libnotify}/bin/notify-send --transient "waybar" "waybar is not running"
-#   fi
-# '';
-
 {
-  # imports = [ ./scripts ];
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+let
+  # TODO: narrow the proc search to only the process with name `^waybar$`
+  scripts.waybar-reload = pkgs.writeShellApplication {
+    name = "waybar-reload";
+    runtimeInputs = with pkgs; [
+      procps
+      libnotify
+      # config.services.waybar.package
+    ];
+    text = ''
+      if ! pkill -USR2 waybar; then
+        notify-send --transient waybar "waybar is not running"
+      fi
+    '';
+  };
 
-  # home.file.".config/waybar/nix-logo.png".source = ./nix-logo.png;
-  # xdg.configFile."waybar-nixos-logo.png".source = ./nixos-logo.png;
+  # TODO: narrow the proc search to only the process with name `^waybar$`
+  scripts.waybar-toggle-visibility = pkgs.writeShellApplication {
+    name = "waybar-toggle-visibility";
+    runtimeInputs = with pkgs; [
+      procps
+      libnotify
+      # config.services.waybar.package
+    ];
 
+    text = ''
+      if ! pkill -USR1 waybar; then
+        notify-send --transient "waybar" "waybar is not running"
+      fi
+    '';
+  };
+in
+{
   # TODO: use https://github.com/raffaem/waybar-mediaplayer
   # https://github.com/raffaem/waybar-screenrecorder
-  #
-  #
 
+  # TODO: sync with the window gap in niri, for left/right padding
+  # TODO: also use colors configured from it
   programs.waybar = {
-    enable = false;
+    enable = true;
     systemd.enable = true;
     # TODO: figure out how to only start when session is niri
-    settings = {
-      top = {
-        layer = "top";
-        position = "right";
-        spacing = 0; # gaps between modules
+    settings.top = rec {
+      layer = "top";
+      position = "top";
+      spacing = 6; # gaps between modules
+      height = 38;
 
-        modules-left = [
-          "niri/language"
-          "niri/workspaces"
-        ];
-        modules-center = [
-          "clock"
-          # "niri/window"
-        ];
-        modules-right = [
-          # "clock"
-          "cpu"
-          "memory"
-          "battery"
-          "tray"
-        ];
-        "niri/language" = {
-          format = "Lang: {long}";
-          format-en = "🇺🇸";
-          format-dk = "🇩🇰";
-        };
-        "niri/windows" = {
-          icon = true;
-          icon-size = 16;
-        };
-        tray.spacing = 10;
-        cpu.tooltip = false;
+      # TODO: use this attr to configure the padding of the bar
+      # config.programs.niri.settings.layout.gaps
+
+      modules-left = [
+        "niri/language"
+        "niri/workspaces"
+      ];
+      modules-center = [
+        "niri/window"
+      ];
+      modules-right = [
+        "privacy"
+        "mpd"
+        "cpu"
+        "memory"
+        "pulseaudio"
+        "backlight"
+        "bluetooth"
+        "network"
+        "battery"
+        "tray"
+        "clock"
+      ];
+      "niri/language" = {
+        format = "Lang: {long}";
+        format-en = "English (US) 🇺🇸";
+        format-dk = "Danish 🇩🇰";
+      };
+      "niri/window" = {
+        icon = true;
+        icon-size = builtins.floor (2 / 3 * height);
+      };
+      tray = {
+        spacing = 10;
       };
 
+      battery = {
+        states = {
+          warning = 30;
+          critical = 15;
+        };
+      };
+      cpu.format = "  {usage}%";
+      memory.format = "  {}%";
+      backlight = {
+        format = "{icon}  {percent}%";
+        format-icons = [
+          ""
+          ""
+          ""
+          ""
+          ""
+          ""
+          ""
+          ""
+          ""
+        ];
+      };
     };
     style = builtins.readFile ./style.css;
   };
+
+  # xdg.configFile."waybar/config.jsonc".source =
+  #   config.lib.file.mkOutOfStoreSymlink "/etc/nixos/home/bars/waybar/config.jsonc";
+
+  # xdg.configFile."waybar/style.css".source =
+  #   config.lib.file.mkOutOfStoreSymlink "/etc/nixos/home/bars/waybar/style.css";
 
   # programs.waybar = {
   #   enable = true;
@@ -1238,9 +1251,15 @@ in
   # TODO: create and submit a home-manager module for this
   # TODO: install some .thThemes and .sublime-syntax
 
-  # home.packages =
-  #   builtins.attrValues scripts
-  #   ++ (with pkgs; [
-  #     wttrbar # Dependency of `waybar`
-  #   ]);
+  home.packages = builtins.attrValues scripts;
+  # ++ (with pkgs; [
+  #   wttrbar # Dependency of `waybar`
+  # ]);
+
+  # Modify service definition to enable in a tiling WM like niri, but
+  # disable in when using KDE Plasma.
+  # [ref:set_XDG_CURRENT_DESKTOP_to_niri]
+  # systemd.user.services.mako = {
+  #   User.ConditionEnvironment = "XDG_CURRENT_DESKTOP=niri";
+  # };
 }
