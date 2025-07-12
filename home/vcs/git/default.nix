@@ -2,6 +2,7 @@
 # If it works then upstream a home-manager option for it.
 {
   config,
+  inputs,
   lib,
   pkgs,
   ...
@@ -18,34 +19,37 @@
     # ./git-semver-tags.nix
   ];
 
-  home.packages = with pkgs; [
-    # gitbutler
-    # gitoxide
-    delta
-    difftastic
-    mergiraf
-    # ghorg
-    # gitflow
-    # git-gui
-    # tk # needed by `git citool`
-    # ghostie
-    # github-backup
-    # github-to-sqlite
-    # serie # rich git commit graph terminal
-    # git-interactive-rebase-tool
-    # git-branchless
-    # git-brunch
-    # git-branchstack
-    # git-bars
-    # gitleaks
-    # commitizen
-    # git-workspace
-    # git-absorb
-    # lighttpd # needed by `git instaweb`
-    # dependabot-cli
-    # git-doc
-    # sublime-merge
-  ];
+  home.packages =
+    with pkgs;
+    [
+      # gitbutler
+      # gitoxide
+      delta
+      difftastic
+      mergiraf
+      # ghorg
+      # gitflow
+      # git-gui
+      # tk # needed by `git citool`
+      # ghostie
+      # github-backup
+      # github-to-sqlite
+      # serie # rich git commit graph terminal
+      # git-interactive-rebase-tool
+      # git-branchless
+      # git-brunch
+      # git-branchstack
+      # git-bars
+      # gitleaks
+      # commitizen
+      # git-workspace
+      # git-absorb
+      # lighttpd # needed by `git instaweb`
+      # dependabot-cli
+      # git-doc
+      # sublime-merge
+    ]
+    ++ (builtins.attrValues inputs.git-subcommands.packages.${pkgs.stdenv.system});
 
   programs.git.mergiraf.enable = true;
 

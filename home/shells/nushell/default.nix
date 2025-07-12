@@ -93,7 +93,7 @@
 
 
       # TODO: figure out how to make a fg/bg toggle keybind
-      $env.config.keybinds = [
+      $env.config.keybindings = [
         # {
         #   name: ctrl-z
         #   modifier: control

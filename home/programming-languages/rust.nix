@@ -63,37 +63,43 @@ in
     # RUSTC_WRAPPER = "sccache";
   };
 
-  home.packages =
-    [
-      # pkgs.cargo
-    ]
-    ++ (with pkgs; [
-      # sccache
-      # pkgs.rust-bin.stable.latest.default
-      lldb
-      gdb
-      mold # modern linker
-      rustup # rust toolchain manager
-      pkg-config # `rust-analyzer` sometimes gives errors if it cannot find pkg-config
-      openssl
-      # rustc
-      # rust-analyzer
-      # clippy
-      clippy-sarif
-      clang
-    ])
-    ++ thirdparty-cargo-subcommands
-    ++ [
-      cargo-bins
-      cargo-examples
-      cargo-tests
-      rustc-target-list
-    ];
+  # home.packages =
+  #   [
+  #     # pkgs.cargo
+  #   ]
+  #   ++ (with pkgs; [
+  #     # sccache
+  #     # pkgs.rust-bin.stable.latest.default
+  #     lldb
+  #     gdb
+  #     mold # modern linker
+  #     rustup # rust toolchain manager
+  #     pkg-config # `rust-analyzer` sometimes gives errors if it cannot find pkg-config
+  #     openssl
+  #     # rustc
+  #     # rust-analyzer
+  #     # clippy
+  #     clippy-sarif
+  #     clang
+  #   ]);
+  # ++ thirdparty-cargo-subcommands
+  # ++ [
+  #   cargo-bins
+  #   cargo-examples
+  #   cargo-tests
+  #   rustc-target-list
+  # ];
 
   # https://doc.rust-lang.org/cargo/reference/config.html#configuration-format
   home.file."cargo/config.toml".source = tomlFormat.generate "cargo-config" {
-    alias = {
-      cfg = "-Z unstable-options config get | ${pkgs.bat}/bin/bat -l toml --plain";
+    alias = rec {
+      config = "-Z unstable-options config get | ${pkgs.bat}/bin/bat -l toml --plain";
+      cfg = config;
+      b = "build";
+      c = "check";
+      t = "test";
+      r = "run";
+      rr = "run --release";
     };
   };
 }

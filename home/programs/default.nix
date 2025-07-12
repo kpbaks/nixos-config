@@ -16,6 +16,7 @@
     ./fd.nix
     ./fzf.nix
     ./gdb.nix
+    ./hwatch.nix
     ./gum.nix
     ./moar.nix
     # ./mpv.nix
@@ -28,7 +29,7 @@
     # ./spicetify.nix
     ./sqlite3.nix
     ./ssh.nix
-    # ./starship.nix
+    ./starship.nix
     # ./swaylock.nix
     ./tealdeer.nix
     # ./wlogout.nix

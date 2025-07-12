@@ -12,3 +12,16 @@ home-manager = { expr = '(builtins.getFlake "/etc/nixos").homeConfigurations."kp
 [[language]]
 name = "nix"
 language-servers = ["nixd"]
+
+[[language]]
+name = "git-commit"
+scope = "git.commitmsg"
+file-types = [
+  { glob = "COMMIT_EDITMSG" },
+  { glob = "MERGE_MSG" },
+  { glob = "NOTES_EDITMSG" },
+]
+comment-token = "#"
+indent = { tab-width = 2, unit = "  " }
+rulers = [51, 73]
+text-width = 72

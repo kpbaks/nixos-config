@@ -1,5 +1,3 @@
-# TODO: package these for nixpkgs:
-# - https://github.com/darrenburns/posting
 { pkgs, ... }:
 {
   # TODO: checkout
@@ -13,7 +11,8 @@
     # podman-desktop
     # kraft
     # bloaty
-    # serpl
+    serpl
+    scooter
     # topiary
     # aha
     # binsider
@@ -277,6 +276,7 @@
     # spacedrive
     # typos
     taplo
+    tombi
     # harper
   ];
 }

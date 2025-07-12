@@ -4,6 +4,7 @@
   programs.alacritty = {
     enable = true;
     settings = {
+      terminal.osc52 = "CopyPaste";
       bell.duration = 200;
       cursor = {
         style = {
@@ -15,6 +16,10 @@
       };
       font = {
         builtin_box_drawing = true;
+        offset = {
+          x = 0;
+          y = 6;
+        };
         normal = {
           # family = "JetBrains Mono NFM";
           # family = "Iosevka Nerd Font Mono";
@@ -31,7 +36,7 @@
           persist = false;
           # "mouse.enabled" = true;
           binding = {
-            key = "u";
+            key = "o";
             mods = "Control|Shift";
           };
         }
@@ -86,13 +91,14 @@
       };
       selection.save_to_clipboard = true;
       window = {
+        resize_increments = true;
         blur = false;
         decorations = "None";
         dynamic_padding = true;
-        opacity = 1.0;
+        opacity = 0.9;
         padding = {
-          x = 10;
-          y = 10;
+          x = 0;
+          y = 0;
         };
         # startup_mode = "Fullscreen";
       };

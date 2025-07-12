@@ -30,7 +30,8 @@
     # nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     home-manager = {
-      url = "github:nix-community/home-manager/master";
+      # url = "github:nix-community/home-manager/master";
+      url = "git+file:///home/kpbaks/forks/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
@@ -43,7 +44,9 @@
       inputs.home-manager.follows = "home-manager";
     };
     niri = {
-      url = "github:sodiboo/niri-flake";
+      # url = "github:sodiboo/niri-flake";
+      # url = "flake:local-niri-flake-fork";
+      url = "git+file:///home/kpbaks/forks/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -77,7 +80,7 @@
     stylix = {
       url = "github:danth/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
+      # inputs.home-manager.follows = "home-manager";
     };
 
     pre-commit-hooks.url = "github:cachix/git-hooks.nix";
@@ -89,6 +92,16 @@
 
     quickshell = {
       url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    git-subcommands = {
+      url = "git+https://codeberg.org/kpbaks/git-subcommands.git";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    swww = {
+      url = "github:LGFae/swww";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -161,10 +174,11 @@
       ...
     }@inputs:
     let
+      inherit (nixpkgs) lib;
       hostname = "nixos";
       username = "kpbaks";
       system = "x86_64-linux";
-      for-all-systems = nixpkgs.lib.genAttrs [ system ];
+      for-all-systems = lib.genAttrs [ system ];
       overlays = [
         # inputs.rust-overlay.overlays.default
         # inputs.hyprpanel.overlay
@@ -199,18 +213,7 @@
       checks = for-all-systems (system: {
         pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
           src = ./.;
-          hooks = {
-            nixfmt-rfc-style.enable = true;
-            # deadnix.enable = true;
-            flake-checker.enable = true;
-            statix.enable = true;
-            check-toml.enable = true;
-            check-json.enable = true;
-            check-yaml.enable = true;
-            lychee.enable = true;
-            typos.enable = true;
-            # trufflehog.enable = true;
-          };
+          hooks = import ./git-hooks.nix { inherit pkgs; };
         };
       });
 

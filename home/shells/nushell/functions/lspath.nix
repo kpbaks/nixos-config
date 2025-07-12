@@ -7,7 +7,7 @@
         | wrap dir
         | insert executables { |row|
           if ($row.dir | path exists) {
-            ls --long $row.dir | get mode | str substring 2..2 | filter { $in == "x" } | length
+            ls --long $row.dir | get mode | str substring 2..2 | where { $in == "x" } | length
           } else {
             null
           }

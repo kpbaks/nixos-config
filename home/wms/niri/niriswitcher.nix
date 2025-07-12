@@ -16,7 +16,9 @@ in
   };
 
   programs.niri.settings.spawn-at-startup = lib.optional enable {
-    command = lib.getExe config.programs.niriswitcher.package;
+    command = [
+      (lib.getExe config.programs.niriswitcher.package)
+    ];
   };
 
   # https://github.com/isaksamsten/niriswitcher#gdbus

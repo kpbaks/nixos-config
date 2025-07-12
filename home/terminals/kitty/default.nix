@@ -142,6 +142,7 @@
       tab_title_template = "{fmt.fg.red}{bell_symbol} {activity_symbol}{fmt.fg.tab}{title}";
       # tab_bar_background = surface0.hex;
       # tab_bar_margin_color = flamingo.hex;
+      cursor_trail = 3;
     };
     shellIntegration.mode = "no-cursor";
     shellIntegration.enableFishIntegration = true;

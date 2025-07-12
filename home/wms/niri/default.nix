@@ -11,8 +11,10 @@
     inputs.niri.homeModules.niri
     ./scripts
     ./window-rules.nix
+    ./layer-rules.nix
     ./binds.nix
     ./outputs.nix
+    ./overview.nix
     ./event-stream-handler.nix
     ./niriswitcher.nix
   ];
@@ -165,6 +167,7 @@
         "${pkgs.telegram-desktop}/bin/telegram-desktop -startintray"
         # "ironbar"
         # "${pkgs.swww}/bin/swww-daemon"
+        "${pkgs.swaybg}/bin/swaybg -i /home/kpbaks/Pictures/wallpapers/spacehawks.png"
         # "${pkgs.copyq}/bin/copyq"
         # "${pkgs.eww}/bin/eww daemon"
         # "${pkgs.birdtray}/bin/birdtray"
@@ -247,6 +250,15 @@
       name = "niri - Power off monitors";
       exec = lib.getExe (
         pkgs.writeShellScriptBin "niri-power-off-monitors" ''${config.programs.niri.package}/bin/niri msg action power-off-monitors''
+      );
+      terminal = false;
+      type = "Application";
+      categories = [ "System" ];
+    };
+    open-screenshots-dir = {
+      name = "niri - Open screenshots directory";
+      exec = lib.getExe (
+        pkgs.writeShellScriptBin "niri-open-screenshots-dir" ''${pkgs.libnotify}/bin/xdg-open $(dirname ${config.programs.niri.settings.screenshot-path})''
       );
       terminal = false;
       type = "Application";

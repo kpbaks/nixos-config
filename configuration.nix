@@ -368,10 +368,8 @@
       # };
     };
   };
-  # services.xserver.desktopManager.gnome.enable = true;
-  # services.xserver.displayManager.gdm.enable = true;
 
-  services.desktopManager.gnome.enable = true;
+  services.desktopManager.gnome.enable = false;
   # Exclude applications installed with Gnome
   environment.gnome.excludePackages = with pkgs; [
     gnome-tour
@@ -1061,4 +1059,7 @@
 
   services.desktopManager.cosmic.enable = false;
   services.displayManager.cosmic-greeter.enable = false;
+
+  # programs.command-not-found.dbPath
+  programs.command-not-found.enable = true;
 }
