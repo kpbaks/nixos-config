@@ -45,6 +45,8 @@
         "*.msproj:xml"
         # "*.nu:nushell"
       ];
+      theme-dark = "Coldark-Dark";
+      theme-light = "Coldark-Cold";
     };
   };
 }

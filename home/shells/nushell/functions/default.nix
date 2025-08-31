@@ -78,5 +78,42 @@
         | move pciid --before bus
         | sort-by type
       }
+
+      # https://www.man7.org/linux/man-pages//man1/lsclocks.1.html
+      def lsclocks []: nothing -> table<id: int, name: string, time: duration, resolution: string, iso_time: datetime> {
+        ${pkgs.util-linux}/bin/lsclocks --json
+        | from json
+        | get clocks
+        | rename --column {resol: resolution}
+        | update iso_time { into datetime }
+      }
+
+      def lsipc []: nothing -> table<resource: string, description: string, limit: filesize, used: string, use%: string> {
+        ${pkgs.util-linux}/bin/lsipc --json
+        | from json
+        | get ipclimits
+        | update limit { try { into filesize } }
+        | update resource {
+          let first_3_chars = $in | str substring ..2
+          let color = match $first_3_chars {
+            "MSG" => "blue",
+            "MQU" => "cyan",
+            "SHM" => "yellow",
+            "SEM" => "green",
+            _ => { error make {msg: $"Unknown IPC mechanism: ($first_3_chars)" } }
+          }
+
+          $"(ansi $color)($first_3_chars)($in | str substring 3..)"
+        }
+      }
+
+      def lsns []: nothing -> table<ns: int, type: string, nprocs: int, pid: int, user: string, command: string> {
+        ${pkgs.util-linux}/bin/lsns --json
+        | from json
+        | get namespaces
+        # | sort-by type
+        # | group-by type
+        # | update command { nu-highlight }
+      }
     '';
 }

@@ -1,65 +1,87 @@
-#! /nix/store/ywp33ksgp2v32g0dwril2ds1rlri1kp8-nushell-0.104.0/bin/nu --no-config-file
-# TODO: handle case where `niri` is not the active compositor
-let outputs = (niri msg --json outputs | from json)
+#! /usr/bin/env nu --no-config-file
 
-let body = $outputs | items { |name, output|
+let outputs = try {
+  ^niri msg --json outputs | from json
+} catch {
+  # TODO: handle case where `niri` is not the active compositor
+
+}
+
+let output_data: table<name: string, x: int, y: int, width: float, height: float> = $outputs | items { |name, output|
   let x: int = ($output | get logical.x)
   let y: int = ($output | get logical.y)
-  let width: int = ($output | get logical.width / 10)
-  let height: int = ($output | get logical.height / 10)
+  let width: int = ($output | get logical.width | do { $in / 1 } )
+  let height: int = ($output | get logical.height | do { $in / 1 } )
 
-  let rect = $"<rect x='($x)' y='($y)' width='($width)' height='($height)' fill='#ff0000' stroke='#ffffff' stroke-width='6px' />"
+  [[name, x, y, width, height]; [$name, $x, $y, $width, $height]]
+}
+| flatten
 
- $rect
-
- #  $buf += $rect
-
+let x_offset: int = [0 ...$output_data.x] | math min | do { -1 * $in }
+let y_offset: int = [0 ...$output_data.y] | math min | do { -1 * $in }
 
 
-# # Add rectangle
-#  echo "<rect x='$x_scaled' y='$y_scaled' width='$width_scaled' height='$height_scaled' fill='$fill' stroke='$stroke' stroke-width='6px' />"
+# FIXME: handle > 3 monitors
+let fill_colors: list<string> = ["#ff0000" "#00ff00" "#0000ff"]
 
-#  # Add text for width and height
-#  # top center
-#  set -l width_center (math $x_scaled + $width_scaled / 2)
-#  set -l height_center (math $y_scaled + $height_scaled / 2)
-#  echo "<text x='$width_center' y='$(math $y_scaled - $label_offset)' text-anchor='middle' font-size='$font_size' $shared_text_properties>$width px </text>"
+const font = "JetBrainsMono Nerd Font Mono"
 
-#  # bottom center
-#  printf "<text x='%d' y='%d' text-anchor='middle' font-size='$font_size' $shared_text_properties> %spx</text>\n" $width_center (math "$y_scaled + $height_scaled + $label_offset * 2") $width
-#  # right center
-#  printf "<text x='%d' y='%d' text-anchor='start' font-size='$font_size' $shared_text_properties> %spx</text>\n" (math $x_scaled + $width_scaled + $label_offset) $height_center $height
-#  # left center
-#  printf "<text x='%d' y='%d' text-anchor='end' font-size='$font_size' $shared_text_properties> %spx</text>\n" (math $x_scaled - $label_offset) $height_center $height
 
-#  # Add text for display name in the center of the rectangle
-#  printf "<text x='%d' y='%d' font-size='20' text-anchor='middle' $shared_text_properties> %s (scale: %s)</text>\n" (math $x_scaled + $width_scaled / 2) (math $y_scaled + $height_scaled / 2) $name $scale
+let svg_body = $output_data
+| update x { $in + $x_offset }
+| update y { $in + $y_offset }
+| zip $fill_colors
+| each {|pair|
+  let output = $pair.0
+  let fill_color = $pair.1
+  let rect = $"<rect x='($output.x)' y='($output.y)' width='($output.width)' height='($output.height)' fill='($fill_color)' stroke='#000000' stroke-width='6px' />"
 
- } | str join "\n"
+  let width_center = $output.x + $output.width / 2
+  let height_center = $output.y + $output.height / 2
 
+  let width_text = $"<text x='($width_center)' y='($height_center)' text-anchor='middle' font-family='($font)' font-size='20'>($output.width) px</text>"
+
+   let name_text = $"<text x='($width_center)' y='($height_center)' text-anchor='middle' dominant-baseline='middle' font-family='($font)' font-size='20' fill='black'>($output.name)</text>"
+
+    # <!-- Define the text centered within the rectangle -->
+  # <text x="150" y="100" text-anchor="middle" dominant-baseline="middle" font-family="Arial" font-size="20" fill="black">
+  #   Centered Text
+  # </text>
+
+
+  [$rect $width_text $name_text]
+
+# #  # Add text for width and height
+# #  # top center
+# #  set -l width_center (math $x_scaled + $width_scaled / 2)
+# #  set -l height_center (math $y_scaled + $height_scaled / 2)
+# #  echo "<text x='$width_center' y='$(math $y_scaled - $label_offset)' text-anchor='middle' font-size='$font_size' $shared_text_properties>$width px </text>"
+
+# #  # bottom center
+# #  printf "<text x='%d' y='%d' text-anchor='middle' font-size='$font_size' $shared_text_properties> %spx</text>\n" $width_center (math "$y_scaled + $height_scaled + $label_offset * 2") $width
+# #  # right center
+# #  printf "<text x='%d' y='%d' text-anchor='start' font-size='$font_size' $shared_text_properties> %spx</text>\n" (math $x_scaled + $width_scaled + $label_offset) $height_center $height
+# #  # left center
+# #  printf "<text x='%d' y='%d' text-anchor='end' font-size='$font_size' $shared_text_properties> %spx</text>\n" (math $x_scaled - $label_offset) $height_center $height
+
+# #  # Add text for display name in the center of the rectangle
+# #  printf "<text x='%d' y='%d' font-size='20' text-anchor='middle' $shared_text_properties> %s (scale: %s)</text>\n" (math $x_scaled + $width_scaled / 2) (math $y_scaled + $height_scaled / 2) $name $scale
+
+
+}
+| flatten
+| each { $"    ($in)" }
+| str join "\n"
+
+# TODO: add other attributes
 const HEADER: string = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1">'
 const FOOTER: string = "</svg>"
 
 
-print $body
-# return
+let svg_document = [$HEADER $svg_body $FOOTER] | str join "\n"
 
-let svg_document = [$HEADER $body $FOOTER] | str join "\n"
+$svg_document | save -f niri-outputs.svg
 
-$svg_document | /nix/store/119y38i56azh5iflcwwwkws52h40y60d-bat-0.25.0/bin/bat -l svg
+print ($svg_document | bat -l svg --color always --plain)
 
-$svg_document | /nix/store/073hfl7g0rpr6m3i4xslcymhyj9cwslq-resvg-0.45.1/bin/resvg --resources-dir . - -c | /nix/store/ccqvkclhmp0dlx00fyfg7wjzvhsdnm9x-timg-1.6.2/bin/timg --center -
-
-# let svg_file = (mktemp --suffix svg)
-# $svg_document | save $svg_file
-
-# resvg
-
-# timg
-
-# rm $svg_file
-
-
-# end | resvg --resources-dir . - $png_path
-
-# timg --center $png_path
+$svg_document | resvg --resources-dir . - -c | timg --center -

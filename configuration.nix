@@ -36,18 +36,18 @@
   nix.settings.substituters = [
     "https://cache.nixos.org"
     "https://nix-community.cachix.org"
-    "https://cosmic.cachix.org/"
+    # "https://cosmic.cachix.org/"
   ];
   nix.settings.extra-substituters = [
-    "https://anyrun.cachix.org"
+    # "https://anyrun.cachix.org"
     "https://yazi.cachix.org"
   ];
   nix.settings.trusted-public-keys = [
     "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-    "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE="
+    # "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE="
   ];
   nix.settings.extra-trusted-public-keys = [
-    "anyrun.cachix.org-1:pqBobmOjI7nKlsUMV25u9QHa9btJK65/C8vnO3p346s="
+    # "anyrun.cachix.org-1:pqBobmOjI7nKlsUMV25u9QHa9btJK65/C8vnO3p346s="
     "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
   ];
   nix.settings.trusted-substituters = [ "https://cache.nixos.org" ];
@@ -305,7 +305,7 @@
   #   magicOrExtension = ''\x7fELF....AI\x02'';
   # };
 
-  programs.appimage.enable = true;
+  programs.appimage.enable = false;
   programs.appimage.binfmt = true;
   programs.appimage.package = pkgs.appimage-run.override {
     extraPkgs =
@@ -484,6 +484,7 @@
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
+    rio
     cyme # a fancier `lsusb`
     psmisc
     busybox
@@ -536,7 +537,7 @@
     pciutils # `lscpi`
     lsof # "List open file descriptors"
     # nvtopPackages.full
-    ddcutil # control external displays, such as chaning their brightness
+    ddcutil # control external displays, such as changing their brightness
     findutils # find, locate
     moreutils # `sponge` etc.
 
@@ -564,7 +565,7 @@
     # Networking inspection tools
     ipinfo
     dig # lookup dns name resolving
-    dogdns # loopup dns name resolving, but in rust!
+    dogdns # lookup dns name resolving, but in rust!
     nmap
     # sniffnet
 
@@ -657,17 +658,9 @@
     )
   ];
 
-  programs.hyprland = {
-    enable = false;
-    xwayland.enable = true;
-    # package = pkgs.hyprland;
-    # TODO: use overlay
-    package = inputs.hyprland.packages.${pkgs.stdenv.system}.default;
-  };
-
   programs.niri.enable = true;
-  # programs.niri.package = pkgs.niri;
-  programs.niri.package = pkgs.niri-unstable;
+  programs.niri.package = pkgs.niri;
+  # programs.niri.package = pkgs.niri-unstable;
 
   # hardware.system76.power-daemon.enable = true;
   services.system76-scheduler.enable = true;
@@ -703,7 +696,14 @@
   security.pam.services.gdm.enableGnomeKeyring = false;
   programs.seahorse.enable = false;
   # services.gnome.gnome-keyring.enable = false;
-  programs.ssh.askPassword = "${pkgs.x11_ssh_askpass}/libexec/x11-ssh-askpass";
+  # programs.ssh.askPassword = "${pkgs.x11_ssh_askpass}/libexec/x11-ssh-askpass";
+
+  programs.ssh = {
+    askPassword = lib.getExe pkgs.kdePackages.ksshaskpass;
+    startAgent = true;
+  };
+  services.gnome.gcr-ssh-agent.enable = !config.programs.ssh.startAgent;
+  programs.git.lfs.enablePureSSHTransfer = true;
 
   programs.firejail = {
     enable = false;
@@ -727,6 +727,10 @@
   # services.surrealdb.enable = true;
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
+  services.openssh = {
+    enable = false;
+    settings.PasswordAuthentication = false;
+  };
 
   # services.jitsi-meet = {
   #   enable = true;
@@ -742,9 +746,13 @@
   # It is annoying to sometimes reboot/shutdown and having to wait 2 ENTIRE minutes, which is the default,
   # for Systemd to wait patiently for a program to terminate.
   # FIXME: this is not always respected it seems. Figure out why, and how to fix it
-  systemd.extraConfig = ''
-    DefaultTimeoutStopSec=15s
-  '';
+  # systemd.extraConfig = ''
+  #   DefaultTimeoutStopSec=15s
+  # '';
+  # https://www.freedesktop.org/software/systemd/man/latest/systemd-system.conf.html
+  systemd.settings.Manager = {
+    DefaultTimeoutStopSec = "15s";
+  };
 
   # Prevent OOM when building with nix e.g. `nixos-rebuild switch`
   # By setting the maximum allowed usage of memory at the same time to be lower than the installed
@@ -858,7 +866,7 @@
           "1.0.0.1"
         ];
       };
-      #Enable Blocking of certian domains.
+      #Enable Blocking of certain domains.
       blocking = {
         blackLists = {
           #Adblocking
@@ -1026,6 +1034,12 @@
     '';
   };
 
+  # https://www.postgresql.org/docs/18/color.html
+  # environment.variables = {
+  #   PG_COLOR = "auto";
+  #   PG_COLORS = "";
+  # };
+
   services.ntfy-sh.enable = false;
   services.ntfy-sh.settings.base-url = "https://ntfy.sh";
 
@@ -1050,16 +1064,20 @@
   # TODO: wrap .desktop file Exec entry in a call to run0 or kdialog with sudo to run as root
   programs.sniffnet.enable = true;
 
-  networking.hosts = {
-    "127.0.0.1" = [
-      "reddit.com"
-      "instagram.com"
-    ];
-  };
+  # networking.hosts = {
+  #   "127.0.0.1" = [
+  #     "reddit.com"
+  #     "instagram.com"
+  #   ];
+  # };
 
   services.desktopManager.cosmic.enable = false;
   services.displayManager.cosmic-greeter.enable = false;
 
   # programs.command-not-found.dbPath
   programs.command-not-found.enable = true;
+
+  systemd.enableStrictShellChecks = true;
+
+  # services
 }

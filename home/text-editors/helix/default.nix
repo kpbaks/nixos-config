@@ -12,6 +12,7 @@
     ./languages.nix
     ./keys.nix
     ./themes.nix
+    ./ignores.nix
     # ./hx-wrapper.nix
     ./fetch-and-build-grammars-on-build.nix
     ./snippets
@@ -51,14 +52,6 @@
       #   python313Packages.mdformat-tables
     ];
 
-    ignores = [
-      ".build/"
-      "build/"
-      "target/"
-      "typings/" # Python specific
-      ".direnv/"
-    ];
-
     settings = {
       editor = {
         cursorline = true;
@@ -82,6 +75,13 @@
         auto-info = true;
         auto-format = true;
         undercurl = true;
+
+        word-completion = {
+          enable = true;
+          trigger-length = 2; # default is 7
+        };
+
+        rainbow-brackets = true; # https://github.com/helix-editor/helix/commit/1941f0b639f8d21e123f57c62fb0f4d08b7523e4
 
         trim-trailing-whitespace = true;
         trim-final-newlines = true;

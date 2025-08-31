@@ -183,7 +183,10 @@
 
   # Modify service definition to enable in a tiling WM like niri, but
   # disable in when using KDE Plasma.
-  systemd.user.services.swaync = lib.mkAfter {
-    User.ConditionEnvironment = "XDG_CURRENT_DESKTOP=niri";
+  systemd.user.services.swaync = {
+    Unit.ConditionEnvironment = lib.mkForce [
+      "WAYLAND_DISPLAY"
+      "XDG_CURRENT_DESKTOP=niri"
+    ];
   };
 }

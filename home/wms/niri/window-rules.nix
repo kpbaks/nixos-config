@@ -132,5 +132,14 @@ in
       ];
       open-on-workspace = "development";
     }
+    {
+      matches = [
+        {
+          app-id = "^thunderbird$";
+          at-startup = true;
+        }
+      ];
+      open-on-workspace = "mail";
+    }
   ];
 }

@@ -157,7 +157,7 @@
     # FIXME: no wayland support
     # daktilo # turn your keyboard into a typewriter!
     # lemmyknow # identify anything
-    # the-way # termial snippet-manager
+    # the-way # terminal snippet-manager
     # appflowy # open source alternative to notion
     # macchina # neofetch like program
     # neovim-remote # TODO: create `darkman` script to toggle light/dark mode with `set background=dark`
@@ -278,5 +278,7 @@
     taplo
     tombi
     # harper
+
+    matugen
   ];
 }

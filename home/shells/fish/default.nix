@@ -22,6 +22,8 @@
   programs.fish.interactiveShellInit = ''
     echo "todo: use $NIX_GCROOT as a marker being in a `nix develop` shell, and use it to diff the environment from the \"parent\" shell"
   '';
+
+  programs.fish.shellInitLast = '''';
   #   echo "todo checkout \$status_generation"
   # '';
 }

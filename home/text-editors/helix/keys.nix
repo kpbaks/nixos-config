@@ -1,11 +1,28 @@
+{ config, ... }:
+let
+  chooser-file = "/tmp/yazi-chooser-file";
+  yazi = "${config.programs.yazi.package}/bin/yazi";
+  tree-sitter-subtree = [
+    "trim_selections"
+    ":tree-sitter-subtree"
+  ];
+in
 {
+
   programs.helix.settings.keys = {
 
-    # keys.insert = {
-    #   C-space = "signature_help";
-    # };
+    insert = {
+      C-z = "suspend";
+      # C-space = "signature_help";
+    };
 
     normal = {
+      "C-r" = [
+        ":reload"
+        # ":reload-all"
+        # ":config-reload"
+        ":run-shell-command notify-send hx 'reloaded %{buffer_name}'"
+      ];
       "A-y" = [ "yank_joined" ];
       # "A-y" = ''@"%Pyu'';
       # "A-Y" = ''@"%P<space>Yu'';
@@ -22,7 +39,7 @@
       "tab" = "expand_selection";
       "S-tab" = "shrink_selection";
       g.w = [
-        "save_selection" # Make it possible to go back immediatly with `<c-o>`
+        "save_selection" # Make it possible to go back immediately with `<c-o>`
         "goto_word"
       ];
       # Idea is to always have plenty of space to actually read the popup
@@ -133,17 +150,39 @@
       C-q = ":quit";
       space.p = "paste_clipboard_before"; # I like <space>P more as the default
       # space.n = ":set-option line-number absolute";
-      space.N = ":set-option line-number relative";
-      space.t.i = ":toggle-option lsp.display-inlay-hints";
-      space.t.w = ":toggle-option soft-wrap.enable";
-      space.t.n = ":toggle-option indent-guides.render";
-      space.t.p = ":toggle-option lsp.display-progress-messages";
+      # space.N = ":set-option line-number relative";
+      space.t = {
+        i = ":toggle-option lsp.display-inlay-hints";
+        n = ":toggle-option indent-guides.render";
+        p = ":toggle-option lsp.display-progress-messages";
+        r = ":toggle-option rainbow-brackets";
+        w = ":toggle-option soft-wrap.enable";
+      };
+      space.T = tree-sitter-subtree;
+
       # space.t.d = [":toggle-option "];
       space.l = {
         r = ":lsp-restart";
         s = ":lsp-stop";
         w = ":lsp-workspace-command";
       };
+
+      # Replace builtin file explorer with yazi
+      space.e = [
+        ":sh rm -f ${chooser-file}"
+        '':insert-output ${yazi} %{workspace_directory} --chooser-file=${chooser-file}''
+        '':insert-output echo "\x1b[?1049h" > /dev/tty''
+        '':open %sh{cat ${chooser-file}}''
+        ":redraw"
+      ];
+      space.E = [
+        ":sh rm -f ${chooser-file}"
+        '':insert-output ${yazi} %{current_working_directory} --chooser-file=${chooser-file}''
+        '':insert-output echo "\x1b[?1049h" > /dev/tty''
+        '':open %sh{cat ${chooser-file}}''
+        ":redraw"
+      ];
+
       # space.n = [
 
       #   "select_register"
@@ -254,6 +293,7 @@
         "extend_line_up"
         "extend_to_line_bounds"
       ];
+      space.T = tree-sitter-subtree;
       # g = {
       #   u = "switch_to_lowercase";
       #   U = "switch_to_uppercase";

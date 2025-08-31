@@ -3,8 +3,8 @@
 
   home.packages = with pkgs; [
     sqlite # sql database in a file
-    litecli # A nicer repl for sqlite
-    sqlitebrowser
+    # litecli # A nicer repl for sqlite
+    # sqlitebrowser
   ];
 
   xdg.mimeApps.defaultApplications."application/vnd.sqlite3" = [

@@ -93,8 +93,8 @@ in
     _abbr_editor =
       let
         git = "${config.programs.git.package}/bin/git";
-        # fd = "${config.progams.fd.package}/bin/fd}";
       in
+      # fd = "${config.programs.fd.package}/bin/fd}";
       # fish
       ''
         if test $HOME -eq $PWD

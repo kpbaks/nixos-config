@@ -8,30 +8,29 @@
       "https://nix-community.cachix.org"
       # "https://insane.cachix.org"
       "https://cachix.cachix.org"
-      # "https://hyprland.cachix.org"
       "https://helix.cachix.org"
       "https://yazi.cachix.org"
       # "https://cache.garnix.io" # used by `ironbar`
-      "https://watersucks.cachix.org"
+      # "https://watersucks.cachix.org"
     ];
     extra-trusted-public-keys = [
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       # "insane.cachix.org-1:cLCCoYQKkmEb/M88UIssfg2FiSDUL4PUjYj9tdo4P8o="
       "cachix.cachix.org-1:eWNHQldwUO7G2VkjpnjDbWwy4KQ/HNxht7H4SSoMckM="
-      # "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
       "helix.cachix.org-1:ejp9KQpR1FBI2onstMQ34yogDm4OgU2ru6lIwPvuCVs="
       "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
       # "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
-      "watersucks.cachix.org-1:6gadPC5R8iLWQ3EUtfu3GFrVY7X6I4Fwz/ihW25Jbv8="
+      # "watersucks.cachix.org-1:6gadPC5R8iLWQ3EUtfu3GFrVY7X6I4Fwz/ihW25Jbv8="
     ];
   };
 
   inputs = {
     # nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.05";
     home-manager = {
-      # url = "github:nix-community/home-manager/master";
-      url = "git+file:///home/kpbaks/forks/home-manager";
+      url = "github:nix-community/home-manager/master";
+      # url = "git+file:///home/kpbaks/forks/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
@@ -44,33 +43,37 @@
       inputs.home-manager.follows = "home-manager";
     };
     niri = {
-      # url = "github:sodiboo/niri-flake";
+      url = "github:sodiboo/niri-flake";
       # url = "flake:local-niri-flake-fork";
-      url = "git+file:///home/kpbaks/forks/niri-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # url = "git+file:///home/kpbaks/forks/niri-flake";
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
-
     helix = {
       url = "github:helix-editor/helix";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
     yazi = {
       url = "github:sxyazi/yazi";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
-    ghostty = {
-      url = "git+ssh://git@github.com/ghostty-org/ghostty";
-      # inputs.nixpkgs-stable.follows = "nixpkgs-unstable";
-      # inputs.nixpkgs-unstable.follows = "nixpkgs-unstable";
+    nixd = {
+      url = "github:nix-community/nixd";
+      # NOTE: Developer does not recommend to override the nixpkgs input
+      # https://github.com/nix-community/nixd/blob/main/nixd/docs/editor-setup.md#:~:text=Note%20that%20please%20do%20NOT%20override%20nixpkgs%20revision%20for%20nixd%20inputs.
     };
+    # ghostty = {
+    #   url = "git+ssh://git@github.com/ghostty-org/ghostty";
+    #   # inputs.nixpkgs-stable.follows = "nixpkgs-unstable";
+    #   # inputs.nixpkgs-unstable.follows = "nixpkgs-unstable";
+    # };
     ghostty-shaders = {
       url = "github:hackr-sh/ghostty-shaders";
       flake = false;
     };
-    eldritch-theme-ghostty = {
-      url = "github:eldritch-theme/ghostty";
-      flake = false;
-    };
+    # eldritch-theme-ghostty = {
+    #   url = "github:eldritch-theme/ghostty";
+    #   flake = false;
+    # };
     # eldritch-theme-kitty = {
     #   url = "github:eldritch-theme/kitty";
     #   flake = false;
@@ -84,26 +87,28 @@
     };
 
     pre-commit-hooks.url = "github:cachix/git-hooks.nix";
-    fh.url = "https://flakehub.com/f/DeterminateSystems/fh/*.tar.gz";
+    # fh.url = "https://flakehub.com/f/DeterminateSystems/fh/*.tar.gz";
     # inputs.patchy.url = "github:NikitaRevenco/patchy/main";
-    impermanence.url = "github:nix-community/impermanence";
-    zen-browser.url = "github:youwen5/zen-browser-flake";
-    zen-browser.inputs.nixpkgs.follows = "nixpkgs";
+    # impermanence.url = "github:nix-community/impermanence";
+    zen-browser = {
+      url = "github:youwen5/zen-browser-flake";
+      # inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     quickshell = {
       url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
 
     git-subcommands = {
       url = "git+https://codeberg.org/kpbaks/git-subcommands.git";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    swww = {
-      url = "github:LGFae/swww";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # swww = {
+    #   url = "github:LGFae/swww";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     # TODO: use
     # inputs.sops-nix = {
@@ -127,10 +132,11 @@
       url = "github:ndtoan96/ouch.yazi";
       flake = false;
     };
-    tree-sitter-roc = {
-      url = "github:faldor20/tree-sitter-roc";
-      flake = false;
-    };
+
+    # tree-sitter-roc = {
+    #   url = "github:faldor20/tree-sitter-roc";
+    #   flake = false;
+    # };
 
     nix_command_not_found_fish = {
       url = "github:kpbaks/nix_command_not_found.fish";
@@ -152,6 +158,8 @@
       url = "github:kpbaks/nix.fish";
       flake = false;
     };
+
+    try.url = "github:tobi/try";
 
     # nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
 
@@ -183,16 +191,17 @@
         # inputs.rust-overlay.overlays.default
         # inputs.hyprpanel.overlay
         # (final: prev: { ghostty = inputs.ghostty.packages.${system}.default; })
-        inputs.ghostty.overlays.releasefast
+        # inputs.ghostty.overlays.releasefast
         # inputs.wired-notify.overlays.default
         inputs.niri.overlays.niri
-        (final: prev: { niri = final.niri-unstable; })
+        # (final: prev: { niri = final.niri-unstable; })
         # (final: prev: { woomer = inputs.woomer.packages.${system}.default; })
         # inputs.swww.overlays.default
         # (final: prev: { swww = inputs.swww.packages.${prev.system}.swww; })
         # (final: prev: { zjstatus = inputs.zjstatus.packages.${prev.system}.default; })
         inputs.yazi.overlays.default
         inputs.helix.overlays.default
+        inputs.nixd.overlays.default
         # (final: prev: { television = inputs.television.packages.${prev.system}.default; })
         # inputs.neovim-nightly-overlay.overlay
       ];
@@ -241,7 +250,16 @@
             # https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md#default-configuration--who-needs-configuration
             nix.nixPath = [ "nixpkgs=${inputs.nixpkgs}" ];
           }
-          inputs.niri.nixosModules.niri
+          {
+            imports = [
+              inputs.niri.nixosModules.niri
+
+            ];
+            # I get an error when I build for "attribute 'polkit-kde-agent' missing"
+            # when the package set is `pkgs.libsForQt5`
+            # systemd.user.services.niri-flake-polkit.serviceConfig.ExecStart =
+            #   lib.mkForce "${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1";
+          }
 
           # ./k3s.nix
           # {
@@ -367,10 +385,22 @@
             # )
             {
               imports = [
-                inputs.nix-index-database.hmModules.nix-index
+                inputs.nix-index-database.homeModules.nix-index
               ];
               programs.nix-index-database.comma.enable = true;
             }
+            (
+              { config, ... }:
+              {
+                imports = [ inputs.try.homeManagerModules.default ];
+                programs.try = {
+                  enable = true;
+                  path = "${config.home.homeDirectory}/experiments";
+                  # path = "~/experiments"; # optional, defaults to ~/src/tries
+
+                };
+              }
+            )
             # { home.packages = [ inputs.steel.packages.${system}.default ]; }
             # { home.packages = [ inputs.crates-lsp.packages.${system}.default ]; }
           ];

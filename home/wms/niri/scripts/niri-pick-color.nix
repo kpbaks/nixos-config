@@ -74,6 +74,9 @@ in
     terminal = false;
     type = "Application";
     categories = [ "System" ];
+    # TODO: upstream support for missing keys in xdg desktop entry spec v1.5
+    # https://specifications.freedesktop.org/desktop-entry-spec/1.5/
+    # onlyShowIn = [ "niri" ];
   };
 
   programs.niri.settings.binds = with config.lib.niri.actions; {

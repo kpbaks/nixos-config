@@ -1,7 +1,5 @@
 {
-  config,
   lib,
-  pkgs,
   ...
 }:
 {
@@ -64,25 +62,10 @@
   # # Modify service definition to enable in a tiling WM like niri, but
   # # disable in when using KDE Plasma.
   # # [ref:set_XDG_CURRENT_DESKTOP_to_niri]
-  # # systemd.user.services.mako = {
-  # #   User.ConditionEnvironment = "XDG_CURRENT_DESKTOP=niri";
-  # # };
-  # systemd.user.services.wluma = {
-  #   Unit = {
-  #     Description = "Adjusting screen brightness based on screen contents and amount of ambient light";
-  #     PartOf = [ "graphical-session.target" ];
-  #     After = [ "graphical-session.target" ];
-
-  #   };
-
-  #   Service = {
-  #     ExecStart = "${pkgs.wluma}/bin/wluma";
-  #     Restart = "always";
-  #     EnvironmentFile = "-%E/wluma/service.conf";
-  #     PrivateNetwork = true;
-  #     PrivateMounts = false;
-  #   };
-
-  #   Install.WantedBy = [ "graphical-session.target" ];
-  # };
+  systemd.user.services.wluma = {
+    Unit.ConditionEnvironment = lib.mkForce [
+      "WAYLAND_DISPLAY"
+      "XDG_CURRENT_DESKTOP=niri"
+    ];
+  };
 }

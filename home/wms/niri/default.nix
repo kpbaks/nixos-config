@@ -67,6 +67,9 @@
   programs.niri.settings.hotkey-overlay.skip-at-startup = true;
   programs.niri.settings.workspaces = {
     main = {
+      # open-on-output = "eDP-1"; # laptop screen
+    };
+    mail = {
       open-on-output = "eDP-1"; # laptop screen
     };
     chat = { };
@@ -88,7 +91,7 @@
   };
 
   programs.niri.settings.input.touchpad.dwt = true; # "disable when typing"
-  programs.niri.settings.input.warp-mouse-to-focus = true;
+  programs.niri.settings.input.warp-mouse-to-focus.enable = true;
   programs.niri.settings.input.keyboard.track-layout = "window";
 
   programs.niri.settings.input.mouse.left-handed = false;
@@ -163,15 +166,19 @@
       [
         "${lib.getExe config.default-application.terminal}"
         "${lib.getExe config.default-application.browser}"
+        "${lib.getExe config.programs.thunderbird.package}"
         # TODO: does not show-up
-        "${pkgs.telegram-desktop}/bin/telegram-desktop -startintray"
+        # "${pkgs.telegram-desktop}/bin/telegram-desktop -startintray"
         # "ironbar"
         # "${pkgs.swww}/bin/swww-daemon"
-        "${pkgs.swaybg}/bin/swaybg -i /home/kpbaks/Pictures/wallpapers/spacehawks.png"
+        # "${pkgs.swaybg}/bin/swaybg -i /home/kpbaks/Pictures/wallpapers/spacehawks.png"
+        # TODO: run with systemd
+        # "${pkgs.swaybg}/bin/swaybg -i /home/kpbaks/Pictures/wallpapers/helix-logo.png"
         # "${pkgs.copyq}/bin/copyq"
         # "${pkgs.eww}/bin/eww daemon"
         # "${pkgs.birdtray}/bin/birdtray"
-        "${pkgs.wluma}/bin/wluma"
+        # TODO: run with systemd
+        # "${pkgs.wluma}/bin/wluma"
         # FIXME: does not work
         # "${pkgs.obs-studio}/bin/obs --minimize-to-tray"
       ];

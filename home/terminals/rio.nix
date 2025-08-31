@@ -1,10 +1,13 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 {
+  # For some reason (unknown to me) `rio` does not get added to the $PATH with `programs.rio.enable = true;`
+  home.packages = [ pkgs.rio ];
   programs.rio = {
     enable = true;
     # catppuccin.enable = false;
     settings = {
       shell = {
+        # TODO: use default shell option
         program = "${config.programs.fish.package}/bin/fish";
         args = [ "--login" ];
       };
@@ -13,11 +16,12 @@
         args = [ ];
       };
       # confirm-before-quit = true;
-      # cursor = {
-      #   shape = "beam";
-      #   blinking = false;
-      # };
-      # env-vars = [];
+      cursor = {
+        shape = "beam";
+        blinking = false;
+      };
+      env-vars = [ ];
+      line-height = 1.5;
       # hide-mouse-cursor-when-typing = false;
       # window = {
       #   blur = true;
@@ -34,8 +38,9 @@
       # scroll.multiplier = 5.0;
       # scroll.divider = 1.0;
 
-      # adaptive-theme.light = "belafonte-day";
-      # adaptive-theme.dark = "belafonte-night";
+      theme = "lucario";
+      adaptive-theme.light = "belafonte-day";
+      adaptive-theme.dark = "belafonte-night";
     };
   };
 }

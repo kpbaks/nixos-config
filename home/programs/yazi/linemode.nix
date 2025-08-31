@@ -18,9 +18,9 @@ in
 
       	local size = self._file:size()
       	return ui.Line(string.format("%s %s", size and ya.readable_size(size) or "-", time))
-      end	
+      end
     '';
 
-  programs.yazi.settings.manager.linemode = linemode;
+  programs.yazi.settings.mgr.linemode = linemode;
 
 }

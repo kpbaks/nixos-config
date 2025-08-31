@@ -16,7 +16,7 @@ in
   # disable in when using KDE Plasma.
   # [ref:set_XDG_CURRENT_DESKTOP_to_niri]
   systemd.user.services.copyq = {
-    User.ConditionEnvironment = "XDG_CURRENT_DESKTOP=niri";
+    Unit.ConditionEnvironment = "XDG_CURRENT_DESKTOP=niri";
   };
 
   programs.niri.settings.window-rules = lib.optional enable {

@@ -43,7 +43,7 @@ in
   # TODO: sync with the window gap in niri, for left/right padding
   # TODO: also use colors configured from it
   programs.waybar = {
-    enable = true;
+    enable = false;
     systemd.enable = true;
     # TODO: figure out how to only start when session is niri
     settings.top = rec {
@@ -691,7 +691,7 @@ in
   #         # },
 
   #         # "group/group-power" = {
-  #         #   orientation = "inerit";
+  #         #   orientation = "inherit";
   #         #   drawer = {
   #         #     transition-duration = 500;
   #         #     children-class = "not-power";
@@ -1259,7 +1259,10 @@ in
   # Modify service definition to enable in a tiling WM like niri, but
   # disable in when using KDE Plasma.
   # [ref:set_XDG_CURRENT_DESKTOP_to_niri]
-  # systemd.user.services.mako = {
-  #   User.ConditionEnvironment = "XDG_CURRENT_DESKTOP=niri";
-  # };
+  systemd.user.services.waybar = {
+    Unit.ConditionEnvironment = lib.mkForce [
+      "WAYLAND_DISPLAY"
+      "XDG_CURRENT_DESKTOP=niri"
+    ];
+  };
 }

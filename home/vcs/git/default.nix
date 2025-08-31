@@ -43,7 +43,7 @@
       # gitleaks
       # commitizen
       # git-workspace
-      # git-absorb
+      git-absorb
       # lighttpd # needed by `git instaweb`
       # dependabot-cli
       # git-doc

@@ -5,7 +5,7 @@
   ...
 }:
 let
-  enable = true;
+  enable = false;
 in
 {
   programs.niriswitcher = {

@@ -15,7 +15,7 @@ in
       }
     '';
 
-  programs.yazi.keymap.manager.prepend_keymap = [
+  programs.yazi.keymap.mgr.prepend_keymap = [
     {
       on = [ "k" ];
       run = "plugin --sync ${plugin_name} -1";

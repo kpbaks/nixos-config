@@ -101,4 +101,5 @@
     intelBusId = "PCI:00:02:0";
   };
 
+  services.hardware.bolt.enable = true;
 }

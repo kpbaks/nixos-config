@@ -51,7 +51,7 @@ in
       # https://yazi-rs.github.io/docs/quick-start#shell-wrapper
       shellWrapperName = "y";
       settings = {
-        manager = {
+        mgr = {
           ratio = [
             2
             4
@@ -133,7 +133,7 @@ in
           };
         in
         {
-          manager.prepend_keymap =
+          mgr.prepend_keymap =
             let
               keymap =
                 {

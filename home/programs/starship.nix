@@ -7,7 +7,7 @@
     enableFishIntegration = false;
     enableNushellIntegration = false;
     # settings = { };
-    preset = "jetpack";
+    # preset = "jetpack";
     # $\{env_var.AGAIN_ENABLED}
     # $\{env_var.AGAIN_DYNAMIC_ENABLED}
     # settings = {

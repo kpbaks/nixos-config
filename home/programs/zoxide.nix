@@ -3,14 +3,30 @@
   lib,
   ...
 }:
+let
+  enable = true;
+  cmd = "cd";
+in
 {
-  programs.zoxide.enable = true;
+  programs.zoxide = {
+    inherit enable;
+  };
   programs.zoxide.enableNushellIntegration = true;
   # programs.zoxide.enablePowershellIntegration = true;
   programs.zoxide.options = [
-    "--cmd=cd" # override `cd` and create `cdi`
+    "--cmd=${cmd}" # override `cd` and create `cdi`
     "--hook=pwd"
   ];
+
+  programs.fish.functions.z =
+    # fish
+    ''
+      if (count $argv) -eq 0
+        cdi
+      else
+        cd $argv
+      end
+    '';
 
   # TODO: there should be an option to ignore subdirs in a git repo. I do not think you can capture
   # that in a glob
@@ -31,4 +47,6 @@
       "*.git/*"
     ]; # Default aka. "$HOME"
   };
+
+  programs.fish.shellInitLast = lib.mkIf enable ''${cmd}i'';
 }

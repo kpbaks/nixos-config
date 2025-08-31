@@ -2,6 +2,7 @@
 {
   programs.lazygit = {
     enable = true;
+    # changeDirOnExit = true;
     settings = {
       # https://github.com/jesseduffield/lazygit/blob/master/docs/Custom_Pagers.md#using-external-diff-commands
       git = {
@@ -59,25 +60,33 @@
       #     lightTheme = true;
       #   };
 
-      customCommands = [
-        # {
-        #   key = "v";
-        #   context = "localBranches";
-        # }
-        {
-          # https://github.com/jesseduffield/lazygit/wiki/Custom-Commands-Compendium#committing-via-commitizen-cz-c
-          key = "C";
-          # FIXME: command seems wrong
-          command = "${pkgs.git}/bin/git cz c";
-          description = "commit with commitizen";
-          context = "files";
-          loadingText = "opening commitizen commit tool";
-          subProcess = true;
-        }
-      ];
+      # customCommands = [
+      #   # {
+      #   #   key = "v";
+      #   #   context = "localBranches";
+      #   # }
+      #   {
+      #     # https://github.com/jesseduffield/lazygit/wiki/Custom-Commands-Compendium#committing-via-commitizen-cz-c
+      #     key = "C";
+      #     # FIXME: command seems wrong
+      #     command = "${pkgs.git}/bin/git cz c";
+      #     description = "commit with commitizen";
+      #     context = "files";
+      #     loadingText = "opening commitizen commit tool";
+      #     subProcess = true;
+      #   }
+      # ];
+
+      keybindings = {
+        universal = {
+          nextBlock = "n";
+          prevBlock = "N";
+        };
+      };
     };
   };
 
-  programs.nushell.extraConfig = "alias lg = ${config.programs.lazygit.package}/bin/lazygit";
+  home.shellAliases.lg = "${config.programs.lazygit.package}/bin/lazygit";
+  # programs.nushell.extraConfig = "alias lg = ${config.programs.lazygit.package}/bin/lazygit";
   programs.fish.shellAbbrs.lg = "lazygit";
 }

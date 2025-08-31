@@ -17,7 +17,7 @@
       local function entry()
       	local PKG_CONFIG_PATH = os.getenv("PKG_CONFIG_PATH")
       	if PKG_CONFIG_PATH == nil then
-          	return fail("Environment varible $PKG_CONFIG_PATH not set")
+          	return fail("Environment variable $PKG_CONFIG_PATH not set")
       	end
       	local root = root()
       	local id = ya.id("ft")
@@ -53,7 +53,7 @@
     #     require("pkg-config"):setup()
     #   '';
 
-    keymap.manager.prepend_keymap = [
+    keymap.mgr.prepend_keymap = [
       {
         on = [
           "g"

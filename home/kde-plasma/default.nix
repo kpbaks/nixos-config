@@ -170,6 +170,7 @@
       merkuro
       itinerary
       kolourpaint
+      krohnkite
     ]
     ++ (with pkgs; [
       plasma-panel-colorizer

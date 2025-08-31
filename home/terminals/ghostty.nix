@@ -18,7 +18,7 @@ in
 # https://ghostty.org/docs/help/terminfo#copy-ghostty's-terminfo-to-a-remote-machine
 {
 
-  xdg.configFile."ghostty/themes/Eldritch".source = "${inputs.eldritch-theme-ghostty}/Eldritch";
+  # xdg.configFile."ghostty/themes/Eldritch".source = "${inputs.eldritch-theme-ghostty}/Eldritch";
 
   programs.ghostty = {
     enable = true;
@@ -78,7 +78,8 @@ in
       # theme = "0x96f";
       # theme = "dark:iceberg-dark,light:iceberg-light";
       # theme = "dark:BlueDolphin,light:Builtin Solarized Light";
-      theme = "Eldritch";
+      # theme = "Eldritch";
+      theme = "0x96f";
       # theme = "shadow";
       # theme = "dark:Kanagawa Wave,light:GruvboxLight";
 
@@ -87,35 +88,34 @@ in
       # keybind = global:ctrl+s=toggle_quick_terminal
 
       # custom-shader = "${ghostty-shaders}/water.glsl";
-      # custom-shader = "${ghostty-shaders}/crt.glsl";
+      custom-shader = "${inputs.ghostty-shaders}/cursor_blaze.glsl";
       focus-follows-mouse = true;
 
       # https://ghostty.org/docs/config/keybind
-      keybind =
-        [
-          "ctrl+enter=toggle_tab_overview"
-          "f11=toggle_fullscreen"
-          "ctrl+shift+w=close_surface"
-        ]
-        ++ lib.optionals config.programs.zellij.enable [
-          "ctrl+shift+t=unbind" # spawn tab
-          "ctrl+shift+w=unbind" # close tab
-          "ctrl+shift+n=unbind" # open new window
-          "ctrl+page_up=unbind"
-          "ctrl+page_down=unbind"
-          "ctrl+tab=unbind"
-          "ctrl+shift+tab=unbind"
-          "ctrl+shift+o=unbind" # open vertical split
-          "ctrl+shift+e=unbind" # open horizontal split
-          "ctrl+comma=unbind" # open ghostty config
-          "ctrl+shift+comma=unbind" # reload ghostty config
-          "ctrl+alt+left=unbind"
-          "ctrl+shift+a=unbind" # select all text
-          "ctrl+shift+left=unbind"
-          "ctrl+shift+right=unbind"
-          "ctrl+shift+j=unbind" # write screen contents to tmp file
-          "alt+1=unbind"
-        ];
+      keybind = [
+        "ctrl+enter=toggle_tab_overview"
+        "f11=toggle_fullscreen"
+        "ctrl+shift+w=close_surface"
+      ]
+      ++ lib.optionals config.programs.zellij.enable [
+        "ctrl+shift+t=unbind" # spawn tab
+        "ctrl+shift+w=unbind" # close tab
+        "ctrl+shift+n=unbind" # open new window
+        "ctrl+page_up=unbind"
+        "ctrl+page_down=unbind"
+        "ctrl+tab=unbind"
+        "ctrl+shift+tab=unbind"
+        "ctrl+shift+o=unbind" # open vertical split
+        "ctrl+shift+e=unbind" # open horizontal split
+        "ctrl+comma=unbind" # open ghostty config
+        "ctrl+shift+comma=unbind" # reload ghostty config
+        "ctrl+alt+left=unbind"
+        "ctrl+shift+a=unbind" # select all text
+        "ctrl+shift+left=unbind"
+        "ctrl+shift+right=unbind"
+        "ctrl+shift+j=unbind" # write screen contents to tmp file
+        "alt+1=unbind"
+      ];
     };
 
     themes = {

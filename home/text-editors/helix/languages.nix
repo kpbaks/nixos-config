@@ -97,6 +97,10 @@
           tab-width = 4;
           unit = "\t";
         };
+        git-stripspace = {
+          command = "${config.programs.git.package}/bin/git";
+          args = [ "stripspace" ];
+        };
       in
       [
         {
@@ -107,7 +111,7 @@
             "harper-ls"
           ];
           file-types = [
-            "qmd" # to quarto langauge yet
+            "qmd" # to quarto language yet
             "md"
             "livemd"
             "markdown"
@@ -134,12 +138,6 @@
           inherit indent;
         }
         {
-          name = "cpp";
-          auto-format = false;
-          language-servers = [ "clangd" ];
-          inherit indent;
-        }
-        {
           name = "css";
           # formatter = {
           #   command = "${pkgs.dprint}/bin/dprint";
@@ -153,11 +151,6 @@
             "vscode-css-language-server"
             "dprint"
           ];
-        }
-        {
-          name = "fish";
-          auto-format = true;
-          formatter.command = "${config.programs.fish.package}/bin/fish_indent";
         }
         {
           name = "java";
@@ -191,6 +184,10 @@
           inherit indent;
         }
         {
+          name = "make";
+          formatter = git-stripspace;
+        }
+        {
           name = "nix";
           auto-format = true;
           formatter = {
@@ -199,50 +196,21 @@
           language-servers = [ "nil" ];
           inherit indent;
         }
-        {
-          name = "nu";
-          auto-format = true;
-          language-servers = [ "nu-lsp" ];
-          # FIXME: fucks up the text
-          # formatter.command = "${pkgs.nufmt}/bin/nufmt";
-          # formatter.args = [ "--stdin" ];
-          inherit indent;
-        }
-        {
-          name = "python";
-          language-servers = [
-            "basedpyright"
-            "ruff"
-            "typos-lsp"
-            "ast-grep"
-          ];
-        }
+        # {
+        #   name = "python";
+        #   language-servers = [
+        #     "basedpyright"
+        #     "ruff"
+        #     "typos-lsp"
+        #     "ast-grep"
+        #   ];
+        # }
         {
           name = "rust";
           language-servers = [
             "rust-analyzer"
             "typos-lsp"
             "ast-grep"
-          ];
-        }
-        {
-          name = "toml";
-          auto-format = true;
-          # formatter = {
-          #   command = "${pkgs.taplo}/bin/taplo";
-          #   args = [
-          #     "format"
-          #     "-"
-          #   ];
-          # };
-          language-servers = [ "taplo" ];
-        }
-        {
-          name = "yaml";
-          file-types = [
-            "yml"
-            "yaml"
-            ".clang-format"
           ];
         }
         {
@@ -279,5 +247,5 @@
     ];
   };
 
-  xdg.configFile."helix/runtime/queries/roc".source = "${inputs.tree-sitter-roc}/queries";
+  # xdg.configFile."helix/runtime/queries/roc".source = "${inputs.tree-sitter-roc}/queries";
 }

@@ -10,33 +10,72 @@
 let
   templateDir = "${config.xdg.dataHome}/git/templateDir";
   git = lib.getExe config.programs.git.package;
-
   git-install-global-templatedir-hooks =
-    pkgs.writers.writeFishBin "git-install-global-templatedir-hooks" { }
-      # fish
+    pkgs.writers.writeNuBin "git-install-global-templatedir-hooks" { }
       ''
-        ${git} rev-parse --show-toplevel 2> /dev/null | read toplevel
-        if test $pipestatus[1] -ne 0
-          printf "%serror%s: not inside a git repository\n" (set_color red --bold) (set_color normal) >&2
-          exit 1
-        end
+        def main [
+          # TODO: implement this properly
+          --force (-f) # overwrite existing hooks
+          --interactive (-i) # ask before overwriting existing hooks
+          --list (-l) # list available hooks
+        ]: nothing -> nothing {
+          let output = ${git} rev-parse --show-toplevel | complete
+          if $output.exit_code != 0 {
+            error make {msg: "not inside a git repository"}
+          }
+          let toplevel = $output.stdout
 
-        if argparse f/force -- $argv
-          exit 2
-        end
+          if $list {
+            const githooks_url = "https://git-scm.com/docs/githooks"
+            let all_githooks: list<string> = http get $githooks_url | query web --query 'h2#_hooks ~ div h3' | flatten
 
-        for hook in ${templateDir}/hooks/*
-          set -l git_event (path basename $hook)
-          if test $toplevel/.git/hooks/$git_event; and not set -q _flag_force
-           echo "skipping ..."
-           continue
-          end
+            for hook in (glob ${templateDir}/hooks/*) {
 
-          cp $hook $toplevel/.git/hooks/$git_event
-          # TODO: print ansi link to git docs
-          echo "installed $git_event hook"
-        end
+            }
+          }
+
+          for hook in (glob ${templateDir}/hooks/*) {
+            let git_event = ($hook | path basename)
+            if not $force and ($"($toplevel)/.git/hooks/($git_event)" | path exists) {
+              echo $"skipping ($git_event)"
+              continue
+            }
+
+           # TODO: use `install` to set proper permissions
+           # TODO: print ansi link to git docs
+            cp -i $hook $"($toplevel)/.git/hooks/($git_event)"
+            echo $"installed ($git_event) hook"
+          }
+        }
       '';
+
+  # git-install-global-templatedir-hooks =
+  #   pkgs.writers.writeFishBin "git-install-global-templatedir-hooks" { }
+  #     # fish
+  #     ''
+  #       ${git} rev-parse --show-toplevel 2> /dev/null | read toplevel
+  #       if test $pipestatus[1] -ne 0
+  #         printf "%serror%s: not inside a git repository\n" (set_color red --bold) (set_color normal) >&2
+  #         exit 1
+  #       end
+
+  #       if not argparse f/force -- $argv
+  #         exit 2
+  #       end
+
+  #       for hook in ${templateDir}/hooks/*
+  #         set -l git_event (path basename $hook)
+  #         if test $toplevel/.git/hooks/$git_event; and not set -q _flag_force
+  #          echo "skipping ..."
+  #          continue
+  #         end
+
+  #         # TODO: use `install` to set proper permissions
+  #         cp $hook $toplevel/.git/hooks/$git_event
+  #         # TODO: print ansi link to git docs
+  #         echo "installed $git_event hook"
+  #       end
+  #     '';
 in
 {
   # https://git-scm.com/docs/git-init#Documentation/git-init.txt-codeinittemplateDircode
@@ -58,6 +97,17 @@ in
             ${git} stash list
 
           '';
+    };
+
+    # List the commits pulled with `git pull`
+    "git/templateDir/hooks/post-merge" = {
+      executable = true;
+      source = pkgs.writers.writeFish "post-merge" ''
+        echo "executing post-merge hook"
+        echo "https://git-scm.com/docs/githooks#_post_merge"
+        echo "git log --oneline HEAD@{1}.." | fish_indent --ansi
+        ${git} log --oneline HEAD@{1}..
+      '';
     };
 
     # IDEA: turn into a rust program

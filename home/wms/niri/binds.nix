@@ -49,7 +49,8 @@
           ''
             def main [app_id: string, program: string] {
               let windows = ${niri} msg --json windows | from json
-              # let workspaces = ${niri} msg --json workspaces | from json
+              let workspaces = ${niri} msg --json workspaces | from json
+              let outputs = ${niri} msg --json outputs | from json
 
               let focus = $windows
               | filter { |window| $window.app_id == $app_id }
@@ -57,7 +58,9 @@
               | do { $in > 0 }
 
               if $focus {
-                ${pkgs.wlrctl}/bin/wlrctl window focus $app_id
+                # TODO: use `niri msg action focus-window --id`
+                # ${pkgs.wlrctl}/bin/wlrctl window focus $app_id
+                ${niri} msg action focus-window --id $app_id
                 sleep 0.5sec
                 ${niri} msg action center-column
               } else {
@@ -87,9 +90,6 @@
       # TODO: bind to an action that toggles light/dark theme
       # hint: it is the f12 key with a shaded moon on it
       # "XF86Sleep".action = "";
-
-      # TODO: use, this is the "fly funktion knap"
-      # "XF86RFKill".action = "";
 
       # TODO: bind a key to the alternative to f3
 
@@ -144,8 +144,6 @@
       # "Mod+B".action = focus-or-spawn "${browser}";
       # "Mod+B".action = focus-or-spawn "zen-alpha" "flatpak run io.github.zen_browser.zen";
       # "Mod+G".action = focus-or-spawn "org.telegram.desktop" "${pkgs.telegram-desktop}/bin/telegram-desktop";
-      # S for spotify
-      # "Mod+S".action = spawn "spotify";
       # D for discord
       # "Mod+D".action = focus-or-spawn "vesktop" "${pkgs.vesktop}/bin/vesktop";
       # N for notes
@@ -153,6 +151,9 @@
       # "Mod+E".action = run-in-kitty "yazi";
       # TODO: detect the newest file in ~/Downloads and focus it first by doing `yazi $file`
       # "Mod+Y".action = run-with-sh-within-terminal "cd ~/Downloads; yazi";
+
+      # S for spotify
+      "Mod+S".action = focus-or-spawn "spotify" "${pkgs.spotify}/bin/spotify";
       # E is default on other platforms like Windows, for opening the "file explorer" program
       "Mod+E".action = focus-or-spawn "org.kde.dolphin" "${pkgs.kdePackages.dolphin}/bin/dolphin";
       # P for pdf
@@ -171,11 +172,11 @@
 
       # (pkgs.lib.getExe bluetoothctl-init-script);
       "f11".action = fullscreen-window;
-      "f3" = {
-        # action = run-in-terminal "htop";
-        action = spawn "ghostty" "-e" "htop";
-        hotkey-overlay.title = "Open HTOP";
-      };
+      # "f3" = {
+      #   # action = run-in-terminal "htop";
+      #   action = spawn "ghostty" "-e" "htop";
+      #   hotkey-overlay.title = "Open HTOP";
+      # };
       # "Shift+f11".action = spawn (pkgs.lib.getExe scripts.wb-toggle-visibility-or-spawn);
       # "Mod+f11".action = spawn (pkgs.lib.getExe scripts.wb-toggle-visibility);
       "Mod+Q".action = close-window;
@@ -286,6 +287,7 @@
 
       # // Switches focus between the current and the previous workspace.
       "Mod+Tab".action = focus-workspace-previous;
+      "Mod+Shift+Tab".action = focus-monitor-previous;
       # "Mod+Return".action = spawn "anyrun";
       # "Mod+Return".action = fish "pidof anyrun; and pkill anyrun; or anyrun";
       # "Mod+Return".action = fish "pidof nwg-drawer; and pkill nwg-drawer; or nwg-drawer -ovl -fm dolphin";
@@ -319,21 +321,25 @@
 
       "Mod+W".action = toggle-column-tabbed-display;
 
-      "Mod+Shift+Tab" = {
-        action = toggle-overview;
-      };
+      # "Mod+Shift+Tab" = {
+      #   action = toggle-overview;
+      # };
 
       "Mod+Return" = {
         action = toggle-overview;
       };
 
-      # "Mod+Z".action = center-column; # kinda like `zz` in helix
-      # "Mod+Z".action = spawn (pkgs.lib.getExe pkgs.woomer);
-      # "Mod+Z".action
-
+      "Mod+BackSpace" = {
+        action = focus-window-previous;
+      };
       # TODO: implement
       # "Mod+BackSpace".action = focus-last-window;
 
       # TODO: keybind to switch all windows between two outputs/monitors. Use `niri msg windows` to figure out which output windows are on
+
+      # "Mod+Z".action = center-column; # kinda like `zz` in helix
+      # "Mod+Z".action = spawn (pkgs.lib.getExe pkgs.woomer);
+      # "Mod+Z".action
+
     };
 }

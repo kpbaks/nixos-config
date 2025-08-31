@@ -13,8 +13,8 @@
     }
     {
       matches = [ { namespace = "^launcher$"; } ];
-      baba-is-float = true;
-      opacity = 0.95;
+      baba-is-float = false;
+      opacity = 1.0;
       shadow.enable = true;
       # geometry-corner-radius = config.programs.fuzzel.settings.border.radius;
       # TODO: update niri-flake to accept a float value OR a submodule

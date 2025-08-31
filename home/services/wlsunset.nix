@@ -1,3 +1,4 @@
+{ lib, ... }:
 {
   # set screen gamma (aka. night light) based on time of day
   services.wlsunset = {
@@ -19,6 +20,9 @@
   # disable in when using KDE Plasma.
   # [ref:set_XDG_CURRENT_DESKTOP_to_niri]
   systemd.user.services.wlsunset = {
-    User.ConditionEnvironment = "XDG_CURRENT_DESKTOP=niri";
+    Unit.ConditionEnvironment = lib.mkForce [
+      "WAYLAND_DISPLAY"
+      "XDG_CURRENT_DESKTOP=niri"
+    ];
   };
 }
