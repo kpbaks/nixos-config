@@ -238,6 +238,11 @@
         };
       });
 
+      templates.dev-generic = {
+        path = ./templates/dev/generic;
+        description = "";
+      };
+
       nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
         inherit pkgs system;
         specialArgs = {

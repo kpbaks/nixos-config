@@ -131,6 +131,18 @@
     enableAlias = true;
   };
 
+  programs.nix-init = {
+    enable = true;
+    settings = {
+      maintainers = [ "kpbaks" ];
+      nixpkgs = ''builtins.getFlake "nixpkgs"'';
+
+      access-tokens = {
+        # "gitlab.com".command = [];
+      };
+    };
+  };
+
   programs.cavalier.enable = false;
 
   home.shell = {

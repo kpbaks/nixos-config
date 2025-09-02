@@ -6,5 +6,6 @@
     # ./kakoune.nix
     # ./micro.nix
     ./zed.nix
+    ./flow.nix
   ];
 }
