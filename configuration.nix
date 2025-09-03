@@ -659,8 +659,8 @@
   ];
 
   programs.niri.enable = true;
-  programs.niri.package = pkgs.niri;
-  # programs.niri.package = pkgs.niri-unstable;
+  # programs.niri.package = pkgs.niri;
+  programs.niri.package = pkgs.niri-unstable;
 
   # hardware.system76.power-daemon.enable = true;
   services.system76-scheduler.enable = true;

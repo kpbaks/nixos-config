@@ -40,10 +40,10 @@
 
     in
     [
-      cage
-      xwayland-run
+      # cage
+      # xwayland-run
       # FIXME: crashes when starting as a systemd service
-      xwayland-satellite
+      # xwayland-satellite
       # wlrctl
       # wlr-which-key
       # wlr-randr
