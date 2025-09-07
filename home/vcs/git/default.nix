@@ -192,6 +192,15 @@
     # use that keymap configuration.
     # https://github.com/extrawurst/gitui/blob/master/vim_style_key_config.ron
     # keyConfig = "vim";
+    theme =
+      # ron
+      ''
+        (
+          selection_bg: Gray,
+          selection_fg: White,
+          cmdbar_bg: DarkGray,
+        )
+      '';
   };
 
   programs.git-credential-oauth.enable = false;
