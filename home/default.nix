@@ -154,6 +154,10 @@
     enable = true;
   };
 
+  xdg.configFile."tombi/config.toml".source = (pkgs.formats.toml { }).generate "tombi-config" {
+    lint.rules.tables-out-of-order = "off";
+  };
+
   programs.zotero.enable = true;
   programs.neohtop.enable = true;
   programs.calibre.enable = true;
