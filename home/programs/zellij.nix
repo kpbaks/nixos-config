@@ -81,6 +81,19 @@
     keybinds = {
       _props.clear-defaults = false;
       normal._children = [
+        # TODO: also bind Alt Shift {Left,Right} to this
+        {
+          bind = {
+            _args = [ "Ctrl PageUp" ];
+            GoToNextTab = [ ];
+          };
+        }
+        {
+          bind = {
+            _args = [ "Ctrl PageDown" ];
+            GoToPreviousTab = [ ];
+          };
+        }
       ]
       ++ map (i: {
         bind = {
