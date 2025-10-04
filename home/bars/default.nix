@@ -1,7 +1,7 @@
 {
   imports = [
     # ./ironbar
-    ./waybar
+    # ./waybar
     # ./yambar.nix
   ];
 }

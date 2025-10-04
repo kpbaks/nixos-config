@@ -1,7 +1,7 @@
 { lib, pkgs, ... }:
 {
 
-  programs.zed-editor.enable = true;
+  programs.zed-editor.enable = false;
   programs.zed-editor.package = pkgs.zed-editor;
   # programs.zed-editor.package = pkgs.zed-editor-fhs;
   # programs.zed-editor.extensions = [

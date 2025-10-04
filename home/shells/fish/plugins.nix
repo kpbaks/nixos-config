@@ -85,18 +85,18 @@ in
 {
   # programs.fish.functions.plugins = lib.getExe scripts.plugins;
   programs.fish.plugins = nixpkgs-plugins ++ [
-    {
-      name = "git.fish";
-      src = inputs.git_fish;
-    }
+    # {
+    #   name = "git.fish";
+    #   src = inputs.git_fish;
+    # }
     {
       name = "ctrl-z.fish";
       src = inputs.ctrl_z_fish;
     }
-    {
-      name = "nix.fish";
-      src = inputs.nix_fish;
-    }
+    # {
+    #   name = "nix.fish";
+    #   src = inputs.nix_fish;
+    # }
     {
       name = "private_mode.fish";
       src = inputs.private_mode_fish;

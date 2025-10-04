@@ -11,5 +11,9 @@
   # programs.helix.settings.theme = "gruber-darker";
   # programs.helix.settings.theme = "carbon";
   # programs.helix.settings.theme = "iceberg-dark";
-  programs.helix.settings.theme = "focus_nova";
+  programs.helix.settings.theme = {
+    dark = "catppuccin_frappe";
+    light = "catppuccin_latte";
+    # theme = "focus_nova";
+  };
 }

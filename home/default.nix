@@ -3,12 +3,16 @@
   pkgs,
   ...
 }:
+let
+  tomlFormat = pkgs.formats.toml { };
+in
 {
   imports = [
+    ./shell-aliases.nix
     ./quickshell
     ./bars
     ./browsers
-    ./calendar.nix
+    # ./calendar.nix
     ./custom-modules
     ./desktop-environments
     ./direnv.nix
@@ -36,6 +40,7 @@
     ./wms
     ./xdg
     ./obsidian.nix
+    ./tldr.nix
   ];
 
   # TODO: set up `localsend` service to start in background
@@ -61,7 +66,7 @@
   # automatically set some environment variables that will ease usage of software installed with nix on non-NixOS linux (fixing local issues, settings XDG_DATA_DIRS, etc.)
   # targets.genericLinux.enable = false;
 
-  programs.btop.enable = false;
+  # programs.btop.enable = false;
 
   programs.jq.enable = true;
 
@@ -72,7 +77,7 @@
   };
 
   # TODO: use systemd env var activation condition to activate on niri
-  services.network-manager-applet.enable = false;
+  # services.network-manager-applet.enable = false;
 
   # gtk.enable = true;
 
@@ -150,15 +155,92 @@
     enableNushellIntegration = true;
   };
 
+  programs.satty = {
+    enable = true;
+    settings = {
+      general = {
+        fullscreen = true;
+        corner-roundness = 12;
+        initial-tool = "brush";
+        output-filename = "/tmp/test-%Y-%m-%d_%H:%M:%S.png";
+      };
+      color-palette = {
+        palette = [
+          "#00ffff"
+          "#a52a2a"
+          "#dc143c"
+          "#ff1493"
+          "#ffd700"
+          "#008000"
+        ];
+      };
+    };
+  };
+
+  programs.vivid = {
+    enable = true;
+    activeTheme = "tokyonight-moon";
+  };
+
+  # services.shpool = {
+  #   enable = true;
+  # };
+
   programs.numbat = {
     enable = true;
   };
+
+  programs.waveterm = {
+    enable = true;
+  };
+
+  programs.tray-tui.enable = true;
+  programs.twitch-tui.enable = true;
+  # services.ssh-tpm-agent.enable = true;
+  programs.radio-cli.enable = true;
+  programs.nix-search-tv.enable = true;
+
+  programs.grep = {
+    enable = true;
+    # # TODO: improve colors, to not use default red
+    # # https://www.gnu.org/software/grep/manual/html_node/Environment-Variables.html
+    # GREP_COLORS = "ms=01;31:mc=01;31:sl=:cx=:fn=35:ln=32:bn=32:se=36";
+
+    colors = {
+      error = "01;31";
+    };
+  };
+
+  # programs.lutris.enable = true;
+
+  # TODO: try out
+  # programs.meli = {
+  #   enable = true;
+  # };
+
+  # programs.docker-cli = {
+  #   enable = true;
+  # };
 
   xdg.configFile."tombi/config.toml".source = (pkgs.formats.toml { }).generate "tombi-config" {
     lint.rules.tables-out-of-order = "off";
   };
 
   programs.zotero.enable = true;
-  programs.neohtop.enable = true;
+  programs.neohtop.enable = false;
   programs.calibre.enable = true;
+
+  # TODO: add an option to set a high level config like "niri"
+  # to generate commands for lock and turn of monitors that makes
+  # use of the functionality of the wm.
+  # https://github.com/AMNatty/wleave
+  # TODO: configure colors to match niri accent colors
+  programs.wleave.enable = true;
+
+  # https://github.com/XAMPPRocky/tokei/blob/master/tokei.example.toml
+  # TODO: create hm module
+  xdg.configFile."tokei/tokei.toml".source = tomlFormat.generate "tokei-config" {
+    sort = "lines";
+    num-format = "underscores";
+  };
 }

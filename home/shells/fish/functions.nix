@@ -348,7 +348,7 @@ in
         description = "search for a word with `rg`, i.e. matches can not be substrings";
         body = # fish
           ''
-            argparse --min-args=1 $options -- $argv; or return 2
+            argparse --min-args=1 --ignore-unknown $options -- $argv; or return 2
 
             set -l pattern "\b$(string join '|' -- $argv)\b"
 

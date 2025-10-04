@@ -36,6 +36,10 @@
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
+    nixgl = {
+      url = "github:nix-community/nixGL";
+    };
+    jail-nix.url = "sourcehut:~alexdavid/jail.nix";
 
     plasma-manager = {
       url = "github:pjones/plasma-manager";
@@ -61,6 +65,9 @@
       # NOTE: Developer does not recommend to override the nixpkgs input
       # https://github.com/nix-community/nixd/blob/main/nixd/docs/editor-setup.md#:~:text=Note%20that%20please%20do%20NOT%20override%20nixpkgs%20revision%20for%20nixd%20inputs.
     };
+
+    nil.url = "github:oxalica/nil";
+
     # ghostty = {
     #   url = "git+ssh://git@github.com/ghostty-org/ghostty";
     #   # inputs.nixpkgs-stable.follows = "nixpkgs-unstable";
@@ -80,11 +87,11 @@
     # };
     # catppuccin.url = "github:catppuccin/nix";
     # nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
-    stylix = {
-      url = "github:danth/stylix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      # inputs.home-manager.follows = "home-manager";
-    };
+    # stylix = {
+    #   url = "github:danth/stylix";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    #   # inputs.home-manager.follows = "home-manager";
+    # };
 
     pre-commit-hooks.url = "github:cachix/git-hooks.nix";
     # fh.url = "https://flakehub.com/f/DeterminateSystems/fh/*.tar.gz";
@@ -97,12 +104,27 @@
 
     quickshell = {
       url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
+      inputs.nixpkgs.follows = "nixpkgs";
+      # url = "git+https://git.outfoxxed.me/outfoxxed/quickshell?ref=v0.2.0";
       # inputs.nixpkgs.follows = "nixpkgs";
+    };
+    noctalia = {
+      url = "github:noctalia-dev/noctalia-shell";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.quickshell.follows = "quickshell";
     };
 
     git-subcommands = {
       url = "git+https://codeberg.org/kpbaks/git-subcommands.git";
       # inputs.nixpkgs.follows = "nixpkgs";
+    };
+    my-scripts = {
+      url = "git+https://codeberg.org/kpbaks/scripts.git";
+      # inputs.nixpkgs.follows = "nixpkgs";
+    };
+    gen-oci-annotations = {
+      url = "git+https://codeberg.org/kpbaks/gen-oci-annotations.git";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # swww = {
@@ -146,9 +168,16 @@
       url = "github:kpbaks/private_mode.fish";
       flake = false;
     };
-    git_fish = {
-      url = "github:kpbaks/git.fish";
-      flake = false;
+    # git_fish = {
+    #   url = "github:kpbaks/git.fish";
+    #   flake = false;
+    # };
+    # "gabbr.fish" = {
+    gabbr_fish = {
+      # FIXME(nix): this blocks forever if the repo has private visibility
+      url = "git+https://codeberg.org/kpbaks/gabbr.fish.git";
+      inputs.nixpkgs.follows = "nixpkgs";
+      # flake = false;
     };
     ctrl_z_fish = {
       url = "github:kpbaks/ctrl-z.fish";
@@ -156,7 +185,8 @@
     };
     nix_fish = {
       url = "github:kpbaks/nix.fish";
-      flake = false;
+      inputs.nixpkgs.follows = "nixpkgs";
+      # flake = false;
     };
 
     try.url = "github:tobi/try";
@@ -179,6 +209,7 @@
       self,
       nixpkgs,
       home-manager,
+      jail-nix,
       ...
     }@inputs:
     let
@@ -188,6 +219,7 @@
       system = "x86_64-linux";
       for-all-systems = lib.genAttrs [ system ];
       overlays = [
+        inputs.nixgl.overlay
         # inputs.rust-overlay.overlays.default
         # inputs.hyprpanel.overlay
         # (final: prev: { ghostty = inputs.ghostty.packages.${system}.default; })
@@ -202,6 +234,7 @@
         inputs.yazi.overlays.default
         inputs.helix.overlays.default
         inputs.nixd.overlays.default
+        inputs.nil.overlays.default
         # (final: prev: { television = inputs.television.packages.${prev.system}.default; })
         # inputs.neovim-nightly-overlay.overlay
       ];
@@ -215,6 +248,8 @@
           #   "electron-27.3.11"
         ];
       };
+      # TODO: try out
+      jail = jail-nix.lib.init pkgs;
     in
     {
       formatter.${system} = pkgs.nixfmt-rfc-style;
@@ -231,6 +266,8 @@
           inherit (self.checks.${system}.pre-commit-check) shellHook;
           buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
           packages = with pkgs; [
+            nixd
+            nil
             update-nix-fetchgit
             # Needed for the various *.css files used
             vscode-langservers-extracted
@@ -407,6 +444,7 @@
               }
             )
             # { home.packages = [ inputs.steel.packages.${system}.default ]; }
+            { home.packages = [ inputs.gen-oci-annotations.packages.${system}.default ]; }
             # { home.packages = [ inputs.crates-lsp.packages.${system}.default ]; }
           ];
         };

@@ -9,19 +9,25 @@ args = ["--inlay-hints", "--semantic-tokens"]
 nixos = { expr = '(builtins.getFlake "/etc/nixos").nixosConfigurations.nixos.options' }
 home-manager = { expr = '(builtins.getFlake "/etc/nixos").homeConfigurations."kpbaks@nixos".options' }
 
-[[language]]
-name = "nix"
-language-servers = ["nixd"]
+
+# https://github.com/oxalica/nil/blob/main/docs/configuration.md
+[language-server.nil.config.nil]
+nix = { flake = { autoArchive = true } }
+
 
 [[language]]
-name = "git-commit"
-scope = "git.commitmsg"
-file-types = [
-  { glob = "COMMIT_EDITMSG" },
-  { glob = "MERGE_MSG" },
-  { glob = "NOTES_EDITMSG" },
-]
-comment-token = "#"
-indent = { tab-width = 2, unit = "  " }
-rulers = [51, 73]
-text-width = 72
+name = "nix"
+language-servers = ["nixd", "nil", "typos-lsp"]
+
+# [[language]]
+# name = "git-commit"
+# scope = "git.commitmsg"
+# file-types = [
+#   { glob = "COMMIT_EDITMSG" },
+#   { glob = "MERGE_MSG" },
+#   { glob = "NOTES_EDITMSG" },
+# ]
+# comment-token = "#"
+# indent = { tab-width = 2, unit = "  " }
+# rulers = [51, 73]
+# text-width = 72

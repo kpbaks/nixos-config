@@ -135,6 +135,7 @@
       status.aheadBehind = true;
       status.showStash = true;
       status.submoduleSummary = true;
+      # status.showUntrackedFiles = "no";
       tag.forceSignAnnotated = true;
       rerere.enabled = true;
       rerere.autoupdate = true;

@@ -1,10 +1,13 @@
 { lib, pkgs, ... }:
 {
+  # TODO: bind ctrl-w to kill-word like action and now close application
+  # also support ctrl-{u,k,e} like emacs mode
   programs.broot = {
     enable = true;
     enableFishIntegration = true;
     settings = rec {
-      modal = false;
+      modal = true;
+      initial_mode = "insert";
       # icon_theme = "vscode";
       icon_theme = "nerdfont";
       default_flags = "-gh"; # show (h)idden files and status of files related to (g)it
@@ -19,6 +22,7 @@
       # };
       enable_kitty_keyboard = lib.mkForce false;
       capture_mouse = true;
+      quit_on_last_cancel = false;
       transformers = [
         # Beutify JSON
         {
@@ -43,33 +47,33 @@
           ];
         }
         # Render Office files using libreoffice
-        rec {
-          input_extensions = [
-            "xls"
-            "xlsx"
-            "doc"
-            "docx"
-            "ppt"
-            "pptx"
-            "ods"
-            "odt"
-            "odp"
-          ];
-          output_extension = "png";
-          mode = "image";
-          command = [
-            "${pkgs.libreoffice}/bin/libreoffice"
-            "--headless"
-            "--convert-to"
-            output_extension
-            "--outdir"
-            "{output-dir}"
-            "{input-path}"
-          ];
-        }
+        # rec {
+        #   input_extensions = [
+        #     "xls"
+        #     "xlsx"
+        #     "doc"
+        #     "docx"
+        #     "ppt"
+        #     "pptx"
+        #     "ods"
+        #     "odt"
+        #     "odp"
+        #   ];
+        #   output_extension = "png";
+        #   mode = "image";
+        #   command = [
+        #     "${pkgs.libreoffice}/bin/libreoffice"
+        #     "--headless"
+        #     "--convert-to"
+        #     output_extension
+        #     "--outdir"
+        #     "{output-dir}"
+        #     "{input-path}"
+        #   ];
+        # }
 
         {
-          # TODO: when this works sumbit a pr to add it to broots docs
+          # TODO: when this works submit a pr to add it to broots docs
           # https://dystroy.org/broot/conf_file/
           input_extensions = [ "d2" ];
           output_extension = "png";
@@ -80,6 +84,7 @@
             "{output-path}"
           ];
         }
+        # TODO: compile mermaid diagrams
       ];
     };
 

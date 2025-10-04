@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 {
-  home.packages = with pkgs; [ gg-jj ];
+  # home.packages = with pkgs; [ gg-jj ];
   programs.jujutsu = {
     enable = true;
     settings = {

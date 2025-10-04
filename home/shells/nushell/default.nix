@@ -107,10 +107,10 @@
   programs.nushell = {
     enable = true;
     shellAliases = {
-      g = "git";
-      ll = "ls -l";
-      la = "ls -a";
-      lla = "ls -al";
+      # g = "git";
+      # ll = "ls -l";
+      # la = "ls -a";
+      # lla = "ls -al";
       fg = "job unfreeze"; # 🤤
       jobs = "job list";
     };

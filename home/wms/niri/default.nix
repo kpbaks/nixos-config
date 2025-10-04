@@ -6,6 +6,9 @@
   pkgs,
   ...
 }:
+let
+  laptop-screen = "eDP-1";
+in
 {
   imports = [
     inputs.niri.homeModules.niri
@@ -70,7 +73,7 @@
       # open-on-output = "eDP-1"; # laptop screen
     };
     mail = {
-      open-on-output = "eDP-1"; # laptop screen
+      open-on-output = laptop-screen;
     };
     chat = { };
     development = { };
@@ -164,9 +167,11 @@
   programs.niri.settings.spawn-at-startup =
     map (s: { command = pkgs.lib.strings.splitString " " s; })
       [
-        "${lib.getExe config.default-application.terminal}"
-        "${lib.getExe config.default-application.browser}"
-        "${lib.getExe config.programs.thunderbird.package}"
+        (lib.getExe config.default-application.terminal)
+        (lib.getExe config.default-application.browser)
+        (lib.getExe config.programs.thunderbird.package)
+        (lib.getExe config.programs.vesktop.package)
+        (lib.getExe pkgs.telegram-desktop)
         # TODO: does not show-up
         # "${pkgs.telegram-desktop}/bin/telegram-desktop -startintray"
         # "ironbar"

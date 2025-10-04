@@ -1,4 +1,9 @@
-{ pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   home.packages = with pkgs; [
     # dependabot-cli
@@ -27,6 +32,29 @@
     };
   };
 
-  programs.gh-dash.enable = true;
+  programs.gh-dash = {
+    enable = true;
+    # https://www.gh-dash.dev/configuration/
+    settings = {
+      defaults = {
+        preview.width = 60;
+      };
+      pager.diff = "${lib.getExe pkgs.moar}";
+      # TODO: disable escape
+      keybindings = {
+        universal = [
+          {
+            key = "g";
+            name = "lazygit";
+            command = "cd {{.RepoPath}} && ${lib.getExe config.programs.lazygit.package}";
+          }
+        ];
+      };
 
+      # prsSections = {
+      #   title = "Review";
+      #   filter = ''is:open -author:@me updated>= {{ nowModify "-2w" }}'';
+      # };
+    };
+  };
 }

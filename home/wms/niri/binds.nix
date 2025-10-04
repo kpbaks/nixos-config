@@ -298,17 +298,17 @@
       # "Mod+Return".action = fish "${pkgs.procps}/bin/pkill walker; or ${pkgs.walker}/bin/walker";
       # "Mod+Slash".action = fish "${pkgs.procps}/bin/pkill walker; or ${pkgs.walker}/bin/walker";
       # "Mod+Slash".action = spawn "${pkgs.walker}/bin/walker";
-      "Mod+Slash" =
-        let
-          fuzzel = "${config.programs.fuzzel.package}/bin/fuzzel";
-          pkill = "${pkgs.procps}/bin/pkill";
-        in
-        {
-          # Hit "Mod+Slash" again to hide/close fuzzel again
-          action = sh "${pkill} fuzzel || ${fuzzel}";
-          hotkey-overlay.title = "Toggle fuzzel (App launcher and fuzzy finder)";
-          repeat = false;
-        };
+      # "Mod+Slash" =
+      #   let
+      #     fuzzel = "${config.programs.fuzzel.package}/bin/fuzzel";
+      #     pkill = "${pkgs.procps}/bin/pkill";
+      #   in
+      #   {
+      #     # Hit "Mod+Slash" again to hide/close fuzzel again
+      #     action = sh "${pkill} fuzzel || ${fuzzel}";
+      #     hotkey-overlay.title = "Toggle fuzzel (App launcher and fuzzy finder)";
+      #     repeat = false;
+      #   };
 
       "Mod+Shift+P".action = power-off-monitors;
       # Mod+R { switch-preset-column-width; }

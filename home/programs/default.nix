@@ -39,7 +39,7 @@
     ./yazi
     ./zellij.nix
     ./zoxide.nix
-    # ./lazydocker.nix
+    ./lazydocker.nix
     # ./imhex.nix
     # ./signal.nix
     # ./lla.nix

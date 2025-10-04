@@ -35,7 +35,7 @@ in
       matches = [
         {
           app-id = "thunderbird";
-          title = "^\d+ Reminders?$";
+          title = "^\d+ Reminder.*$";
         }
         {
           # Pops up when running `run0 <program>`
@@ -68,6 +68,7 @@ in
           title = "^New Text Note.*";
         }
         { app-id = "^org.freedesktop.impl.portal.desktop.kde$"; }
+        { app-id = "^org.kde.plasma.emojier$"; }
       ];
 
       # default-column-width.proportion = remaining-column-width-proportion;
@@ -140,6 +141,7 @@ in
         }
       ];
       open-on-workspace = "mail";
+      open-maximized = true;
     }
   ];
 }

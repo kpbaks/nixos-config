@@ -122,6 +122,11 @@ in
           }
           require("git"):setup()
           require("no-status"):setup()
+
+          -- https://yazi-rs.github.io/docs/plugins/builtins/#zoxide
+          require("zoxide"):setup {
+            update_db = true,
+          }
         '';
 
       keymap =

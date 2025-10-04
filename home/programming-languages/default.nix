@@ -1,3 +1,4 @@
+{ pkgs, ... }:
 {
   imports = [
     ./csharp.nix
@@ -11,7 +12,16 @@
     # ./roc.nix
     ./rust.nix
     # ./zig.nix
+    ./dockerfile.nix
   ];
+
+  programs.gcc = {
+    enable = true;
+    package = pkgs.gcc;
+    colors = {
+      error = "01;31";
+    };
+  };
 
   # https://github.com/koalaman/shellcheck/wiki/Directive#shellcheckrc-file
   xdg.configFile."shellcheckrc".text =

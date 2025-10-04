@@ -23,6 +23,9 @@ let
 in
 {
   programs.fish.shellAbbrs = abbrs {
+    g = "git";
+    s = "git show @%";
+    d = "docker";
     cmdl = "commandline";
     bn = "path basename";
     dn = "path dirname";
@@ -36,8 +39,8 @@ in
     sys = "systemctl";
     sysu = "systemctl --user";
     dtm = "datamash";
-    jpt = "jupyter";
-    jptl = "jupyter lab";
+    # jpt = "jupyter";
+    # jptl = "jupyter lab";
     # h = {
     #   expansion = "history search '%'";
     #   setCursor = true;

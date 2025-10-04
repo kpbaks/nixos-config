@@ -79,7 +79,9 @@ in
       # theme = "dark:iceberg-dark,light:iceberg-light";
       # theme = "dark:BlueDolphin,light:Builtin Solarized Light";
       # theme = "Eldritch";
-      theme = "0x96f";
+      # theme = "0x96f";
+      # theme = "noctalia"; # Updated by `noctalia-shell` using `matugen`
+      theme = "dark:Catppuccin Frappe,light:Catppuccin Latte";
       # theme = "shadow";
       # theme = "dark:Kanagawa Wave,light:GruvboxLight";
 
@@ -88,7 +90,9 @@ in
       # keybind = global:ctrl+s=toggle_quick_terminal
 
       # custom-shader = "${ghostty-shaders}/water.glsl";
-      custom-shader = "${inputs.ghostty-shaders}/cursor_blaze.glsl";
+      # TODO: use if merged https://github.com/hackr-sh/ghostty-shaders/pull/47
+      # custom-shader = "${inputs.ghostty-shaders}/cursor_blaze.glsl";
+      # custom-shader = "${inputs.ghostty-shaders}/spotlight.glsl";
       focus-follows-mouse = true;
 
       # https://ghostty.org/docs/config/keybind

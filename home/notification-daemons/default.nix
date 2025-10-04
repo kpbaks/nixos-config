@@ -3,6 +3,6 @@
     # ./swaync
     # ./dunst.nix
     # ./wired-notify
-    ./mako.nix
+    # ./mako.nix
   ];
 }

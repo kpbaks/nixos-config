@@ -3,7 +3,8 @@
   programs.niri = {
     settings = {
       overview = {
-        zoom = 1.0 / 2.0;
+        # zoom = 1.0 / 2.0;
+        zoom = 1.0 / 3.0;
         backdrop-color = null;
         # TODO: add support for this in `flake:niri-flake`
         # workspace-shadow.enable = true;

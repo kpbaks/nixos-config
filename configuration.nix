@@ -665,8 +665,6 @@
   # hardware.system76.power-daemon.enable = true;
   services.system76-scheduler.enable = true;
 
-  programs.river.enable = false;
-
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -676,8 +674,6 @@
   # };
 
   # List services that you want to enable:
-  services.tailscale.enable = false;
-  services.tailscale.openFirewall = false;
   # services.netbird.enable = true;
 
   services.flatpak.enable = true;
@@ -686,11 +682,6 @@
     path = [ pkgs.flatpak ];
     script = "flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo";
   };
-  # FIXME: get to work
-  #   services.espanso.enable = false;
-  services.mullvad-vpn.enable = false;
-  services.mozillavpn.enable = false;
-  # services.wg-netmanager.enable = true;
 
   # security.pam.services.gdm.enableGnomeKeyring = false;
   security.pam.services.gdm.enableGnomeKeyring = false;
@@ -704,38 +695,6 @@
   };
   services.gnome.gcr-ssh-agent.enable = !config.programs.ssh.startAgent;
   programs.git.lfs.enablePureSSHTransfer = true;
-
-  programs.firejail = {
-    enable = false;
-    # wrappedBinaries = {
-    #   librewolf = {
-    #     executable = "${pkgs.librewolf}/bin/librewolf";
-    #     profile = "${pkgs.firejail}/etc/firejail/librewolf.profile";
-    #     extraArgs = [
-    #       # Required for U2F USB stick
-    #       "--ignore=private-dev"
-    #       # Enforce dark mode
-    #       "--env=GTK_THEME=Adwaita:dark"
-    #       # Enable system notifications
-    #       "--dbus-user.talk=org.freedesktop.Notifications"
-    #     ];
-    #   };
-    # };
-  };
-
-  # services.spotifyd.enable = true;
-  # services.surrealdb.enable = true;
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-  services.openssh = {
-    enable = false;
-    settings.PasswordAuthentication = false;
-  };
-
-  # services.jitsi-meet = {
-  #   enable = true;
-  #   excalidraw.enable = true;
-  # };
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
@@ -784,18 +743,24 @@
   virtualisation.containers.enable = true;
   # virtualisation.containers.cdi.dynamic.nvidia.enable = true;
 
-  virtualisation.podman.enable = true;
-  virtualisation.podman.extraPackages = [
-    # pkgs.gvisor
-  ];
-  # Users must be in the podman group in order to connect. As with Docker, members of this group can gain root access.
-  virtualisation.podman.dockerSocket.enable =
-    builtins.elem "podman"
-      config.users.users.${username}.extraGroups;
-  virtualisation.podman.autoPrune.enable = false;
-  virtualisation.podman.autoPrune.dates = "monthly";
-  virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
-  virtualisation.podman.dockerCompat = !config.virtualisation.docker.enable;
+  # /etc/containers/containers.conf
+  # virtualisation.containers.containersConf.settings = {
+  #   # Disable warning log when using podman-compose wrapper
+  #   compose_warning_logs = false;
+  # };
+
+  virtualisation.podman = {
+    enable = true;
+    extraPackages = [
+      pkgs.gvisor
+    ];
+    # Users must be in the podman group in order to connect. As with Docker, members of this group can gain root access.
+    dockerSocket.enable = builtins.elem "podman" config.users.users.${username}.extraGroups;
+    autoPrune.enable = false;
+    autoPrune.dates = "monthly";
+    defaultNetwork.settings.dns_enabled = true;
+    dockerCompat = !config.virtualisation.docker.enable;
+  };
 
   # needed for `darkman`
   # services.geoclue2.enable = false;
@@ -892,9 +857,6 @@
       };
     };
   };
-
-  # KDE partition manager
-  programs.partition-manager.enable = false;
 
   # programs.regreet.enable = config.services.greetd.enable;
   programs.regreet.enable = false;
@@ -1016,32 +978,14 @@
 
   programs.bandwhich.enable = true;
 
-  services.osquery.enable = false;
-  services.osquery.flags = { };
-  services.osquery.settings = { };
-
   # TODO: check if works in wsl?
   services.envfs.enable = false; # use fusefs to resolve shebangs like #!/bin/bash that does not work on NixOS because of not being compliant with FHS standard
-
-  services.postgresql = {
-    enable = false;
-    enableJIT = true;
-    # package = pkgs.postgresql;
-    ensureDatabases = [ "testdb" ];
-    authentication = pkgs.lib.mkOverride 10 ''
-      #type database DBuser auth-method
-      local all all trust
-    '';
-  };
 
   # https://www.postgresql.org/docs/18/color.html
   # environment.variables = {
   #   PG_COLOR = "auto";
   #   PG_COLORS = "";
   # };
-
-  services.ntfy-sh.enable = false;
-  services.ntfy-sh.settings.base-url = "https://ntfy.sh";
 
   # services.cpupower-gui.enable = true;
   # programs.coolercontrol.enable = true;
@@ -1062,7 +1006,7 @@
   environment.enableAllTerminfo = true;
 
   # TODO: wrap .desktop file Exec entry in a call to run0 or kdialog with sudo to run as root
-  programs.sniffnet.enable = true;
+  programs.sniffnet.enable = false;
 
   # networking.hosts = {
   #   "127.0.0.1" = [
@@ -1079,5 +1023,13 @@
 
   systemd.enableStrictShellChecks = true;
 
-  # services
+  services.locate = {
+    enable = true;
+    package = pkgs.plocate;
+  };
+
+  # TODO: figure out a way to integrate with zellij for true session
+  # resurrection
+  programs.criu.enable = true;
+  programs.systemtap.enable = false;
 }

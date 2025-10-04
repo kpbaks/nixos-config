@@ -22,10 +22,10 @@ let
   imports = [
 
     ./fonts.nix
-    ./leds.nix
+    # ./leds.nix
     ./xkcd.nix
-    ./displays.nix
-    ./bluetooth-devices.nix
+    # ./displays.nix
+    # ./bluetooth-devices.nix
     ./ocr.nix
     ./flake-inputs.nix
     ./xdg-desktop-portals.nix
@@ -36,7 +36,7 @@ let
     ./just-a-chill-guy.nix
     ./issue.nix
     ./whichie.nix
-    ./ls-pkg-config-path.nix
+    # ./ls-pkg-config-path.nix
     # ./version-bump.nix
     # ./sync-fork.nix
     # ./lg.nix
