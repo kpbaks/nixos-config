@@ -8,6 +8,7 @@
   home.packages =
     with pkgs;
     [
+      docker-compose
       # inputs.patchy.packages.${pkgs.system}.default
       # podman-compose
       # podman-desktop

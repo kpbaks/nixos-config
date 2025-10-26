@@ -44,7 +44,7 @@ in
         {
           geometry-corner-radius =
             let
-              r = 20.0;
+              r = 12.0;
             in
             {
               bottom-right = r;
@@ -74,28 +74,60 @@ in
           place-within-backdrop = true;
         }
       ];
-      binds = with config.lib.niri.actions; {
-        "Mod+Slash" = {
-          action = spawn (lib.getExe noctalia-shell) "ipc" "call" "launcher" "toggle";
-          hotkey-overlay.title = "Toggle Application Launcher";
-          repeat = false;
-        };
-      };
+      binds =
+        with config.lib.niri.actions;
+        let
+          ipc = spawn (lib.getExe noctalia-shell) "ipc" "call";
+        in
+        {
+          "Mod+Comma" = {
+            action = ipc "settings" "toggle";
+            hotkey-overlay.title = "Toggle Settings Menu";
+          };
+          "Mod+Slash" = {
+            action = ipc "launcher" "toggle";
+            hotkey-overlay.title = "Toggle Application Launcher";
+            repeat = false;
+          };
+          # TODO: bind to an action that toggles light/dark theme
+          # hint: it is the f12 key with a shaded moon on it
+          "XF86Sleep" = {
+            action = ipc "darkMode" "toggle";
+            hotkey-overlay.title = "Toggle Dark Mode";
+            repeat = false;
+          };
+          "Mod+V" = {
+            action = ipc "launcher" "clipboard";
+            hotkey-overlay.title = "Open Clipboard History Menu";
+            repeat = false;
+          };
+          "Mod+L" = {
+            action = ipc "lockScreen" "toggle";
+            hotkey-overlay.title = "Toggle Lockscreen";
+            repeat = false;
+          };
+          "Mod+W" = {
+            action = ipc "wallpaper" "toggle";
+            hotkey-overlay.title = "Toggle Wallpaper Menu";
+            repeat = false;
+          };
+          # "Control+Alt+Delete" = {
+          #   action = ipc "sessionMenu" "toggle";
+          #   hotkey-overlay.title = "Toggle Logout, Shutdown, Reboot etc. Menu";
+          #   repeat = false;
+          # };
 
-      # "Mod+Slash" =
-      #   let
-      #     fuzzel = "${config.programs.fuzzel.package}/bin/fuzzel";
-      #     pkill = "${pkgs.procps}/bin/pkill";
-      #   in
-      #   {
-      #     # Hit "Mod+Slash" again to hide/close fuzzel again
-      #     action = sh "${pkill} fuzzel || ${fuzzel}";
-      #     hotkey-overlay.title = "Toggle fuzzel (App launcher and fuzzy finder)";
-      #     repeat = false;
-      #   };
+          "XF86MonBrightnessUp" = {
+            action = ipc "brightness" "increase";
+            hotkey-overlay.title = "Increase Monitor Brightness";
+          };
+          "XF86MonBrightnessDown" = {
+            action = ipc "brightness" "decrease";
+            hotkey-overlay.title = "Decrease Monitor Brightness";
+          };
+        };
       spawn-at-startup = [
         {
-          # map (s: { command = pkgs.lib.strings.splitString " " s; })
           command = [ (lib.getExe noctalia-shell) ];
         }
       ];

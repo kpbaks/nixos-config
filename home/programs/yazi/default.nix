@@ -1,7 +1,12 @@
 # TODO: integrate https://github.com/imsi32/yatline.yazi
 # https://github.com/ndtoan96/ouch.yazi
 # https://github.com/Mellbourn/ls-colors.yazi
-{ inputs, pkgs, ... }:
+{
+  config,
+  inputs,
+  pkgs,
+  ...
+}:
 let
   inherit (pkgs) fetchFromGitHub;
 in
@@ -161,6 +166,7 @@ in
                 desc = "Open selected files with `ripdrag`";
               }
               {
+                # Like in helix
                 run = "arrow bot";
                 on = [
                   "g"
@@ -178,19 +184,26 @@ in
                 on = [ "q" ];
                 desc = "Close yazi";
               }
+              # {
+              #   run = "cd "
+              # }
               (cd "m" "~/Music")
               (cd "p" "~/Pictures")
               (cd "b" "~/Documents") # b for books, which I mostly keep in my ~/Documents folder
               (cd "v" "~/Videos")
-              (cd "w" "~/work")
-              (cd "." "~/dotfiles")
-              (cd "n" "/etc/nixos")
+              # (cd "n" "/etc/nixos")
+              (cd "," "/etc/nixos") # ',' is commonly used in gui apps for "open configuration" action
               # (cd "r" "/") # r for root
               (cd "/" "/")
-              (cd "s" "~/Pictures/screenshots")
-              (cd "Do" "~/development/own")
-              (cd "Df" "~/development/forks")
-              (cd "Dc" "~/development/cloned")
+              # (cd "s" "~/Pictures/screenshots")
+              (cd "s" (baseNameOf config.programs.niri.settings.screenshot-path))
+              (cd "o" "~/development/own")
+              # (cd "Df" "~/development/forks")
+              # (cd "Dc" "~/development/cloned")
+              (cd "c" "~/clones")
+              (cd "f" "~/forks")
+              (cd "." config.xdg.configHome)
+              # (cd "x")
               (cd "y" "~/.config/yazi")
 
               {
@@ -213,14 +226,14 @@ in
                 run = "plugin --sync kdeconnect";
                 desc = "";
               }
-              {
-                on = [
-                  "g"
-                  "c"
-                ];
-                run = "plugin vcs-files";
-                desc = "Show Git changed files";
-              }
+              # {
+              #   on = [
+              #     "g"
+              #     "c"
+              #   ];
+              #   run = "plugin vcs-files";
+              #   desc = "Show Git changed files";
+              # }
             ];
         };
     };

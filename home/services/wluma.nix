@@ -10,8 +10,9 @@
   # `RUST_LOG=debug wluma`
   # "Unable to init export_dmabuf_manager: Missing"
   services.wluma = {
-    enable = true;
+    enable = false;
     systemd.enable = true;
+    # TODO: only use time of day input
     # TODO: find the target for niri
     # systemd.target = "sway-session.target";
     settings = {

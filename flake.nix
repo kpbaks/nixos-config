@@ -197,6 +197,8 @@
     #   url = "github:nix-community/nix-melt";
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
+    # gonzo.url = "git+https://codeberg.org/kpbaks/gonzo.nix";
+    gonzo.url = "git+file:///home/kpbaks/development/own/gonzo.nix";
   };
   # inputs.hyprpanel.url = "github:Jas-SinghFSU/HyprPanel";
   #
@@ -446,6 +448,10 @@
             # { home.packages = [ inputs.steel.packages.${system}.default ]; }
             { home.packages = [ inputs.gen-oci-annotations.packages.${system}.default ]; }
             # { home.packages = [ inputs.crates-lsp.packages.${system}.default ]; }
+            {
+              imports = [ inputs.gonzo.homeModules.default ];
+              programs.gonzo.enable = true;
+            }
           ];
         };
       };

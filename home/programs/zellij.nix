@@ -1,9 +1,7 @@
 {
-  self,
   config,
   pkgs,
   lib,
-  inputs,
   ...
 }:
 {
@@ -68,8 +66,8 @@
     # https://zellij.dev/tutorials/web-client/
     web_server = true;
     # Generated with `nix run nixpkgs#mkcert -install localhost 127.0.0.1`
-    web_server_cert = builtins.toString /etc/nixos/localhost+1.pem;
-    web_server_key = builtins.toString /etc/nixos/localhost+1-key.pem;
+    web_server_cert = toString /etc/nixos/localhost+1.pem;
+    web_server_key = toString /etc/nixos/localhost+1-key.pem;
     enforce_https_over_localhost = true;
 
     # /home/kpbaks/.nix-profile/bin/hx .
@@ -94,6 +92,27 @@
             GoToPreviousTab = [ ];
           };
         }
+        {
+          bind = {
+            _args = [ "Ctrl Home" ];
+            GotoTab = [ 1 ];
+          };
+        }
+        # FIXME: zellij should have an action like GotoFirstTab, GotoLastTab
+        {
+          bind = {
+            _args = [ "PageUp" ];
+            # https://zellij.dev/documentation/keybindings-possible-actions.html#halfpagescrollup
+            HalfPageScrollUp = [ ];
+          };
+        }
+        {
+          bind = {
+            _args = [ "PageDown" ];
+            # https://zellij.dev/documentation/keybindings-possible-actions.html#halfpagescrolldown
+            HalfPageScrollDown = [ ];
+          };
+        }
       ]
       ++ map (i: {
         bind = {
@@ -111,13 +130,21 @@
         # };
         _children = [
           {
+            bind = {
+              _args = [ "Alt t" ];
+              # https://zellij.dev/documentation/keybindings-possible-actions.html#launchorfocusplugin
+              LaunchOrFocusPlugin = {
+                _args = [ "zellij:session-manager" ];
+                floating = true;
+              };
+            };
             unbind = {
               _args = [
                 # disable alt+i and alt+o, as I use them in helix
                 "Alt i"
                 "Alt o"
                 "Ctrl o" # Used in helix
-                "Ctrl q" # Do not want to accidently quit
+                "Ctrl q" # Do not want to accidentally quit
               ];
             };
           }

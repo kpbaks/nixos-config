@@ -4,6 +4,9 @@
   pkgs,
   ...
 }:
+let
+  inherit (lib) getExe;
+in
 {
 
   # https://github.com/sodiboo/niri-flake/blob/main/docs.md#programsnirisettingsbinds
@@ -12,28 +15,25 @@
   programs.niri.settings.binds =
     with config.lib.niri.actions;
     let
-      terminal = lib.getExe config.default-application.terminal;
-      browser = lib.getExe config.default-application.browser;
+      terminal = getExe config.default-application.terminal;
+      browser = getExe config.default-application.browser;
       # sh = spawn "sh" "-c";
-      fish = spawn "${config.programs.fish.package}/bin/fish" "--no-config" "-c";
-      sh = spawn "sh" "-c";
       # nu = spawn "nu" "-c";
-      playerctl = spawn "playerctl";
-      # brightnessctl = spawn "brightnessctl";
-      # wpctl = spawn "wpctl"; # wireplumber
-      # bluetoothctl = spawn "bluetoothctl";
+      playerctl = spawn (getExe pkgs.playerctl);
+      brightnessctl = spawn (getExe pkgs.brightnessctl);
+      wpctl = spawn "${pkgs.wireplumber}/bin/wpctl"; # wireplumber
+      bluetoothctl = spawn "${pkgs.bluez}/bin/bluetoothctl";
       # swayosd-client = spawn "${config.services.swayosd.package}/bin/swayosd-client";
       swayosd-client = spawn "${pkgs.swayosd}/bin/swayosd-client";
-      run-flatpak = spawn "flatpak" "run";
       # browser = spawn "${pkgs.firefox}/bin/firefox";
       # browser = run-flatpak "io.github.zen_browser.zen";
       # run-in-terminal = spawn "kitty";
       # run-in-terminal = spawn "${pkgs.alacritty}/bin/alacritty";
       # run-in-terminal = spawn "${pkgs.kitty}/bin/kitty";
-      run-in-terminal = spawn terminal;
-      run-with-sh-within-terminal = run-in-terminal "sh" "-c";
+      # run-in-terminal = spawn terminal;
+      # run-with-sh-within-terminal = run-in-terminal "sh" "-c";
       # run-with-fish-within-terminal = run-in-terminal "sh" "-c";
-      run-with-fish-within-terminal = spawn terminal "${pkgs.fish}/bin/fish" "--no-config" "-c";
+      # run-with-fish-within-terminal = spawn terminal "${pkgs.fish}/bin/fish" "--no-config" "-c";
 
       # Mod+Ctrl+Shift+N { spawn "/home/myname/scripts/niri_win.sh" "goto" "org.wezfurlong.wezterm" "/home/myname/bin/wezterm --config enable_wayland=true"; }
       # Mod+Ctrl+Shift+E { spawn "/home/myname/scripts/niri_win.sh" "goto" "code-url-handler" "/usr/share/code/code --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform-hint=auto --unity-launch"; }
@@ -69,7 +69,7 @@
               }
             }
           '';
-      focus-or-spawn = spawn (lib.getExe focus-or-spawn-script);
+      focus-or-spawn = spawn (getExe focus-or-spawn-script);
     in
     # home.packages = [focus-or-spawn-script];
     # run-in-sh-within-kitty = spawn "kitty" "sh" "-c";
@@ -80,12 +80,18 @@
     #     value = {action = "focus-workspace ${toString n}";};
     #   }) (range 1 10));
     {
-      # "XF86AudioRaiseVolume".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+";
-      # "XF86AudioLowerVolume".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-";
-      "XF86AudioRaiseVolume".action = swayosd-client "--output-volume" "raise";
-      "XF86AudioLowerVolume".action = swayosd-client "--output-volume" "lower";
-      "XF86AudioMute".action = swayosd-client "--output-volume" "mute-toggle";
-      "XF86AudioMicMute".action = swayosd-client "--input-volume" "mute-toggle";
+      "XF86AudioRaiseVolume" = {
+        action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05+";
+        allow-when-locked = true;
+      };
+      "XF86AudioLowerVolume" = {
+        action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05-";
+        allow-when-locked = true;
+      };
+      # "XF86AudioRaiseVolume".action = swayosd-client "--output-volume" "raise";
+      # "XF86AudioLowerVolume".action = swayosd-client "--output-volume" "lower";
+      # "XF86AudioMute".action = swayosd-client "--output-volume" "mute-toggle";
+      # "XF86AudioMicMute".action = swayosd-client "--input-volume" "mute-toggle";
 
       # TODO: bind to an action that toggles light/dark theme
       # hint: it is the f12 key with a shaded moon on it
@@ -95,26 +101,43 @@
 
       # command = "${pkgs.swayosd}/bin/swayosd-client --output-volume mute-toggle";
       # command = "${pkgs.swayosd}/bin/swayosd-client --input-volume mute-toggle";
-      # "XF86AudioMute" = {
-      #   action = wpctl "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle";
-      #   allow-when-locked = true;
-      # };
-      # "XF86AudioMicMute" = {
-      #   action = wpctl "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle";
-      #   allow-when-locked = true;
-      # };
+      "XF86AudioMute" = {
+        action = wpctl "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle";
+        allow-when-locked = true;
+      };
+      "XF86AudioMicMute" = {
+        action = wpctl "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle";
+        allow-when-locked = true;
+      };
 
-      # "Mod+TouchpadScrollDown".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02+";
-      # "Mod+TouchpadScrollUp".action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02-";
-      "Mod+TouchpadScrollDown".action = swayosd-client "--output-volume" "+2";
-      "Mod+TouchpadScrollUp".action = swayosd-client "--output-volume" "-2";
-
-      "XF86AudioPlay".action = playerctl "play-pause";
-      "XF86AudioNext".action = playerctl "next";
-      "XF86AudioPrev".action = playerctl "previous";
-      "XF86AudioStop".action = playerctl "stop";
-      "XF86MonBrightnessUp".action = swayosd-client "--brightness" "raise";
-      "XF86MonBrightnessDown".action = swayosd-client "--brightness" "lower";
+      "Mod+TouchpadScrollDown" = {
+        action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02+";
+        allow-when-locked = true;
+      };
+      "Mod+TouchpadScrollUp" = {
+        action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02-";
+        allow-when-locked = true;
+      };
+      "XF86AudioPlay" = {
+        action = playerctl "play-pause";
+        allow-when-locked = true;
+      };
+      "XF86AudioNext" = {
+        action = playerctl "next";
+        allow-when-locked = true;
+      };
+      "XF86AudioPrev" = {
+        action = playerctl "previous";
+        allow-when-locked = true;
+      };
+      "XF86AudioStop" = {
+        action = playerctl "stop";
+        allow-when-locked = true;
+      };
+      # TODO: create a script that checks which monitor is focused and dispatches
+      # to the respective tool to increase/lower brightness on it
+      # "XF86MonBrightnessUp".action = swayosd-client "--brightness" "raise";
+      # "XF86MonBrightnessDown".action = swayosd-client "--brightness" "lower";
       # TODO: make variant for external displays
       # "Shift+XF86MonBrightnessUp".action = "ddcutil";
       # "Shift+XF86MonBrightnessDown".action = "ddcutil";
@@ -158,27 +181,23 @@
       "Mod+E".action = focus-or-spawn "org.kde.dolphin" "${pkgs.kdePackages.dolphin}/bin/dolphin";
       # P for pdf
       "Mod+P".action = focus-or-spawn "org.kde.okular" "${pkgs.kdePackages.okular}/bin/okular";
-      # "Mod+Z".action = focus-or-spawn "dev.zed.Zed" "${lib.getExe config.programs.zed-editor.package}";
-
-      # FIXME: does not work
-      # "Mod+A".action =
-      #   run-in-terminal "${pkgs.alsa-utils}/bin/alsamixer --black-background --mouse --view playback";
+      # "Mod+Z".action = focus-or-spawn "dev.zed.Zed" "${getExe config.programs.zed-editor.package}";
 
       # "Mod+P".action = spawn (
-      #   pkgs.lib.getExe scripts.search-clipboard-content-with-browser-search-engine
+      #   pkgs.getExe scripts.search-clipboard-content-with-browser-search-engine
       # );
 
       # "Mod+B".action = run-in-terminal "bluetoothctl" "--init-script" "/home/${username}/.local/share/bluetoothctl/init-script";
 
-      # (pkgs.lib.getExe bluetoothctl-init-script);
+      # (pkgs.getExe bluetoothctl-init-script);
       "f11".action = fullscreen-window;
       # "f3" = {
       #   # action = run-in-terminal "htop";
       #   action = spawn "ghostty" "-e" "htop";
       #   hotkey-overlay.title = "Open HTOP";
       # };
-      # "Shift+f11".action = spawn (pkgs.lib.getExe scripts.wb-toggle-visibility-or-spawn);
-      # "Mod+f11".action = spawn (pkgs.lib.getExe scripts.wb-toggle-visibility);
+      # "Shift+f11".action = spawn (pkgs.getExe scripts.wb-toggle-visibility-or-spawn);
+      # "Mod+f11".action = spawn (pkgs.getExe scripts.wb-toggle-visibility);
       "Mod+Q".action = close-window;
       "Mod+Shift+Q".action.quit.skip-confirmation = true;
 
@@ -235,7 +254,8 @@
 
       "Mod+Shift+Slash".action = show-hotkey-overlay;
       # "Mod+V".action = spawn "${pkgs.copyq}/bin/copyq" "menu";
-      "Mod+Shift+M".action = maximize-column;
+      # "Mod+Shift+M".action = maximize-column;
+      "Mod+M".action = maximize-column;
 
       # "Mod+K".action = spawn "${pkgs.kdePackages.kdeconnect-kde}/bin/kdeconnect-app";
       "Mod+K".action =
@@ -262,7 +282,7 @@
         focus-or-spawn "org.kde.plasma.emojier" "${pkgs.kdePackages.plasma-desktop}/bin/plasma-emojier";
       # TODO: color picker keybind
 
-      "Mod+M".action = focus-or-spawn "thunderbird" "${pkgs.thunderbird}/bin/thunderbird";
+      # "Mod+M".action = focus-or-spawn "thunderbird" "${pkgs.thunderbird}/bin/thunderbird";
 
       # // Actions to switch layouts.
       #    // Note: if you uncomment these, make sure you do NOT have
@@ -277,17 +297,17 @@
 
       "Mod+Page_Down".action = focus-workspace-down;
       "Mod+Page_Up".action = focus-workspace-up;
+      # "Mod+U".action = focus-workspace-down;
+      # "Mod+I".action = focus-workspace-up;
 
-      "Mod+U".action = focus-workspace-down;
-      "Mod+I".action = focus-workspace-up;
-
-      "Print".action = screenshot; # { show-pointer = false; };
+      # "Print".action = screenshot; # { show-pointer = false; };
       # "Ctrl+Print".action = screenshot-screen { write-to-disk = true; };
-      "Alt+Print".action = screenshot-window; # { write-to-disk = true; };
+      # "Alt+Print".action = screenshot-window { write-to-disk = true; };
 
       # // Switches focus between the current and the previous workspace.
-      "Mod+Tab".action = focus-workspace-previous;
-      "Mod+Shift+Tab".action = focus-monitor-previous;
+      # "Mod+Tab".action = focus-workspace-previous;
+      "Mod+Tab".action = focus-monitor-previous;
+      "Mod+Shift+Tab".action = focus-workspace-previous;
       # "Mod+Return".action = spawn "anyrun";
       # "Mod+Return".action = fish "pidof anyrun; and pkill anyrun; or anyrun";
       # "Mod+Return".action = fish "pidof nwg-drawer; and pkill nwg-drawer; or nwg-drawer -ovl -fm dolphin";
@@ -319,26 +339,21 @@
       # "Mod+Shift+R".action = reset-window-height;
       "Mod+C".action = center-column;
 
-      "Mod+W".action = toggle-column-tabbed-display;
+      # "Mod+W".action = toggle-column-tabbed-display;
 
       # "Mod+Shift+Tab" = {
       #   action = toggle-overview;
       # };
 
-      "Mod+Return" = {
-        action = toggle-overview;
-      };
-
-      "Mod+BackSpace" = {
-        action = focus-window-previous;
-      };
+      "Mod+Return".action = toggle-overview;
+      "Mod+BackSpace".action = focus-window-previous;
       # TODO: implement
       # "Mod+BackSpace".action = focus-last-window;
 
       # TODO: keybind to switch all windows between two outputs/monitors. Use `niri msg windows` to figure out which output windows are on
 
       # "Mod+Z".action = center-column; # kinda like `zz` in helix
-      # "Mod+Z".action = spawn (pkgs.lib.getExe pkgs.woomer);
+      # "Mod+Z".action = spawn (pkgs.getExe pkgs.woomer);
       # "Mod+Z".action
 
     };

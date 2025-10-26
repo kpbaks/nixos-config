@@ -79,7 +79,7 @@ let
 in
 {
   # https://git-scm.com/docs/git-init#Documentation/git-init.txt-codeinittemplateDircode
-  programs.git.extraConfig.init.templateDir = lib.mkDefault templateDir;
+  programs.git.settings.init.templateDir = lib.mkDefault templateDir;
 
   # https://github.com/CompSciLauren/awesome-git-hooks
   xdg.dataFile = {

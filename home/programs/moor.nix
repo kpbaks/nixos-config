@@ -1,9 +1,9 @@
 { pkgs, ... }:
 {
-  home.packages = with pkgs; [ moar ];
+  home.packages = with pkgs; [ moor ];
 
   home.sessionVariables = {
-    PAGER = "${pkgs.moar}/bin/moar";
+    PAGER = "${pkgs.moor}/bin/moor";
     MOAR = builtins.concatStringsSep " " [
       "-statusbar=bold"
       "-no-linenumbers"

@@ -7,6 +7,9 @@
   # username,
   ...
 }:
+let
+  jsonFormat = pkgs.formats.json { };
+in
 {
   imports = [
     inputs.plasma-manager.homeModules.plasma-manager
@@ -163,24 +166,24 @@
   home.packages =
     with pkgs.kdePackages;
     [
-      neochat
+      # neochat
       # klevernotes
-      akregator
-      kasts
-      merkuro
-      itinerary
-      kolourpaint
-      krohnkite
+      # akregator
+      # kasts
+      # merkuro
+      # itinerary
+      # kolourpaint
+      # krohnkite
     ]
     ++ (with pkgs; [
-      plasma-panel-colorizer
+      # plasma-panel-colorizer
       # libsForQt5.plasma-bigscreen
     ]);
 
   # TODO: verify if this make the browser integration work with zen-browser
   # https://github.com/zen-browser/desktop/issues/349
   home.file.".mozilla/native-messaging-hosts/org.kde.plasma.browser_integration.json".source =
-    (pkgs.formats.json { }).generate "plasma_browser_integration_json"
+    jsonFormat.generate "plasma_browser_integration_json"
       {
         allowed_extensions = [ "plasma-browser-integration@kde.org" ];
         description = "Native connector for KDE Plasma";

@@ -749,8 +749,9 @@
   #   compose_warning_logs = false;
   # };
 
+  virtualisation.docker.enable = true;
   virtualisation.podman = {
-    enable = true;
+    enable = false;
     extraPackages = [
       pkgs.gvisor
     ];
@@ -769,6 +770,7 @@
   location.provider = "geoclue2";
 
   # show dots when typing password for sudo
+  # TODO: create or find tree-sitter grammar for this syntax and integrate into helix
   security.sudo.extraConfig = ''
     Defaults env_reset,pwfeedback
   '';
@@ -939,7 +941,7 @@
 
   systemd.oomd.enable = true;
   systemd.oomd.enableUserSlices = true;
-  systemd.oomd.extraConfig = { };
+  # systemd.oomd.extraConfig = { };
   # services.earlyoom.enable = true;
 
   # TODO(ons 18 sep 10:53:21 CEST 2024): figure out how to configure `niri` and logind

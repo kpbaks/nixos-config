@@ -2,7 +2,7 @@
   imports = [
     ./anki.nix
     # ./appflowy.nix
-    # ./atuin.nix
+    ./atuin.nix
     ./bacon.nix
     ./bat.nix
     # ./beeper.nix
@@ -18,7 +18,7 @@
     ./gdb.nix
     ./hwatch.nix
     ./gum.nix
-    ./moar.nix
+    ./moor.nix
     # ./mpv.nix
     # ./noti.nix
     # ./obs-studio.nix

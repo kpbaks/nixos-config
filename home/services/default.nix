@@ -10,7 +10,7 @@
     ./wlsunset.nix
     ./wluma.nix
     # ./pueue.nix
-    ./copyq.nix
+    # ./copyq.nix
   ];
 
   services.trayscale.enable = false;

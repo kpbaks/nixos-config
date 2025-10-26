@@ -7,7 +7,7 @@
       # https://github.com/jesseduffield/lazygit/blob/master/docs/Custom_Pagers.md#using-external-diff-commands
       git = {
         parseEmoji = true;
-        paging.externalDiffCommand = "${config.programs.git.difftastic.package}/bin/difft --color=always --display=inline";
+        paging.externalDiffCommand = "${config.programs.difftastic.package}/bin/difft --color=always --display=inline";
       };
       notARepository = "quit";
       disableStartupPopups = false;

@@ -1,8 +1,4 @@
-{
-  config,
-  pkgs,
-  ...
-}:
+{ pkgs, ... }:
 let
   tomlFormat = pkgs.formats.toml { };
 in
@@ -41,6 +37,7 @@ in
     ./xdg
     ./obsidian.nix
     ./tldr.nix
+    ./k8s-dev.nix
   ];
 
   # TODO: set up `localsend` service to start in background
@@ -130,11 +127,6 @@ in
   # custom-modules/gitu.nix
 
   # programs.nix-your-shell.enable = true;
-
-  programs.kubecolor = {
-    enable = false;
-    enableAlias = true;
-  };
 
   programs.nix-init = {
     enable = true;
@@ -243,4 +235,13 @@ in
     sort = "lines";
     num-format = "underscores";
   };
+
+  programs.asciinema.enable = true;
+  # programs.amp.enable = true;
+  # programs.andcli.enable = true;
+  # programs.anup.enable = true;
+  # services.autotiling.enable = false;
+  # programs.anvil-editor.enable = true;
+
+  # services.wl-clip-persist.enable = true;
 }

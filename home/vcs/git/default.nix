@@ -51,7 +51,7 @@
     ]
     ++ (builtins.attrValues inputs.git-subcommands.packages.${pkgs.stdenv.system});
 
-  programs.git.mergiraf.enable = true;
+  # programs.git.mergiraf.enable = true;
 
   # TODO: create wrapper script that uses `kitty` for diff program, if `git diff` is called in a kitty window,
   # and uses difftastic otherwise.
@@ -60,9 +60,12 @@
     enable = true;
     # package = pkgs.git.override { guiSupport = true; };
     package = pkgs.git;
-    userName = config.home.username;
-    userEmail = config.personal.email;
-    extraConfig = {
+
+    settings = {
+      user = {
+        name = config.home.username;
+        email = config.personal.email;
+      };
       # core.fsmonitor = true;
       # core.untrackedCache = true;
       color.ui = "auto";
@@ -141,47 +144,52 @@
       rerere.autoupdate = true;
       # https://graphite.dev/guides/git-blame-ignore-revs
       blame.ignoreRevsFile = ".git-blame-ignore-revs";
-    };
 
-    # TODO: how to handle subshells across shells e.g. `$(...)` in bash and `()` in fish
-    aliases = rec {
-      ls = "log --graph --oneline";
-      la = "${ls} --all";
-      wta = "worktree add";
-      wtl = "worktree list";
-      wtr = "worktree remove";
-      unstage = "reset HEAD --";
-      # downloads commits and trees while fetching blobs on-demand
-      # this is better than a shallow git clone --depth=1 for many reasons
-      clone-partial = "clone --filter=blob:none";
-      # fixup = "!git log -n 50 --pretty=format:'%h %s' --no-merges | fzf | cut -c -7 | xargs -o git commit --fixup"
-      # https://jordanelver.co.uk/blog/2020/06/04/fixing-commits-with-git-commit-fixup-and-git-rebase-autosquash/
-      # fixup = "!${config.programs.git.package}/bin/git log -n 50 --pretty=format:'%h %s' --no-merges | ${config.programs.fzf.package}/bin/fzf --ansi";
-      track-untracked = "add --intent-to-add (git ls-files --others --exclude-standard)";
-    };
-    attributes = [ "*.pdf diff=pdf" ];
-    delta = {
-      enable = true;
-      options = {
-        decorations = {
-          commit-decoration-style = "bold yellow box ul";
-          file-decoration-style = "none";
-          file-style = "bold yellow ul";
-        };
-        features = "decorations";
-        whitespace-error-style = "22 reverse";
+      # TODO: how to handle subshells across shells e.g. `$(...)` in bash and `()` in fish
+      aliases = rec {
+        ls = "log --graph --oneline";
+        la = "${ls} --all";
+        wta = "worktree add";
+        wtl = "worktree list";
+        wtr = "worktree remove";
+        unstage = "reset HEAD --";
+        # downloads commits and trees while fetching blobs on-demand
+        # this is better than a shallow git clone --depth=1 for many reasons
+        clone-partial = "clone --filter=blob:none";
+        # fixup = "!git log -n 50 --pretty=format:'%h %s' --no-merges | fzf | cut -c -7 | xargs -o git commit --fixup"
+        # https://jordanelver.co.uk/blog/2020/06/04/fixing-commits-with-git-commit-fixup-and-git-rebase-autosquash/
+        # fixup = "!${config.programs.git.package}/bin/git log -n 50 --pretty=format:'%h %s' --no-merges | ${config.programs.fzf.package}/bin/fzf --ansi";
+        track-untracked = "add --intent-to-add (git ls-files --others --exclude-standard)";
       };
     };
-    difftastic = {
-      enable = false;
-      display = "side-by-side-show-both";
-    };
+
+    attributes = [ "*.pdf diff=pdf" ];
 
     lfs.enable = true;
     ignores = [
       # "**/.envrc"
       "**/.direnv"
     ];
+  };
+
+  programs.delta = {
+    enable = true;
+    enableGitIntegration = true;
+    options = {
+      decorations = {
+        commit-decoration-style = "bold yellow box ul";
+        file-decoration-style = "none";
+        file-style = "bold yellow ul";
+      };
+      features = "decorations";
+      whitespace-error-style = "22 reverse";
+    };
+  };
+
+  programs.difftastic = {
+    enable = false;
+    # enableGitIntegration = false;
+    options.display = "side-by-side-show-both";
   };
 
   programs.git-cliff.enable = true;

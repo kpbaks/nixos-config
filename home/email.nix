@@ -3,7 +3,7 @@
   # programs.aerc.enable = true;
 
   home.packages = with pkgs; [
-    birdtray
+    # birdtray
     thunderbird # email client
   ];
 

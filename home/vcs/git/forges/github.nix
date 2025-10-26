@@ -39,7 +39,7 @@
       defaults = {
         preview.width = 60;
       };
-      pager.diff = "${lib.getExe pkgs.moar}";
+      pager.diff = "${lib.getExe pkgs.moor}";
       # TODO: disable escape
       keybindings = {
         universal = [

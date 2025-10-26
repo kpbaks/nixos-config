@@ -7,6 +7,9 @@
   ...
 }:
 {
+  home.packages = with pkgs; [
+    atuin-desktop
+  ];
 
   # TODO: 1. add pr to add a `shell` column to the `history` sqlite table, to differentiate between
   #    commands that are valid in `fish` and not in `nushell` and vice versa.
@@ -42,26 +45,26 @@
     theme.name = "marine";
     stats = {
       common_subcommands = [
-        "apt"
+        # "apt"
         "cargo"
-        "composer"
-        "dnf"
+        # "composer"
+        # "dnf"
         "docker"
         "git"
         "go"
-        "ip"
+        # "ip"
         "kubectl"
         "nix"
-        "nmcli"
-        "npm"
-        "pecl"
-        "pnpm"
+        # "nmcli"
+        # "npm"
+        # "pecl"
+        # "pnpm"
         "podman"
-        "port"
+        # "port"
         "systemctl"
         "journalctl"
-        "tmux"
-        "yarn"
+        # "tmux"
+        # "yarn"
       ];
       common_prefix = [
         "doas"
@@ -75,7 +78,7 @@
         "pwd"
       ];
     };
-    daemon.enabled = false;
+    daemon.enabled = true;
   };
 
   # lib.mkIf config.atuin.settings.daemon.enabled
