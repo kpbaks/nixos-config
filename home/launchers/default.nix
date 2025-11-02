@@ -4,5 +4,6 @@
     # ./tofi.nix
     # ./walker.nix
     ./sherlock.nix
+    ./vicinae.nix
   ];
 }
