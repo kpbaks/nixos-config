@@ -5,8 +5,11 @@
   ...
 }:
 {
-
   programs.zellij.enable = true;
+  home.sessionVariables = {
+    ZELLIJ_AUTO_ATTACH = lib.mkForce "false";
+    ZELLIJ_AUTO_EXIT = lib.mkForce "false";
+  };
   # TODO: how to start zellij with `zellij --layout welcome`
   # TODO: prevent integration if terminal is embedded in another program,
   # ala. in kate or dolphin or vscode
@@ -25,7 +28,12 @@
     lib.optionalString (!config.programs.zellij.enableFishIntegration)
       # fish
       ''
-        if set -q XDG_CURRENT_DESKTOP; and test $XDG_CURRENT_DESKTOP != niri
+        # WINDOWID is set when in KDE Dolphins embedded terminal
+        # KATE_PID=17749
+        # ZED_TERM=true
+        # TUIOS_WINDOW_ID=c4abe8b9-c57b-41b4-a495-37e1fbcbb943
+        if not set -q WINDOWID; and not set -q KATE_PID; and not set -q ZED_TERM; and not set -q TUIOS_WINDOW_ID
+        # if set -q XDG_CURRENT_DESKTOP; and test $XDG_CURRENT_DESKTOP != niri
           eval (${config.programs.zellij.package}/bin/zellij setup --generate-auto-start fish | string collect)
         end
       '';
@@ -64,7 +72,7 @@
     ui.pane_frames.hide_session_name = false;
 
     # https://zellij.dev/tutorials/web-client/
-    web_server = true;
+    web_server = false;
     # Generated with `nix run nixpkgs#mkcert -install localhost 127.0.0.1`
     web_server_cert = toString /etc/nixos/localhost+1.pem;
     web_server_key = toString /etc/nixos/localhost+1-key.pem;
@@ -95,7 +103,7 @@
         {
           bind = {
             _args = [ "Ctrl Home" ];
-            GotoTab = [ 1 ];
+            GoToTab = [ 1 ];
           };
         }
         # FIXME: zellij should have an action like GotoFirstTab, GotoLastTab
@@ -197,11 +205,6 @@
   #     end
   #   '';
 
-  home.sessionVariables = {
-    # ZELLIJ_AUTO_ATTACH = "true";
-    # ZELLIJ_AUTO_EXIT = "false";
-  };
-
   # TODO: condition on `lib.versionAtLeast cfg.package.version "0.43.0"` and the package being compiled
   # with web server support, and cfg.enable
   systemd.user.services.zellij-web-server = {
@@ -229,5 +232,4 @@
 
     Install.WantedBy = [ "multi-user.target" ];
   };
-
 }

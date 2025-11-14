@@ -15,6 +15,7 @@
     ./wacom-intuos.nix
     ./power-management.nix
     ./steam.nix
+    ./wireguard.nix
     # ./hdmi-cec.nix
     # ./tuxedo-laptop-second-nvme-drive.nix
   ];
@@ -1034,4 +1035,12 @@
   # resurrection
   programs.criu.enable = true;
   programs.systemtap.enable = false;
+
+  # Nicing the nix daemon is a great way to let it automatically get pushed to the back of the line when you're using the machine while still being able to utilize all of it for builds that are holding up your launch.
+  # ref: https://positron.solutions/articles/building-nicely-with-rust-and-nix
+  systemd.services.nix-daemon.serviceConfig = {
+    Nice = lib.mkForce 15;
+    IOSchedulingClass = lib.mkForce "idle";
+    IOSchedulingPriority = lib.mkForce 7;
+  };
 }

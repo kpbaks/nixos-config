@@ -1,13 +1,43 @@
-{ config, pkgs, ... }:
+{
+  self,
+  config,
+  pkgs,
+  ...
+}:
+let
+  git = "${config.programs.git.package}/bin/git";
+  delta = "${config.programs.delta.package}/bin/delta";
+  mergiraf = "${config.programs.mergiraf.package}/bin/mergiraf";
+in
 {
   programs.lazygit = {
     enable = true;
     # changeDirOnExit = true;
     settings = {
+      promptToReturnFromSubprocess = false;
+      confirmOnQuit = false;
+      update = {
+        method = "never";
+      };
       # https://github.com/jesseduffield/lazygit/blob/master/docs/Custom_Pagers.md#using-external-diff-commands
       git = {
+        signOff = true;
+        merging = {
+          args = "--no-ff";
+        };
+        skipHookPrefix = "WIP!";
         parseEmoji = true;
-        paging.externalDiffCommand = "${config.programs.difftastic.package}/bin/difft --color=always --display=inline";
+        branchLogCmd = ''${git} log --all --oneline --graph --color=always --abbrev-commit --date=relative --decorate {{branchName}} --'';
+
+        # paging.externalDiffCommand = "${config.programs.difftastic.package}/bin/difft --color=always --display=inline";
+        pagers = [
+          {
+            pager = ''${delta} --dark --paging=never --line-numbers --hyperlinks --hyperlinks-file-link-format="lazygit-edit://{path}:{line}"'';
+          }
+          {
+            useExternalDiffGitConfig = true;
+          }
+        ];
       };
       notARepository = "quit";
       disableStartupPopups = false;
@@ -20,6 +50,8 @@
         showBranchCommitHash = true;
         showDivergenceFromBaseBranch = "arrowAndNumber";
         filterMode = "fuzzy";
+        border = "single";
+        statusPanelView = "allBranchesLog";
         spinner.frames = [
           "⣷"
           "⣯"
@@ -33,49 +65,96 @@
         sidePanelWidth = 0.5;
         # windowSize = "half";
 
+        theme = {
+          activeBorderColor = [
+            "yellow"
+            "bold"
+          ];
+          inactiveBorderColor = [ "black" ];
+        };
+
         mainBranches = [
           "master"
           "main"
         ];
-        # TODO: highlight mainBranches
-        # FIXME: does not get highlighted
-        branchColors = {
-          "^feature/" = "#00ff00";
-          "^docs/" = "#11aaff"; # use a light blue for branches beginning with 'docs/'
+
+        # https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md#color-attributes
+        branchColorPatterns = {
+          "^(main|master)$" = "red";
+          # "^(${builtins.concatStringsSep "|" gui.mainBranches})$" = "red";
+          "'^docs/'" = "#11aaff"; # use a light blue for branches beginning with 'docs/'
+          "ISSUE-\d+" = "#ff5733"; # use a bright orange for branches containing 'ISSUE-<some-number>'
+          "^feature/" = "green";
+          "^feat/" = "green";
           "^hotfix/" = "red";
           "^bugfix/" = "yellow";
+          "^release/" = "magenta";
         };
-        # branchColors = with config.flavor; {
-        #   "feature" = green.hex;
-        #   "hotfix" = maroon.hex;
-        #   "release" = lavender.hex;
-        #   "bugfix" = peach.hex;
-        #   "doc" = yellow.hex;
-        # };
+      };
 
+      os = {
+        # https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md#custom-command-for-copying-to-and-pasting-from-clipboard
+        copyToClipboardCmd = ''printf "\033]52;c;$(printf {{text}} | base64 -w 0)\a" > /dev/tty'';
       };
 
       quitOnTopLevelReturn = false;
-      #   gui.theme = {
-      #     lightTheme = true;
-      #   };
 
-      # customCommands = [
-      #   # {
-      #   #   key = "v";
-      #   #   context = "localBranches";
-      #   # }
-      #   {
-      #     # https://github.com/jesseduffield/lazygit/wiki/Custom-Commands-Compendium#committing-via-commitizen-cz-c
-      #     key = "C";
-      #     # FIXME: command seems wrong
-      #     command = "${pkgs.git}/bin/git cz c";
-      #     description = "commit with commitizen";
-      #     context = "files";
-      #     loadingText = "opening commitizen commit tool";
-      #     subProcess = true;
-      #   }
-      # ];
+      customCommands = [
+        {
+          # TODO: add command to use `git-absorb`
+          key = "<c-a>";
+          context = "files";
+          description = "git absorb";
+          command = "${pkgs.git-absorb} --one-fixup-per-commit";
+          output = "logWithPty";
+        }
+        {
+          key = "m";
+          context = "files";
+          description = "resolve merge conflicts with `mergiraf solve`";
+          # TODO: constrain to only be available on files with merge conflict markers
+          command = "${mergiraf} solve {{.SelectedFile.Name | quote}}";
+          output = "logWithPty";
+          # after.checkForConflicts = true;
+        }
+        {
+          key = "n";
+          context = "localBranches";
+          prompts = [
+            {
+              type = "menu";
+              title = "What kind of branch is it?";
+              key = "BranchType";
+              options = [
+                {
+                  name = "feature";
+                  description = "a feature branch";
+                  value = "feature";
+                }
+                {
+                  name = "hotfix";
+                  description = "a hotfix branch";
+                  value = "hotfix";
+                }
+                {
+                  name = "release";
+                  description = "a release branch";
+                  value = "release";
+                }
+              ];
+            }
+            {
+              type = "input";
+              title = "What is the new branch name?";
+              key = "BranchName";
+              initialValue = "";
+            }
+          ];
+          command = ''${git} branch "{{.Form.BranchType}}/{{.Form.BranchName}}" && ${git} branch --edit-description "{{.Form.BranchType}}/{{.Form.BranchName}}"'';
+          loadingText = "Creating branch";
+          output = "terminal";
+        }
+      ];
 
       keybindings = {
         universal = {

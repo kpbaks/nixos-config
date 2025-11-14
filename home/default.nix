@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ inputs, pkgs, ... }:
 let
   tomlFormat = pkgs.formats.toml { };
 in
@@ -38,6 +38,7 @@ in
     ./obsidian.nix
     ./tldr.nix
     ./k8s-dev.nix
+    inputs.git-new.homeModules.default
   ];
 
   # TODO: set up `localsend` service to start in background

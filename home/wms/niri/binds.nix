@@ -278,8 +278,8 @@ in
       # TODO: improve by checking if an editor process instance is already running, before spawning another
       # "Mod+Comma".action = run-with-fish-within-terminal "hx ~/dotfiles/{flake,configuration}.nix";
       # "Mod+Period".action = spawn "${pkgs.swaynotificationcenter}/bin/swaync-client" "--toggle-panel";
-      "Mod+Period".action =
-        focus-or-spawn "org.kde.plasma.emojier" "${pkgs.kdePackages.plasma-desktop}/bin/plasma-emojier";
+      # "Mod+Period".action =
+      #   focus-or-spawn "org.kde.plasma.emojier" "${pkgs.kdePackages.plasma-desktop}/bin/plasma-emojier";
       # TODO: color picker keybind
 
       # "Mod+M".action = focus-or-spawn "thunderbird" "${pkgs.thunderbird}/bin/thunderbird";

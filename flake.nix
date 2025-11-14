@@ -12,6 +12,7 @@
       "https://yazi.cachix.org"
       # "https://cache.garnix.io" # used by `ironbar`
       # "https://watersucks.cachix.org"
+      "https://vicinae.cachix.org"
     ];
     extra-trusted-public-keys = [
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
@@ -21,6 +22,7 @@
       "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
       # "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
       # "watersucks.cachix.org-1:6gadPC5R8iLWQ3EUtfu3GFrVY7X6I4Fwz/ihW25Jbv8="
+      "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="
     ];
   };
 
@@ -40,6 +42,7 @@
       url = "github:nix-community/nixGL";
     };
     jail-nix.url = "sourcehut:~alexdavid/jail.nix";
+    vicinae.url = "github:vicinaehq/vicinae";
 
     plasma-manager = {
       url = "github:pjones/plasma-manager";
@@ -117,6 +120,10 @@
     git-subcommands = {
       url = "git+https://codeberg.org/kpbaks/git-subcommands.git";
       # inputs.nixpkgs.follows = "nixpkgs";
+    };
+    git-new = {
+      url = "git+https://codeberg.org/kpbaks/git-new.git";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     my-scripts = {
       url = "git+https://codeberg.org/kpbaks/scripts.git";

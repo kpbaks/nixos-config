@@ -78,17 +78,20 @@ in
         with config.lib.niri.actions;
         let
           ipc = spawn (lib.getExe noctalia-shell) "ipc" "call";
-        in
-        {
-          "Mod+Comma" = {
+          toggle-settings-menu = {
             action = ipc "settings" "toggle";
             hotkey-overlay.title = "Toggle Settings Menu";
-          };
-          "Mod+Slash" = {
-            action = ipc "launcher" "toggle";
-            hotkey-overlay.title = "Toggle Application Launcher";
             repeat = false;
           };
+        in
+        {
+          "Mod+Comma" = toggle-settings-menu;
+          "Mod+I" = toggle-settings-menu; # Like on Windows
+          # "Mod+Slash" = {
+          #   action = ipc "launcher" "toggle";
+          #   hotkey-overlay.title = "Toggle Application Launcher";
+          #   repeat = false;
+          # };
           # TODO: bind to an action that toggles light/dark theme
           # hint: it is the f12 key with a shaded moon on it
           "XF86Sleep" = {
@@ -96,13 +99,13 @@ in
             hotkey-overlay.title = "Toggle Dark Mode";
             repeat = false;
           };
-          "Mod+V" = {
-            action = ipc "launcher" "clipboard";
-            hotkey-overlay.title = "Open Clipboard History Menu";
-            repeat = false;
-          };
+          # "Mod+V" = {
+          #   action = ipc "launcher" "clipboard";
+          #   hotkey-overlay.title = "Open Clipboard History Menu";
+          #   repeat = false;
+          # };
           "Mod+L" = {
-            action = ipc "lockScreen" "toggle";
+            action = ipc "lockScreen" "lock";
             hotkey-overlay.title = "Toggle Lockscreen";
             repeat = false;
           };

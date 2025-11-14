@@ -225,7 +225,7 @@
       # kate # text editor
       duf # disk usage viewer
       dysk
-      du-dust # calculate directory sizes. `du` replacement
+      dust # calculate directory sizes. `du` replacement
       # eza # `ls` replacement
       tokei # count SLOC in a directory
       # hexyl # hex editor

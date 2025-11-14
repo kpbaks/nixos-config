@@ -10,6 +10,7 @@
 {
   imports = [
     ./forges
+    ./hooks
     ./lazygit.nix
     ./subcommands
     ./git-ab.nix
@@ -62,9 +63,18 @@
     package = pkgs.git;
 
     settings = {
+      advice = {
+        detachedHead = true;
+      };
+      feature.experimental = true;
       user = {
         name = config.home.username;
         email = config.personal.email;
+      };
+      core = {
+        whitespace = "trailing-space,space-before-tab";
+        # fsmonitor = true;
+        # untrackedCache = true;
       };
       # core.fsmonitor = true;
       # core.untrackedCache = true;
@@ -95,7 +105,6 @@
       color.advice.hint = "magenta bold";
       column.ui = "auto";
       branch.sort = "-committerdate";
-      tag.sort = "version:refname";
       help.format = "man";
       help.autoCorrect = "prompt";
       diff.algorithm = "histogram";
@@ -104,7 +113,7 @@
       diff.renames = true;
       push = {
         autoSetupRemote = true;
-        default = "nothing";
+        # default = "nothing"; # NOTE: disable until this lazygit issue has been resolved (https://github.com/jesseduffield/lazygit/issues/3140)
         followTags = true;
         negotiate = true;
       };
@@ -114,8 +123,12 @@
       fetch.recurseSubmodules = "on-demand";
       fetch.output = "compact";
       fetch.all = true;
-      grep.patternType = "perl";
-      grep.lineNumber = true;
+      grep = {
+        patternType = "perl";
+        lineNumber = true;
+        column = true;
+        fullname = true;
+      };
       blame.coloring = "highlightRecent";
       blame.showEmail = false;
       # feature.experimental = true;
@@ -124,26 +137,42 @@
       init.defaultBranch = "main";
       # pull.ff = "only";
       pull.rebase = false;
-      merge.conflictstyle = "zdiff3";
-      merge.tool = "smerge"; # sublime merge
+      merge.conflictstyle = "diff3"; # NOTE: we want to use diff3 and not zdiff3 as `mergiraf` requires diff3 (https://mergiraf.org/usage.html)
+      merge.tool = "smerge"; # sublime merge # FIXME: ensure tool is installed
       # mergetool.smerge.path = "${lib.getExe pkgs.sublime-sublime-merge}";
       # rebase.autostash = true;
       commit.verbose = true;
-      rebase.stat = true;
-      rebase.autoSquash = true;
-      rebase.autoStash = true;
-      rebase.updateRefs = true;
+      rebase = {
+        stat = true;
+        abbreviateCommands = true;
+        autoSquash = true;
+        autoStash = true;
+        updateRefs = true; # Needed for "stacked branches" https://github.com/jesseduffield/lazygit/blob/master/docs/Stacked_Branches.md
+      };
       stash.showStat = true;
+      # stash.showPatch = true;
+      #
       status.branch = true;
       status.aheadBehind = true;
       status.showStash = true;
       status.submoduleSummary = true;
       # status.showUntrackedFiles = "no";
       tag.forceSignAnnotated = true;
-      rerere.enabled = true;
-      rerere.autoupdate = true;
+      tag.gpgSign = true;
+      tag.sort = "version:refname";
+
+      rerere = {
+        enabled = true;
+        autoupdate = true;
+      };
       # https://graphite.dev/guides/git-blame-ignore-revs
       blame.ignoreRevsFile = ".git-blame-ignore-revs";
+      url = {
+        "ssh://git@github.com".insteadOf = "gh";
+        "ssh://git@gitlab.com".insteadOf = "glab";
+        "ssh://git@codeberg.org".insteadOf = "codeberg";
+        "ssh://git@gitlab.com:beumer-group/../data-analytics".insteadOf = "da";
+      };
 
       # TODO: how to handle subshells across shells e.g. `$(...)` in bash and `()` in fish
       aliases = rec {
@@ -159,11 +188,17 @@
         # fixup = "!git log -n 50 --pretty=format:'%h %s' --no-merges | fzf | cut -c -7 | xargs -o git commit --fixup"
         # https://jordanelver.co.uk/blog/2020/06/04/fixing-commits-with-git-commit-fixup-and-git-rebase-autosquash/
         # fixup = "!${config.programs.git.package}/bin/git log -n 50 --pretty=format:'%h %s' --no-merges | ${config.programs.fzf.package}/bin/fzf --ansi";
-        track-untracked = "add --intent-to-add (git ls-files --others --exclude-standard)";
+        track-untracked = "!git add --intent-to-add $(git ls-files --others --exclude-standard)";
+        # ref: https://stackoverflow.com/a/5189296
+        first-commit = "rev-list --max-parents=0 HEAD";
+        first = "rev-list --max-parents=0 HEAD";
+        # (r)emove (u)ntracked (f)iles
+        ruf = "!git ls-files --other --exclude-standard | xargs rm -rf";
+        dirty = "diff --quiet";
       };
     };
 
-    attributes = [ "*.pdf diff=pdf" ];
+    # attributes = [ "*.pdf diff=pdf" ];
 
     lfs.enable = true;
     ignores = [

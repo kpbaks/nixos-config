@@ -88,10 +88,10 @@ in
         # TODO: if running in zellij only run if in a single pane tab
         # AFAICT zellij does not expose a way through the `zellij` binary of querying
         # number of panes in a tab.
-        if set -q ZELLIJ
-          ${cmd}i
-        else
-          ${cmd}i
-        end
+        # if set -q ZELLIJ
+        #   ${cmd}i
+        # else
+        #   ${cmd}i
+        # end
       '';
 }
