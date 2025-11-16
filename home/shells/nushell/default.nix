@@ -123,16 +123,6 @@
         # TODO: implement
         def modified [] { ${pkgs.git}/bin/git ls-files --others --exclude-standard | lines }
 
-        # def "config diff" [] {
-        #   if $env.KITTY_PID? != null {
-        #     let default_config = (^mktemp --suffix=.nu)
-        #     config nu --default | save --force $default_config
-        #     ${pkgs.kitty}/bin/kitten diff $default_config $nu.config-path
-        #     rm $default_config
-        #   } else {
-        #     config nu --default | ${pkgs.lib.getExe config.programs.vscode.package} --diff - $nu.config-path
-        #   }
-        # }
 
 
         # def --env cdn [] { cd /etc/nixos; $t{config.programs.helix.package}/bin/hx flake.nix }
