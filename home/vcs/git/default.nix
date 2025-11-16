@@ -23,6 +23,8 @@
   home.packages =
     with pkgs;
     [
+      meld # `git mergetool`
+      sublime-merge # `git mergetool smerge`
       # gitbutler
       # gitoxide
       delta
@@ -35,20 +37,16 @@
       # ghostie
       # github-backup
       # github-to-sqlite
-      # serie # rich git commit graph terminal
+      serie # rich git commit graph terminal
       # git-interactive-rebase-tool
       # git-branchless
       # git-brunch
       # git-branchstack
       # git-bars
-      # gitleaks
-      # commitizen
-      # git-workspace
       git-absorb
       # lighttpd # needed by `git instaweb`
       # dependabot-cli
       # git-doc
-      # sublime-merge
     ]
     ++ (builtins.attrValues inputs.git-subcommands.packages.${pkgs.stdenv.system});
 
@@ -138,8 +136,13 @@
       # pull.ff = "only";
       pull.rebase = false;
       merge.conflictstyle = "diff3"; # NOTE: we want to use diff3 and not zdiff3 as `mergiraf` requires diff3 (https://mergiraf.org/usage.html)
-      merge.tool = "smerge"; # sublime merge # FIXME: ensure tool is installed
+      merge.tool = "meld";
+
       # mergetool.smerge.path = "${lib.getExe pkgs.sublime-sublime-merge}";
+      mergetool = {
+        prompt = false;
+        keepBackup = false;
+      };
       # rebase.autostash = true;
       commit.verbose = true;
       rebase = {
