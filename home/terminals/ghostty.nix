@@ -66,6 +66,11 @@ in
       clipboard-paste-protection = false;
       clipboard-paste-bracketed-safe = false;
       copy-on-select = true;
+      selection-clear-on-copy = true;
+      cursor-style-blink = true;
+      cursor-click-to-move = true;
+      split-divider-color = "#a6e3a1";
+      link-previews = true;
       # theme = Hardcore
       # theme = tokyonight
       # theme = GruvboxDarkHard
@@ -93,24 +98,55 @@ in
       # TODO: use if merged https://github.com/hackr-sh/ghostty-shaders/pull/47
       # custom-shader = "${inputs.ghostty-shaders}/cursor_blaze.glsl";
       # custom-shader = "${inputs.ghostty-shaders}/spotlight.glsl";
-      focus-follows-mouse = true;
+      focus-follows-mouse = false;
 
       # https://ghostty.org/docs/config/keybind
-      keybind = [
-        "ctrl+enter=toggle_tab_overview"
-        "f11=toggle_fullscreen"
-        "ctrl+shift+w=close_surface"
-        "ctrl+shift+comma=unbind" # reload ghostty config (we manage it with home-manager so this will give us nothing)
-        "alt+n=new_split:auto" # Like in zellij
-        "alt+h=goto_split:right"
-        "alt+l=goto_split:left"
-        "alt+j=goto_split:down"
-        "alt+k=goto_split:up"
-        "alt+m=toggle_split_zoom"
-        "ctrl+shift+z=undo"
-        "ctrl+shift+y=redo"
-        # keybind = global:cmd+backquote=toggle_quick_terminal
-      ];
+      keybind =
+        let
+          resize_split_amount = "100";
+        in
+        [
+          "ctrl+enter=toggle_tab_overview"
+          "f11=toggle_fullscreen"
+          "ctrl+shift+w=close_surface"
+          "ctrl+shift+comma=unbind" # reload ghostty config (we manage it with home-manager so this will give us nothing)
+          "alt+n=new_split:auto" # Like in zellij
+          "alt+h=goto_split:left"
+          "alt+l=goto_split:right"
+          "alt+j=goto_split:down"
+          "alt+k=goto_split:up"
+          "alt+shift+h=resize_split:left,${resize_split_amount}"
+          "alt+shift+l=resize_split:right,${resize_split_amount}"
+          "alt+shift+j=resize_split:down,${resize_split_amount}"
+          "alt+shift+k=resize_split:up,${resize_split_amount}"
+          # "alt+==equalize_splits"
+          "alt+m=toggle_split_zoom"
+          "ctrl+shift+z=undo"
+          "ctrl+shift+y=redo"
+          "ctrl+shift+i=inspector:toggle"
+          "ctrl+shift+g=show_gtk_inspector"
+          "performable:ctrl+c=copy_to_clipboard"
+          "ctrl+shift+f=write_scrollback_file:open" # No search action yet, so this is the best alternative
+
+          # keybind = global:cmd+backquote=toggle_quick_terminal
+          # Pane mode ala. zellij
+          "ctrl+p>f=toggle_split_zoom"
+          "ctrl+p>n=new_split:auto"
+          "ctrl+p>h=goto_split:left"
+          "ctrl+p>l=goto_split:right"
+          "ctrl+p>j=goto_split:down"
+          "ctrl+p>k=goto_split:up"
+          "ctrl+p>x=close_surface"
+
+          # Tab mode ala. zellij
+          "ctrl+t>n=new_tab"
+          "ctrl+t>x=close_tab"
+
+          "alt+shift+[=goto_tab:1"
+          "alt+[=previous_tab"
+          "alt+]=next_tab"
+          "alt+shift+]=last_tab"
+        ];
       # ++ lib.optionals config.programs.zellij.enable [
       #   "ctrl+shift+t=unbind" # spawn tab
       #   "ctrl+shift+w=unbind" # close tab

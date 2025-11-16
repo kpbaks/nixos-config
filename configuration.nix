@@ -1046,5 +1046,4 @@
 
   # Needed for noctalia shell (https://docs.noctalia.dev/getting-started/nixos/#installation)
   services.upower.enable = true;
-  services.power-profiles-daemon.enable = true;
 }

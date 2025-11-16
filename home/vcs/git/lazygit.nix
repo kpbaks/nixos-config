@@ -101,6 +101,19 @@ in
 
       customCommands = [
         {
+          # https://github.com/jesseduffield/lazygit/wiki/Custom-Commands-Compendium#pushing-to-a-specific-remote-branch
+          key = "<c-p>";
+          context = "global";
+          loadingText = "pushing";
+          prompts = [
+            {
+              type = "input";
+              title = "which branch do you want to push to?";
+              command = ''${git} push origin {{index .PromptResponses 0}}'';
+            }
+          ];
+        }
+        {
           # TODO: add command to use `git-absorb`
           key = "<c-a>";
           context = "files";

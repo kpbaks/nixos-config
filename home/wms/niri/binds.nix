@@ -300,9 +300,15 @@ in
       # "Mod+U".action = focus-workspace-down;
       # "Mod+I".action = focus-workspace-up;
 
+      # FIXME: sodiboo/niri-flake does not have these functions anymore it seems
+      # figure out why, and what there new name is
       # "Print".action = screenshot; # { show-pointer = false; };
       # "Ctrl+Print".action = screenshot-screen { write-to-disk = true; };
       # "Alt+Print".action = screenshot-window { write-to-disk = true; };
+
+      "Print".action.screenshot = [ ];
+      "Ctrl+Print".action.screenshot-screen = [ ];
+      "Alt+Print".action.screenshot-window = [ ];
 
       # // Switches focus between the current and the previous workspace.
       # "Mod+Tab".action = focus-workspace-previous;
