@@ -22,13 +22,12 @@ in
 
   programs.ghostty = {
     enable = true;
-    enableFishIntegration = true;
+    systemd.enable = true;
     package = pkgs.ghostty;
     settings = {
-
       auto-update = "check";
       auto-update-channel = "tip";
-      bold-is-bright = false;
+      bold-is-bright = true;
       linux-cgroup = "always";
 
       # window-theme = dark
@@ -81,7 +80,8 @@ in
       # theme = "Eldritch";
       # theme = "0x96f";
       # theme = "noctalia"; # Updated by `noctalia-shell` using `matugen`
-      theme = "dark:Catppuccin Frappe,light:Catppuccin Latte";
+      # theme = "dark:Catppuccin Frappe,light:Catppuccin Latte";
+      theme = "dark:Catppuccin Mocha,light:Catppuccin Latte";
       # theme = "shadow";
       # theme = "dark:Kanagawa Wave,light:GruvboxLight";
 
@@ -100,56 +100,65 @@ in
         "ctrl+enter=toggle_tab_overview"
         "f11=toggle_fullscreen"
         "ctrl+shift+w=close_surface"
-      ]
-      ++ lib.optionals config.programs.zellij.enable [
-        "ctrl+shift+t=unbind" # spawn tab
-        "ctrl+shift+w=unbind" # close tab
-        "ctrl+shift+n=unbind" # open new window
-        "ctrl+page_up=unbind"
-        "ctrl+page_down=unbind"
-        "ctrl+tab=unbind"
-        "ctrl+shift+tab=unbind"
-        "ctrl+shift+o=unbind" # open vertical split
-        "ctrl+shift+e=unbind" # open horizontal split
-        "ctrl+comma=unbind" # open ghostty config
-        "ctrl+shift+comma=unbind" # reload ghostty config
-        "ctrl+alt+left=unbind"
-        "ctrl+shift+a=unbind" # select all text
-        "ctrl+shift+left=unbind"
-        "ctrl+shift+right=unbind"
-        "ctrl+shift+j=unbind" # write screen contents to tmp file
-        "alt+1=unbind"
+        "ctrl+shift+comma=unbind" # reload ghostty config (we manage it with home-manager so this will give us nothing)
+        "alt+n=new_split:auto" # Like in zellij
+        "alt+h=goto_split:right"
+        "alt+l=goto_split:left"
+        "alt+j=goto_split:down"
+        "alt+k=goto_split:up"
+        "alt+m=toggle_split_zoom"
+        "ctrl+shift+z=undo"
+        "ctrl+shift+y=redo"
+        # keybind = global:cmd+backquote=toggle_quick_terminal
       ];
+      # ++ lib.optionals config.programs.zellij.enable [
+      #   "ctrl+shift+t=unbind" # spawn tab
+      #   "ctrl+shift+w=unbind" # close tab
+      #   "ctrl+shift+n=unbind" # open new window
+      #   "ctrl+page_up=unbind"
+      #   "ctrl+page_down=unbind"
+      #   "ctrl+tab=unbind"
+      #   "ctrl+shift+tab=unbind"
+      #   "ctrl+shift+o=unbind" # open vertical split
+      #   "ctrl+shift+e=unbind" # open horizontal split
+      #   "ctrl+comma=unbind" # open ghostty config
+      #   "ctrl+alt+left=unbind"
+      #   "ctrl+shift+a=unbind" # select all text
+      #   "ctrl+shift+left=unbind"
+      #   "ctrl+shift+right=unbind"
+      #   "ctrl+shift+j=unbind" # write screen contents to tmp file
+      #   "alt+1=unbind"
+      # ];
     };
 
-    themes = {
-      # https://github.com/rjshkhr/dotfiles/blob/main/.config/ghostty/themes/shadow.conf
-      shadow = {
-        background = "#1D2326";
-        foreground = "#E6E7E6";
-        # cursor-color = "";
-        # selection-background = "";
-        # selection-foreground = "";
-        palette = [
-          "0=#242B2D"
-          "1=#BC8F7D"
-          "2=#96B088"
-          "3=#CCAC7D"
-          "4=#7E9AAB"
-          "5=#A68CAA"
-          "6=#839C98"
-          "7=#CED3DC"
-          "8=#485457"
-          "9=#D4A394"
-          "10=#ABC49E"
-          "11=#E2BF8F"
-          "12=#94B1C4"
-          "13=#BC9EC0"
-          "14=#97B3AF"
-          "15=#E8EBF0"
-        ];
-      };
-    };
+    # themes = {
+    #   # https://github.com/rjshkhr/dotfiles/blob/main/.config/ghostty/themes/shadow.conf
+    #   shadow = {
+    #     background = "#1D2326";
+    #     foreground = "#E6E7E6";
+    #     # cursor-color = "";
+    #     # selection-background = "";
+    #     # selection-foreground = "";
+    #     palette = [
+    #       "0=#242B2D"
+    #       "1=#BC8F7D"
+    #       "2=#96B088"
+    #       "3=#CCAC7D"
+    #       "4=#7E9AAB"
+    #       "5=#A68CAA"
+    #       "6=#839C98"
+    #       "7=#CED3DC"
+    #       "8=#485457"
+    #       "9=#D4A394"
+    #       "10=#ABC49E"
+    #       "11=#E2BF8F"
+    #       "12=#94B1C4"
+    #       "13=#BC9EC0"
+    #       "14=#97B3AF"
+    #       "15=#E8EBF0"
+    #     ];
+    #   };
+    # };
   };
 
   home.packages = [

@@ -118,6 +118,12 @@ in
           # after.checkForConflicts = true;
         }
         {
+          key = "d"; # TODO: rebind build in 'd' to delete branch. d -> D
+          context = "localBranches";
+          output = "terminal";
+          command = "${git} branch --edit-description {{.SelectedLocalBranch | quote}}";
+        }
+        {
           key = "n";
           context = "localBranches";
           prompts = [
@@ -145,6 +151,7 @@ in
             }
             {
               type = "input";
+              # TODO: can {{.Form.BranchType}} be used here?
               title = "What is the new branch name?";
               key = "BranchName";
               initialValue = "";
@@ -156,10 +163,13 @@ in
         }
       ];
 
-      keybindings = {
+      keybinding = {
         universal = {
           nextBlock = "n";
           prevBlock = "N";
+        };
+        branches = {
+          deleteBranch = "D"; # Just a guess for what the action is called (cannot find it in https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md ...😡)
         };
       };
     };

@@ -11,10 +11,12 @@
   # programs.helix.settings.theme = "gruber-darker";
   # programs.helix.settings.theme = "carbon";
   # programs.helix.settings.theme = "iceberg-dark";
-  programs.helix.settings.theme = {
-    # dark = "catppuccin_frappe";
-    dark = "darcula-solid";
-    light = "catppuccin_latte";
-    # theme = "focus_nova";
-  };
+  programs.helix.settings.theme = "catppuccin-mocha";
+  # programs.helix.settings.theme = {
+  # dark = "catppuccin_frappe";
+  # dark = "darcula-solid";
+  # dark = "catppuccin-mocha";
+  # light = "catppuccin_latte";
+  # theme = "focus_nova";
+  # };
 }

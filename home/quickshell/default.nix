@@ -15,6 +15,20 @@ let
   noctalia-shell = inputs.noctalia.packages.${pkgs.system}.default;
 in
 {
+  imports = [
+    inputs.noctalia.homeModules.default
+  ];
+
+  # TODO: change to use this module for config
+  # programs.noctalia-shell = {
+  #   enable = true;
+  #   # https://docs.noctalia.dev/getting-started/nixos/#systemd-service
+  #   systemd.enable = false; # experimental feature
+  #   settings = {
+
+  #   };
+  # };
+
   # FIXME: why are these not in $PATH $out/bin/{qs,quickshell}
   home.packages = [
     inputs.quickshell.packages.${pkgs.system}.default
@@ -134,6 +148,17 @@ in
           command = [ (lib.getExe noctalia-shell) ];
         }
       ];
+    };
+  };
+
+  # TODO: add this snippet to https://docs.noctalia.dev/
+  # https://docs.noctalia.dev/getting-started/keybinds/#theme-controls
+  services.darkman = {
+    darkModeScripts = {
+      noctalia-dark-mode = ''${lib.getExe noctalia-shell} ipc call darkMode setDark'';
+    };
+    lightModeScripts = {
+      noctalia-light-mode = ''${lib.getExe noctalia-shell} ipc call darkMode setLight'';
     };
   };
 }

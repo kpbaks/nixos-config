@@ -5,7 +5,7 @@
   ...
 }:
 {
-  programs.zellij.enable = true;
+  programs.zellij.enable = false;
   home.sessionVariables = {
     ZELLIJ_AUTO_ATTACH = lib.mkForce "false";
     ZELLIJ_AUTO_EXIT = lib.mkForce "false";
