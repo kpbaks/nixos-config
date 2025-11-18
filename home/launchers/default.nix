@@ -3,7 +3,7 @@
     ./fuzzel.nix
     # ./tofi.nix
     # ./walker.nix
-    ./sherlock.nix
+    # ./sherlock.nix
     ./vicinae.nix
   ];
 }
