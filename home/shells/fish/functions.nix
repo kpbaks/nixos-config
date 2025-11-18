@@ -306,7 +306,9 @@ in
       cdn = # fish
         ''
           builtin cd /etc/nixos
-          $EDITOR flake.nix
+          set -l most_recently_modified_nix_file (find . -type f -name "*.nix" -printf "%T@ %p\n" | sort -n | tail -1 | string split --fields 2 " ")
+          # $EDITOR flake.nix
+          $EDITOR $most_recently_modified_nix_file
         '';
       cdtmp = {
         description = "Create a directory under /tmp/ and cd into it";
