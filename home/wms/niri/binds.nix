@@ -8,7 +8,6 @@ let
   inherit (lib) getExe;
 in
 {
-
   # https://github.com/sodiboo/niri-flake/blob/main/docs.md#programsnirisettingsbinds
   # TODO: wrap in `swayosd-client`
   # TODO: add Mod+F keybind to toggle floating layout
@@ -80,6 +79,11 @@ in
     #     value = {action = "focus-workspace ${toString n}";};
     #   }) (range 1 10));
     {
+      "Mod+H".action = move-column-left;
+      "Mod+L".action = move-column-right;
+      "Mod+J".action = focus-window-or-workspace-down;
+      "Mod+K".action = focus-window-or-workspace-up;
+
       "XF86AudioRaiseVolume" = {
         action = wpctl "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05+";
         allow-when-locked = true;
@@ -176,11 +180,11 @@ in
       # "Mod+Y".action = run-with-sh-within-terminal "cd ~/Downloads; yazi";
 
       # S for spotify
-      "Mod+S".action = focus-or-spawn "spotify" "${pkgs.spotify}/bin/spotify";
+      # "Mod+S".action = focus-or-spawn "spotify" "${pkgs.spotify}/bin/spotify";
       # E is default on other platforms like Windows, for opening the "file explorer" program
       "Mod+E".action = focus-or-spawn "org.kde.dolphin" "${pkgs.kdePackages.dolphin}/bin/dolphin";
       # P for pdf
-      "Mod+P".action = focus-or-spawn "org.kde.okular" "${pkgs.kdePackages.okular}/bin/okular";
+      # "Mod+P".action = focus-or-spawn "org.kde.okular" "${pkgs.kdePackages.okular}/bin/okular";
       # "Mod+Z".action = focus-or-spawn "dev.zed.Zed" "${getExe config.programs.zed-editor.package}";
 
       # "Mod+P".action = spawn (
@@ -258,8 +262,8 @@ in
       "Mod+M".action = maximize-column;
 
       # "Mod+K".action = spawn "${pkgs.kdePackages.kdeconnect-kde}/bin/kdeconnect-app";
-      "Mod+K".action =
-        focus-or-spawn "org.kde.kdeconnect.app" "${pkgs.kdePackages.kdeconnect-kde}/bin/kdeconnect-app";
+      # "Mod+Shift+K".action =
+      #   focus-or-spawn "org.kde.kdeconnect.app" "${pkgs.kdePackages.kdeconnect-kde}/bin/kdeconnect-app";
 
       # // There are also commands that consume or expel a single window to the side.
       "Mod+BracketLeft".action = consume-or-expel-window-left;
@@ -336,7 +340,7 @@ in
       #     repeat = false;
       #   };
 
-      "Mod+Shift+P".action = power-off-monitors;
+      # "Mod+Shift+P".action = power-off-monitors;
       # Mod+R { switch-preset-column-width; }
       #   Mod+Shift+R { reset-window-height; }
       #   Mod+F { maximize-column; }
