@@ -6,11 +6,12 @@ in
   imports = [
     ./shell-aliases.nix
     ./quickshell
-    ./bars
+    ./noctalia
+    # ./bars
     ./browsers
     # ./calendar.nix
     ./custom-modules
-    ./desktop-environments
+    # ./desktop-environments
     ./direnv.nix
     ./email.nix
     ./environment-variables.nix
