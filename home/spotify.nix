@@ -42,7 +42,7 @@ in
   # # TODO: override the spotify package used by spicetify to add a proper icon
   # programs.spicetify =
   #   let
-  #     spicetify-pkgs = inputs.spicetify-nix.legacyPackages.${pkgs.system};
+  #     spicetify-pkgs = inputs.spicetify-nix.legacyPackages.${pkgs.stdenv.hostPlatform.system};
   #   in
   #   {
   #     enable = false;

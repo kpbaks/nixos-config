@@ -9,7 +9,7 @@
     with pkgs;
     [
       docker-compose
-      # inputs.patchy.packages.${pkgs.system}.default
+      # inputs.patchy.packages.${pkgs.stdenv.hostPlatform.system}.default
       # podman-compose
       # podman-desktop
       # kraft
@@ -287,5 +287,5 @@
       # inputs.my-scripts.packages.${system}.drvcat
       # inputs.my-scripts.packages.${system}.kernel-command-line-parameters
     ]
-    ++ (builtins.attrValues inputs.my-scripts.packages.${pkgs.system});
+    ++ (builtins.attrValues inputs.my-scripts.packages.${pkgs.stdenv.hostPlatform.system});
 }

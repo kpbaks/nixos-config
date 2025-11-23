@@ -12,7 +12,7 @@
 
   programs.vscode.profiles.default.extensions =
     let
-      extensions = inputs.nix-vscode-extensions.extensions.${pkgs.system};
+      extensions = inputs.nix-vscode-extensions.extensions.${pkgs.stdenv.hostPlatform.system};
     in
     with extensions.vscode-marketplace;
     [

@@ -17,7 +17,7 @@
     ./fetch-and-build-grammars-on-build.nix
     ./snippets
 
-    # inputs.crates-lsp.homeModules.${pkgs.system}.default
+    # inputs.crates-lsp.homeModules.${pkgs.stdenv.hostPlatform.system}.default
   ];
   programs.helix = {
     enable = true;

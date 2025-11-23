@@ -108,8 +108,8 @@ in
 
   # qt = {
   #   style.package = [
-  #     inputs.darkly.packages.${pkgs.system}.darkly-qt5
-  #     inputs.darkly.packages.${pkgs.system}.darkly-qt6
+  #     inputs.darkly.packages.${pkgs.stdenv.hostPlatform.system}.darkly-qt5
+  #     inputs.darkly.packages.${pkgs.stdenv.hostPlatform.system}.darkly-qt6
   #   ];
   #   platformTheme.name = "qtct";
   # };

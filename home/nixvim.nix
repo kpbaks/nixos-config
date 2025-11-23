@@ -4,7 +4,8 @@
   imports = [ inputs.nixvim.homeManagerModules.nixvim ];
 
   programs.nixvim.enable = true;
-  programs.nixvim.package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
+  programs.nixvim.package =
+    inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.default;
   programs.nixvim.extraPackages = with pkgs; [
     gnumake
     tree-sitter

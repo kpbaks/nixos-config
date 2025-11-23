@@ -17,9 +17,9 @@ in
     xwayland.enable = false;
     systemd.enable = true;
     plugins = [
-      # inputs.hyprspace.packages.${pkgs.system}.Hyprspace
-      # inputs.hyprland-plugins.packages.${pkgs.system}.hyprbars
-      # inputs.hyprland-plugins.packages.${pkgs.system}.hyprexpo
+      # inputs.hyprspace.packages.${pkgs.stdenv.hostPlatform.system}.Hyprspace
+      # inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprbars
+      # inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprexpo
     ];
     settings.exec-once = [
       # "${pkgs.hyprpanel}/bin/hyprpanel"

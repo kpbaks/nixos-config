@@ -317,5 +317,5 @@ in
 #       # Find most recent file
 #       set -l file (most-recent)
 #       command yazi $file
-#       # inputs.yazi.packages.${pkgs.system}.default;
+#       # inputs.yazi.packages.${pkgs.stdenv.hostPlatform.system}.default;
 #     '';

@@ -5,7 +5,7 @@
   programs.vscode =
     let
       # inherit (pkgs) vscode-with-extensions;
-      extensions = inputs.nix-vscode-extensions.extensions.${pkgs.system};
+      extensions = inputs.nix-vscode-extensions.extensions.${pkgs.stdenv.hostPlatform.system};
     in
     {
       enable = false;

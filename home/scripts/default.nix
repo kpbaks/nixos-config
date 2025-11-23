@@ -147,7 +147,7 @@ in
 
 #       # TODO: print notification if swww failed e.g. run with wayland compositor like Gnome that
 #       # does not support 'wlr-layer-shell' protocol
-#       ${inputs.swww.packages.${pkgs.system}.swww}/bin/swww img $tmpf --transition-type any
+#       ${inputs.swww.packages.${pkgs.stdenv.hostPlatform.system}.swww}/bin/swww img $tmpf --transition-type any
 #       ${pkgs.coreutils-full}/bin/rm $tmpf
 #     '';
 

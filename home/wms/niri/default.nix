@@ -219,7 +219,7 @@ in
 
   # systemd.user.services.swww-daemon = {
   #   Install.WantedBy = [ "graphical-session.target" ];
-  #   Service.ExecStart = "${inputs.swww.packages.${pkgs.system}.swww}/bin/swww-daemon";
+  #   Service.ExecStart = "${inputs.swww.packages.${pkgs.stdenv.hostPlatform.system}.swww}/bin/swww-daemon";
   # };
 
   # systemd.user.services.copyq = {
