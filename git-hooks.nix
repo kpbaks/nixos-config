@@ -8,5 +8,5 @@ _: {
   check-yaml.enable = true;
   lychee.enable = true;
   typos.enable = true;
-  # trufflehog.enable = true;
+  trufflehog.enable = true;
 }
