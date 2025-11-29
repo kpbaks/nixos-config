@@ -32,6 +32,8 @@
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.05";
     home-manager = {
       url = "github:nix-community/home-manager/master";
+      # NOTE: use this fork until this PR is merged <https://github.com/nix-community/home-manager/pull/8203>
+      # url = "github:thomas-maurice/nix-home-manager?rev=9e72ed9b84ceba0b4134816a1860b829865a94e8";
       # url = "git+file:///home/kpbaks/forks/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
@@ -114,7 +116,7 @@
     noctalia = {
       url = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.quickshell.follows = "quickshell";
+      # inputs.quickshell.follows = "quickshell";
     };
 
     git-subcommands = {
@@ -443,7 +445,7 @@
             (
               { config, ... }:
               {
-                imports = [ inputs.try.homeManagerModules.default ];
+                imports = [ inputs.try.homeModules.default ];
                 programs.try = {
                   enable = true;
                   path = "${config.home.homeDirectory}/experiments";

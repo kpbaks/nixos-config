@@ -1,4 +1,5 @@
 {
+  #   foo
   imports = [
     ./personal.nix
     ./monitor.nix

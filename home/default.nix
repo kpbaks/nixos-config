@@ -22,7 +22,7 @@ in
     ./launchers
     ./modules
     # ./nixvim.nix
-    ./notification-daemons
+    # ./notification-daemons
     ./packages.nix
     ./pgp.nix
     ./programming-languages

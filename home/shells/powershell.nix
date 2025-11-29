@@ -46,7 +46,7 @@
           # Invoke-Expression (&starship init powershell)
 
           # Enable-TransientPrompt
-                
+
         ''
       else
         ""

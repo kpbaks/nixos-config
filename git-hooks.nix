@@ -1,6 +1,6 @@
 _: {
   nixfmt-rfc-style.enable = true;
-  # deadnix.enable = true;
+  alejandra.enable = false;
   deadnix.enable = true;
   flake-checker.enable = true;
   statix.enable = true;

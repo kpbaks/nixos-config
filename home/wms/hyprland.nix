@@ -52,7 +52,7 @@ in
 
         # monitor=DP-1,2560x1600@60,0x0,1,vrr,1
         # monitor=DP-1,2560x1600@60,0x0,1,bitdepth,10
-        # recommended rule for quickly pluggin in random monitors
+        # recommended rule for quickly plugin in random monitors
         # monitor=,preferred,auto,1
         monitor=,highres,auto,1
         # monitor=,highrr,auto,1
@@ -71,130 +71,129 @@ in
       # mouse bindings
       bindm = [ "ALT,mouse:272,movewindow" ];
       # key bindings
-      bind =
-        [
-          ", f11, fullscreen, 1"
-          "SHIFT, f11, fullscreen, 2"
-          "CTRL, f11, fullscreen, 0"
-          "SUPER, r, layoutmsg, orientationnext"
-          "SUPERSHIFT, m, layoutmsg, swapwithmaster"
-          "SUPER, space, layoutmsg, swapwithmaster"
+      bind = [
+        ", f11, fullscreen, 1"
+        "SHIFT, f11, fullscreen, 2"
+        "CTRL, f11, fullscreen, 0"
+        "SUPER, r, layoutmsg, orientationnext"
+        "SUPERSHIFT, m, layoutmsg, swapwithmaster"
+        "SUPER, space, layoutmsg, swapwithmaster"
 
-          # "focusmonitor"
-          # "movecurrentworkspacetomonitor"
-          # "swapactiveworkspaces"
-          "SUPER, c, movetoworkspace, special"
-          "SUPER, q, killactive"
+        # "focusmonitor"
+        # "movecurrentworkspacetomonitor"
+        # "swapactiveworkspaces"
+        "SUPER, c, movetoworkspace, special"
+        "SUPER, q, killactive"
 
-          "SUPER, a, exec, anki"
-          # "SUPER, a, exec, ~/.config/hypr/bin/hyprland-arise --class anki"
-          # "SUPER, f, exec, flatpak run io.github.zen_browser.zen"
+        "SUPER, a, exec, anki"
+        # "SUPER, a, exec, ~/.config/hypr/bin/hyprland-arise --class anki"
+        # "SUPER, f, exec, flatpak run io.github.zen_browser.zen"
 
-          # "SUPER, f, exec, ~/.config/hypr/bin/hyprland-arise --class firefox"
+        # "SUPER, f, exec, ~/.config/hypr/bin/hyprland-arise --class firefox"
 
-          # "$super, K, exec, wezterm-gui start"
-          # "SUPER, k, exec, kitty"
-          # "SUPER, k, exec, wezterm-gui start"
-          # "SUPER, k, exec, alacritty"
-          # "SUPER, k, exec, ~/.config/hypr/bin/hyprland-arise --class kitty"
-          "SUPER, t, exec, ${lib.getExe config.default-application.terminal}"
+        # "$super, K, exec, wezterm-gui start"
+        # "SUPER, k, exec, kitty"
+        # "SUPER, k, exec, wezterm-gui start"
+        # "SUPER, k, exec, alacritty"
+        # "SUPER, k, exec, ~/.config/hypr/bin/hyprland-arise --class kitty"
+        "SUPER, t, exec, ${lib.getExe config.default-application.terminal}"
 
-          "SUPER, s, exec, spotify"
-          # "SUPER, s, exec, ~/.config/hypr/bin/hyprland-arise --class spotify"
-          # "SUPER, d, exec, discord"
-          "SUPER, d, exec, vesktop"
-          # "SUPER, d, exec, ~/.config/hypr/bin/hyprland-arise --class webcord"
+        "SUPER, s, exec, spotify"
+        # "SUPER, s, exec, ~/.config/hypr/bin/hyprland-arise --class spotify"
+        # "SUPER, d, exec, discord"
+        "SUPER, d, exec, vesktop"
+        # "SUPER, d, exec, ~/.config/hypr/bin/hyprland-arise --class webcord"
 
-          "SUPER, m, exec, thunderbird # mail"
-          # "SUPER, m, exec, ~/.config/hypr/bin/hyprland-arise --class thunderbird"
+        "SUPER, m, exec, thunderbird # mail"
+        # "SUPER, m, exec, ~/.config/hypr/bin/hyprland-arise --class thunderbird"
 
-          "SUPER, g, exec, telegram-desktop"
-          # "SUPER, t, exec, ~/.config/hypr/bin/hyprland-arise --class org.telegram.desktop --exec telegram-desktop"
+        "SUPER, g, exec, telegram-desktop"
+        # "SUPER, t, exec, ~/.config/hypr/bin/hyprland-arise --class org.telegram.desktop --exec telegram-desktop"
 
-          # "SUPERSHIFT, o, exec, obs # obs-studio"
-          # "SUPER, o, exec, ~/.config/hypr/bin/hyprland-arise --class com.obsproject.Studio --exec obs"
-          # "SUPERSHIFT, e, exec, ~/.config/hypr/bind/hyprland-arise --class dolphin"
-          "SUPER, e, exec, dolphin"
+        # "SUPERSHIFT, o, exec, obs # obs-studio"
+        # "SUPER, o, exec, ~/.config/hypr/bin/hyprland-arise --class com.obsproject.Studio --exec obs"
+        # "SUPERSHIFT, e, exec, ~/.config/hypr/bind/hyprland-arise --class dolphin"
+        "SUPER, e, exec, dolphin"
 
-          # "SUPER, p, exec, ~/.config/hypr/bind/hyprland-arise --class okular"
-          # "SUPERSHIFT, p, exec, okular # pdf"
+        # "SUPER, p, exec, ~/.config/hypr/bind/hyprland-arise --class okular"
+        # "SUPERSHIFT, p, exec, okular # pdf"
 
-          # "SUPER, z, exec, ~/.config/hypr/bind/hyprland-arise --class Zotero"
-          # "SUPERSHIFT, z, exec, zotero"
+        # "SUPER, z, exec, ~/.config/hypr/bind/hyprland-arise --class Zotero"
+        # "SUPERSHIFT, z, exec, zotero"
 
-          # bind = SUPER, V, exec,  <terminal name> --class floating -e <shell-env>  -c 'clipse $PPID' # bind the open clipboard operation to a nice key.
-          # "ALT, space, exec, krunner"
-          # "ALT, space, exec, wofi --show drun"
-          # "ALT, space, exec, rofi -show drun -show-icons"
-          "SUPER, slash, exec, ${lib.getExe config.programs.fuzzel.package}"
+        # bind = SUPER, V, exec,  <terminal name> --class floating -e <shell-env>  -c 'clipse $PPID' # bind the open clipboard operation to a nice key.
+        # "ALT, space, exec, krunner"
+        # "ALT, space, exec, wofi --show drun"
+        # "ALT, space, exec, rofi -show drun -show-icons"
+        "SUPER, slash, exec, ${lib.getExe config.programs.fuzzel.package}"
 
-          "SUPER, mouse_down, workspace, e-1"
-          "SUPER, mouse_up, workspace, e+1"
-          # "SUPERSHIFT, f, togglefloating"
-          ", xf86audioplay, exec, playerctl play-pause "
-          ", xf86audionext, exec, playerctl next"
-          ", xf86audioprev, exec, playerctl previous"
-          ", xf86audiostop, exec, playerctl stop"
-          ", xf86audioraisevolume, exec, pamixer -i 5"
-          ", xf86audiolowervolume, exec, pamixer -d 5"
+        "SUPER, mouse_down, workspace, e-1"
+        "SUPER, mouse_up, workspace, e+1"
+        # "SUPERSHIFT, f, togglefloating"
+        ", xf86audioplay, exec, playerctl play-pause "
+        ", xf86audionext, exec, playerctl next"
+        ", xf86audioprev, exec, playerctl previous"
+        ", xf86audiostop, exec, playerctl stop"
+        ", xf86audioraisevolume, exec, pamixer -i 5"
+        ", xf86audiolowervolume, exec, pamixer -d 5"
 
-          "SUPER, left, movefocus, l"
-          "SUPER, right, movefocus, r"
-          "SUPER, up, movefocus, u"
-          "SUPER, down, movefocus, d"
+        "SUPER, left, movefocus, l"
+        "SUPER, right, movefocus, r"
+        "SUPER, up, movefocus, u"
+        "SUPER, down, movefocus, d"
 
-          "SUPER, h, movefocus, l"
-          "SUPER, l, movefocus, r"
-          "SUPER, k, movefocus, u"
-          "SUPER, j, movefocus, d"
+        "SUPER, h, movefocus, l"
+        "SUPER, l, movefocus, r"
+        "SUPER, k, movefocus, u"
+        "SUPER, j, movefocus, d"
 
-          "SUPER CTRL,  h, movewindow, l"
-          "SUPER CTRL,  l, movewindow, r"
-          "SUPER CTRL,  k, movewindow, u"
-          "SUPER CTRL,  j, movewindow, d"
+        "SUPER CTRL,  h, movewindow, l"
+        "SUPER CTRL,  l, movewindow, r"
+        "SUPER CTRL,  k, movewindow, u"
+        "SUPER CTRL,  j, movewindow, d"
 
-          "SUPER CTRL,  left, movewindow, l"
-          "SUPER CTRL,  right, movewindow, r"
-          "SUPER CTRL,  up, movewindow, u"
-          "SUPER CTRL,  down, movewindow, d"
+        "SUPER CTRL,  left, movewindow, l"
+        "SUPER CTRL,  right, movewindow, r"
+        "SUPER CTRL,  up, movewindow, u"
+        "SUPER CTRL,  down, movewindow, d"
 
-          "SUPERSHIFT, left, resizeactive, -5% 0"
-          "SUPERSHIFT, right, resizeactive, 5% 0"
-          "SUPERSHIFT, up, resizeactive, 0 -5%"
-          "SUPERSHIFT, down, resizeactive, 0 5%"
+        "SUPERSHIFT, left, resizeactive, -5% 0"
+        "SUPERSHIFT, right, resizeactive, 5% 0"
+        "SUPERSHIFT, up, resizeactive, 0 -5%"
+        "SUPERSHIFT, down, resizeactive, 0 5%"
 
-          "SUPER, Tab, workspace,previous" # cycle recent workspaces
-          "ALT, Tab, cyclenext"
-          "ALT, Tab, bringactivetotop"
-          "SHIFT ALT, Tab, cyclenext, prev"
+        "SUPER, Tab, workspace,previous" # cycle recent workspaces
+        "ALT, Tab, cyclenext"
+        "ALT, Tab, bringactivetotop"
+        "SHIFT ALT, Tab, cyclenext, prev"
 
-          # Goto next/previous workspaces
-          "SUPER, bracketright, workspace, e+1"
-          "SUPER, bracketleft, workspace, e-1"
+        # Goto next/previous workspaces
+        "SUPER, bracketright, workspace, e+1"
+        "SUPER, bracketleft, workspace, e-1"
 
-          ", PRINT, exec, hyprshot -m region"
-          "CTRL, PRINT, exec, hyprshot -m window"
-          "SHIFT, PRINT, exec, hyprshot -m output" # screenshot a monitor
+        ", PRINT, exec, hyprshot -m region"
+        "CTRL, PRINT, exec, hyprshot -m window"
+        "SHIFT, PRINT, exec, hyprshot -m output" # screenshot a monitor
 
-          # Move/Resize windows with mainMod + LMB/RMB and dragging
-          # "bindm = SUPER, mouse:272, movewindow"
-          # "bindm = SUPER, mouse:273, resizewindow"
-        ]
-        # ++ pipe (range 1 10) [builtins.toString (i: "SUPER, ${i}, workspace, ${i}")];
-        ++ map (
-          i:
-          let
-            n = builtins.toString i;
-          in
-          "SUPER, ${n}, workspace, ${n}"
-        ) (range 1 10)
-        ++ map (
-          i:
-          let
-            n = builtins.toString i;
-          in
-          "SUPER CTRL, ${n}, movetoworkspace, ${n}"
-        ) (range 1 10);
+        # Move/Resize windows with mainMod + LMB/RMB and dragging
+        # "bindm = SUPER, mouse:272, movewindow"
+        # "bindm = SUPER, mouse:273, resizewindow"
+      ]
+      # ++ pipe (range 1 10) [builtins.toString (i: "SUPER, ${i}, workspace, ${i}")];
+      ++ map (
+        i:
+        let
+          n = toString i;
+        in
+        "SUPER, ${n}, workspace, ${n}"
+      ) (range 1 10)
+      ++ map (
+        i:
+        let
+          n = toString i;
+        in
+        "SUPER CTRL, ${n}, movetoworkspace, ${n}"
+      ) (range 1 10);
 
       animations = {
         enabled = true;

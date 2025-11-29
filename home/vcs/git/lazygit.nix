@@ -136,44 +136,44 @@ in
           output = "terminal";
           command = "${git} branch --edit-description {{.SelectedLocalBranch | quote}}";
         }
-        {
-          key = "n";
-          context = "localBranches";
-          prompts = [
-            {
-              type = "menu";
-              title = "What kind of branch is it?";
-              key = "BranchType";
-              options = [
-                {
-                  name = "feature";
-                  description = "a feature branch";
-                  value = "feature";
-                }
-                {
-                  name = "hotfix";
-                  description = "a hotfix branch";
-                  value = "hotfix";
-                }
-                {
-                  name = "release";
-                  description = "a release branch";
-                  value = "release";
-                }
-              ];
-            }
-            {
-              type = "input";
-              # TODO: can {{.Form.BranchType}} be used here?
-              title = "What is the new branch name?";
-              key = "BranchName";
-              initialValue = "";
-            }
-          ];
-          command = ''${git} branch "{{.Form.BranchType}}/{{.Form.BranchName}}" && ${git} branch --edit-description "{{.Form.BranchType}}/{{.Form.BranchName}}"'';
-          loadingText = "Creating branch";
-          output = "terminal";
-        }
+        # {
+        #   key = "n";
+        #   context = "localBranches";
+        #   prompts = [
+        #     {
+        #       type = "menu";
+        #       title = "What kind of branch is it?";
+        #       key = "BranchType";
+        #       options = [
+        #         {
+        #           name = "feature";
+        #           description = "a feature branch";
+        #           value = "feature";
+        #         }
+        #         {
+        #           name = "hotfix";
+        #           description = "a hotfix branch";
+        #           value = "hotfix";
+        #         }
+        #         {
+        #           name = "release";
+        #           description = "a release branch";
+        #           value = "release";
+        #         }
+        #       ];
+        #     }
+        #     {
+        #       type = "input";
+        #       # TODO: can {{.Form.BranchType}} be used here?
+        #       title = "What is the new branch name?";
+        #       key = "BranchName";
+        #       initialValue = "";
+        #     }
+        #   ];
+        #   command = ''${git} branch "{{.Form.BranchType}}/{{.Form.BranchName}}" && ${git} branch --edit-description "{{.Form.BranchType}}/{{.Form.BranchName}}"'';
+        #   loadingText = "Creating branch";
+        #   output = "terminal";
+        # }
       ];
 
       keybinding = {
@@ -190,5 +190,10 @@ in
 
   home.shellAliases.lg = "${config.programs.lazygit.package}/bin/lazygit";
   # programs.nushell.extraConfig = "alias lg = ${config.programs.lazygit.package}/bin/lazygit";
-  programs.fish.shellAbbrs.lg = "lazygit";
+  programs.fish.shellAbbrs = {
+    lg = "lazygit";
+    gl = "lazygit --screen-mode full log";
+    gb = "lazygit --screen-mode full branch";
+    gs = "lazygit --screen-mode full status";
+  };
 }

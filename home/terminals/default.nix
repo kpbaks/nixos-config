@@ -1,8 +1,8 @@
 {
   imports = [
-    ./alacritty.nix
+    # ./alacritty.nix
     ./kitty
-    ./rio.nix
+    # ./rio.nix
     # ./wezterm.nix
     # ./foot.nix
     # ./gnome-terminal.nix

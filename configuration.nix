@@ -1006,7 +1006,7 @@
   zramSwap = {
     enable = true;
   };
-  environment.enableAllTerminfo = true;
+  environment.enableAllTerminfo = false; # NOTE: enable when this gets merged https://github.com/NixOS/nixpkgs/issues/465358
 
   # TODO: wrap .desktop file Exec entry in a call to run0 or kdialog with sudo to run as root
   programs.sniffnet.enable = false;

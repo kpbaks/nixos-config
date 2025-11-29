@@ -15,6 +15,7 @@ in
 
   programs.noctalia-shell = {
     enable = true;
+    # TODO: limit to only use niris activation target
     systemd.enable = true;
     # https://docs.noctalia.dev/getting-started/nixos/#config-ref
     settings = {
