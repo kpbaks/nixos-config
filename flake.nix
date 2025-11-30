@@ -46,11 +46,11 @@
     jail-nix.url = "sourcehut:~alexdavid/jail.nix";
     vicinae.url = "github:vicinaehq/vicinae";
 
-    plasma-manager = {
-      url = "github:pjones/plasma-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
-    };
+    # plasma-manager = {
+    #   url = "github:pjones/plasma-manager";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    #   inputs.home-manager.follows = "home-manager";
+    # };
     niri = {
       url = "github:sodiboo/niri-flake";
       # url = "flake:local-niri-flake-fork";

@@ -1,13 +1,13 @@
 # TODO: checkout https://github.com/tieum/atuin-graph
-# TODO: checkout https://github.com/YiNNx/cmd-wrapped
 {
   pkgs,
   ...
 }:
 {
-  home.packages = with pkgs; [
-    atuin-desktop
-  ];
+  # home.packages = with pkgs; [
+  #   atuin-desktop
+  #   cmd-wrapped
+  # ];
   programs.atuin = {
     # TODO: 1. add pr to add a `shell` column to the `history` sqlite table, to differentiate between
     #    commands that are valid in `fish` and not in `nushell` and vice versa.

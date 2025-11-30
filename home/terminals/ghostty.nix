@@ -86,7 +86,8 @@ in
       # theme = "0x96f";
       # theme = "noctalia"; # Updated by `noctalia-shell` using `matugen`
       # theme = "dark:Catppuccin Frappe,light:Catppuccin Latte";
-      theme = "dark:Catppuccin Mocha,light:Catppuccin Latte";
+      # theme = "dark:Catppuccin Mocha,light:Catppuccin Latte";
+      theme = "dark:GruvboxDark,light:GruvboxLight";
       # theme = "shadow";
       # theme = "dark:Kanagawa Wave,light:GruvboxLight";
 

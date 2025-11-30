@@ -114,6 +114,13 @@
         # default = "nothing"; # NOTE: disable until this lazygit issue has been resolved (https://github.com/jesseduffield/lazygit/issues/3140)
         followTags = true;
         negotiate = true;
+
+      };
+      remote = {
+        # `git config --add remote.origin.push refs/notes/*`
+        # Automatically push notes created with `git notes`
+        # https://risadams.com/blog/2025/04/17/git-notes/#:~:text=To%20make%20this%20easier%2C%20add%20a%20configuration%20to%20push%20notes%20automatically
+        origin.push = "refs/notes/*";
       };
 
       fetch.prune = true; # always behave as if `--prune` was set
@@ -179,6 +186,9 @@
 
       # TODO: how to handle subshells across shells e.g. `$(...)` in bash and `()` in fish
       aliases = rec {
+        b = "branch -vv";
+        ba = "${b} --all";
+        be = "branch --edit-description";
         ls = "log --graph --oneline";
         la = "${ls} --all";
         wta = "worktree add";
@@ -198,6 +208,18 @@
         # (r)emove (u)ntracked (f)iles
         ruf = "!git ls-files --other --exclude-standard | xargs rm -rf";
         dirty = "diff --quiet";
+      };
+
+      trailer = {
+        # Configure a shorthand for adding common trailers
+        # git config trailer.issue.key "Issue"
+        # git config trailer.issue.ifExists "replace"
+        # # Now you can use:
+        # git commit --trailer "issue=#789"
+        issue = {
+          key = "Issue";
+          ifExists = "replace";
+        };
       };
     };
 

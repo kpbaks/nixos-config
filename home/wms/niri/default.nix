@@ -20,6 +20,7 @@ in
     ./overview.nix
     ./event-stream-handler.nix
     ./niriswitcher.nix
+    ./xwayland.nix
   ];
 
   # `niri` does not have built-in Xwayland support
@@ -45,7 +46,6 @@ in
     [
       # cage
       # xwayland-run
-      xwayland-satellite
       # wlrctl
       # wlr-which-key
       # wlr-randr
@@ -103,6 +103,7 @@ in
     DISPLAY = null;
     MOZ_ENABLE_WAYLAND = "1";
 
+    # https://github.com/YaLTeR/niri/wiki/Application-Issues#electron-applications
     ELECTRON_OZONE_PLATFORM_HINT = "auto"; # For Electron >= 28.0
     NIXOS_OZONE_WL = "1";
     QT_QPA_PLATFORM = "wayland";

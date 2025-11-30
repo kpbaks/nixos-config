@@ -135,6 +135,11 @@ let
       }
     }
   '';
+  post-checkout = pkgs.writeShellScriptBin "git-post-checkout-hook" ''
+    # Pull `git notes` from remote automatically
+    # FIXME: this assumes a remote called origin exists
+    git pull origin refs/notes/*:refs/notes/*
+  '';
 in
 {
   programs.git.hooks = {
@@ -146,6 +151,12 @@ in
     # also run `git log` to show the git commit on it, not push to remote or not on parent/main/default branch
     # run `git show`
     # https://frankcorso.dev/automatically-run-build-scripts-switching-branches-git-hooks.html
-    # post-checkout = lib.getExe post-checkout;
+    post-checkout = lib.getExe post-checkout;
   };
+
+  #   # .git/hooks/post-checkout
+  # git pull origin refs/notes/*:refs/notes/*
+
+  # # .git/hooks/pre-push
+  # git push origin refs/notes/*
 }

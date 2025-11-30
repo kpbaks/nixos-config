@@ -18,7 +18,7 @@ in
     ./fonts.nix
     # ./git.nix
     # TODO move under ./desktop-environments
-    ./kde-plasma
+    # ./kde-plasma
     ./launchers
     ./modules
     # ./nixvim.nix

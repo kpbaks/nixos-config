@@ -350,25 +350,61 @@
   services.xserver.enable = true;
   # services.displayManager.defaultSession = "niri";
 
-  # Enable the KDE Plasma Desktop Environment.
-  # TODO: try out https://github.com/khaneliman/catppuccin-sddm-corners
-  services.displayManager.sddm = {
+  services.displayManager = {
     enable = true;
-    # catppuccin.enable = true;
-    wayland.enable = true;
-    # autoNumlock = true;
-    # https://man.archlinux.org/man/sddm.conf.5
-    settings = {
-      Users = {
-        RememberLastUser = true;
-        RememberLastSession = true;
+    # lemurs = {
+    #   enable = true;
+    # };
+    ly = {
+      enable = true;
+      settings = {
+        allow_empty_password = false;
+        battery_id = "BAT0";
+        bigclock = "en";
+        animation = "colormix";
+        auto_login_session = "niri";
+        clock = "%c"; # `date +%c`
+        brightness_down_cmd = "${pkgs.brightnessctl}/bin/brightnessctl -q -n set 10%-";
+        brightness_up_cmd = "${pkgs.brightnessctl}/bin/brightnessctl -q -n set +10%";
       };
-      # Autologin = {
-      # Session = "niri";
-      # User = username;
-      # };
+    };
+    sddm = {
+      enable = false;
+      # catppuccin.enable = true;
+      wayland.enable = true;
+      # autoNumlock = true;
+      # https://man.archlinux.org/man/sddm.conf.5
+      settings = {
+        Users = {
+          RememberLastUser = true;
+          RememberLastSession = true;
+        };
+        # Autologin = {
+        # Session = "niri";
+        # User = username;
+        # };
+      };
     };
   };
+
+  # # Enable the KDE Plasma Desktop Environment.
+  # services.displayManager.sddm = {
+  #   enable = true;
+  #   # catppuccin.enable = true;
+  #   wayland.enable = true;
+  #   # autoNumlock = true;
+  #   # https://man.archlinux.org/man/sddm.conf.5
+  #   settings = {
+  #     Users = {
+  #       RememberLastUser = true;
+  #       RememberLastSession = true;
+  #     };
+  #     # Autologin = {
+  #     # Session = "niri";
+  #     # User = username;
+  #     # };
+  #   };
+  # };
 
   services.desktopManager.gnome.enable = false;
   # Exclude applications installed with Gnome
@@ -380,7 +416,7 @@
     evince
   ];
 
-  services.desktopManager.plasma6.enable = true;
+  services.desktopManager.plasma6.enable = false;
 
   # TODO: change to en_US
   # Configure keymap in X11
@@ -485,10 +521,10 @@
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
-    rio
+    # rio
     cyme # a fancier `lsusb`
     psmisc
-    busybox
+    # busybox
     gnumake
     # mullvad-closest
     # rainfrog
@@ -516,7 +552,7 @@
     libva-utils # `vainfo`
     mozwire
     # Gaming
-    kitty
+    # kitty
     # mangohud
     # protonup
     # protonup-qt
@@ -527,7 +563,7 @@
     atool # {,de}compress various compression formats
     # helix # text editor
     git
-    gh
+    # gh
     # Linux
     # btrfs-progs # Tools to interact with btrfs file system partitions
     udev
@@ -543,10 +579,10 @@
     moreutils # `sponge` etc.
 
     # Nix(os) tools
-    hydra-check
-    nix-prefetch-scripts
-    nixfmt-rfc-style
-    nix-output-monitor # `nom`
+    # hydra-check
+    # nix-prefetch-scripts
+    # nixfmt-rfc-style
+    # nix-output-monitor # `nom`
     nvd # nix version diff
     cachix
     nix-du
@@ -556,10 +592,10 @@
     nix-health
     nix-inspect
     nix-janitor
-    statix # nix linter
-    deadnix # detect unused nix code
-    nixd # nix lsp
-    manix # TODO: what does it do?
+    # statix # nix linter
+    # deadnix # detect unused nix code
+    # nixd # nix lsp
+    # manix # TODO: what does it do?
     comma
     nurl
 
@@ -908,7 +944,7 @@
         ids = [ "*" ];
         settings = {
           main = {
-            capslock = "overload(control, esc)";
+            # capslock = "overload(control, esc)";
           };
         };
       };
@@ -979,7 +1015,7 @@
   #   # ignoreLid = false;
   # };
 
-  programs.bandwhich.enable = true;
+  # programs.bandwhich.enable = true;
 
   # TODO: check if works in wsl?
   services.envfs.enable = false; # use fusefs to resolve shebangs like #!/bin/bash that does not work on NixOS because of not being compliant with FHS standard

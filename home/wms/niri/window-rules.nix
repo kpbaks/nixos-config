@@ -143,5 +143,24 @@ in
       open-on-workspace = "mail";
       open-maximized = true;
     }
+    {
+      # https://github.com/YaLTeR/niri/wiki/Application-Issues#steam
+      matches = [
+        {
+          app-id = "steam";
+          title = "^notificationtoasts_\d+_desktop$";
+        }
+      ];
+      default-floating-position = {
+        x = 10;
+        y = 10;
+        relative-to = "bottom-right";
+      };
+    }
+
+    #     window-rule {
+    #     match app-id="steam" title=r#"^notificationtoasts_\d+_desktop$"#
+    #     default-floating-position x=10 y=10 relative-to="bottom-right"
+    # }
   ];
 }

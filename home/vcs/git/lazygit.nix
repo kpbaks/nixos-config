@@ -118,7 +118,7 @@ in
           key = "<c-a>";
           context = "files";
           description = "git absorb";
-          command = "${pkgs.git-absorb} --one-fixup-per-commit";
+          command = "${pkgs.git-absorb}/bin/git-absorb --one-fixup-per-commit";
           output = "logWithPty";
         }
         {
@@ -134,7 +134,14 @@ in
           key = "d"; # TODO: rebind build in 'd' to delete branch. d -> D
           context = "localBranches";
           output = "terminal";
-          command = "${git} branch --edit-description {{.SelectedLocalBranch | quote}}";
+          command = "${git} branch --edit-description {{.SelectedLocalBranch.Name | quote}}";
+        }
+        {
+          # key = "n";
+          key = "<c-n>";
+          context = "commits";
+          output = "terminal";
+          command = ''${git} notes edit --allow-empty {{.SelectedLocalCommit.Hash}}'';
         }
         # {
         #   key = "n";

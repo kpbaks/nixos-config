@@ -1,4 +1,6 @@
-target/
-.direnv/
+/target/
+/.direnv/
+/result/
+
 
 *.pem

@@ -43,10 +43,10 @@
         hotkey-overlay.title = "Manage Saved Wifi Networks";
         repeat = false;
       };
-      "Alt+Tab" = {
-        action = open-deeplink "extensions/vicinae/wm/switch-windows";
-        hotkey-overlay.title = "switch windows";
-        repeat = false;
-      };
+      # "Alt+Tab" = {
+      #   action = open-deeplink "extensions/vicinae/wm/switch-windows";
+      #   hotkey-overlay.title = "switch windows";
+      #   repeat = false;
+      # };
     };
 }
